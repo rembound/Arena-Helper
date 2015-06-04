@@ -1,4 +1,4 @@
-# Arena-Helper
+# Arena Helper
 
 Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [ADWCTA's Arena Tier List](http://www.heartharena.com/tierlist). The created deck can be saved to Hearthstone Deck Tracker.
 
