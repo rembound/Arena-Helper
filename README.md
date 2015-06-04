@@ -6,8 +6,8 @@ The plugin uses perceptual hashing to detect the Hearthstone arena heroes and ca
 
 ## How to Install
 
-1) Download the latest release from the [releases page](https://github.com/rembound/Arena-Helper/releases)
-2) Unzip the archive to the Plugins directory of Hearthstone Deck Tracker
+1) Download the latest release from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
+2) Unzip the archive to the Plugins directory of Hearthstone Deck Tracker  
 3) If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll.
 
 ## How to use
