@@ -404,6 +404,7 @@ namespace ArenaHelper
             // Save deck
             Deck deck = new Deck();
             deck.Name = arenadata.deckname;
+            deck.IsArenaDeck = true;
 
             foreach (var cardid in arenadata.pickedcards)
             {
@@ -602,7 +603,7 @@ namespace ArenaHelper
                 var hsrect = Helper.GetHearthstoneRect(false);
                 if (hsrect.Width > 0 && hsrect.Height > 0)
                 {
-                    fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height);
+                    fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), false);
                 }
                 else
                 {
