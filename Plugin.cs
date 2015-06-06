@@ -263,7 +263,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.1.1"); }
+            get { return new Version("0.1.2"); }
         }
 
         public MenuItem MenuItem
@@ -551,6 +551,7 @@ namespace ArenaHelper
 
             // Init state
             SetState(PluginState.SearchHeroes);
+            prevstate = state;
         }
 
         private void ClearDetected()
@@ -603,7 +604,7 @@ namespace ArenaHelper
                 var hsrect = Helper.GetHearthstoneRect(false);
                 if (hsrect.Width > 0 && hsrect.Height > 0)
                 {
-                    fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), false);
+                    fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), true);
                 }
                 else
                 {
