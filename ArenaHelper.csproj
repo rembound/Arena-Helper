@@ -43,7 +43,6 @@
     <Reference Include="Hearthstone Deck Tracker">
       <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
       <Private>False</Private>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="MahApps.Metro">
       <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
@@ -74,11 +73,18 @@
     <Compile Include="ArenaWindow.xaml.cs">
       <DependentUpon>ArenaWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AdviceOverlay.xaml.cs">
+      <DependentUpon>AdviceOverlay.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Card.xaml.cs">
       <DependentUpon>Card.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\OutlinedTextBlock.cs" />
+    <Compile Include="Controls\ValueOverlay.xaml.cs">
+      <DependentUpon>ValueOverlay.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Plugin.cs" />
+    <Compile Include="Plugins.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Update.cs" />
   </ItemGroup>
@@ -90,7 +96,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\AdviceOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Card.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ValueOverlay.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

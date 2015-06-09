@@ -6,6 +6,38 @@
                       xmlns:localcontrols="clr-namespace:ArenaHelper.Controls"
                       Title="Arena Helper" Height="255" MinHeight="255" MaxHeight="255" Width="400" MinWidth="400" MaxWidth="400"
                       Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Topmost="True" LocationChanged="MetroWindow_LocationChanged">
+    <controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            <Button Click="ButtonOptions_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="16" Height="16">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_settings}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock Margin="4" VerticalAlignment="Center" Text="Options" />
+                </StackPanel>
+            </Button>
+            <Button Click="ButtonAbout_Click">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="4" VerticalAlignment="Center" Text="About" />
+                </StackPanel>
+            </Button>
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>
+    <controls:MetroWindow.Flyouts>
+        <controls:FlyoutsControl Margin="{Binding TitleBarMargin, RelativeSource={RelativeSource AncestorType=local:ArenaWindow}}">
+            <controls:Flyout x:Name="FlyoutOptions" Header="Options" Position="Left" Width="400">
+                <StackPanel>
+                    <CheckBox x:Name="CheckBoxOverlay" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" Checked="CheckBoxOverlay_Checked" Unchecked="CheckBoxOverlay_Unchecked" Content="Show values in overlay" />
+                    <CheckBox x:Name="CheckBoxManual" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxManual_Checked" Unchecked="CheckBoxManual_Unchecked">
+                        <TextBlock TextWrapping="Wrap" VerticalAlignment="Top">Manual card picking<LineBreak />Pick a card in Hearthstone, afterwards, click the card in the Arena Helper window. Don't detect picks automatically.</TextBlock>
+                    </CheckBox>
+                </StackPanel>
+            </controls:Flyout>
+        </controls:FlyoutsControl>
+    </controls:MetroWindow.Flyouts>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -25,13 +57,13 @@
                 </WrapPanel>
 
                 <WrapPanel Grid.Column="1" VerticalAlignment="Center">
-                    <Button x:Name="Button1" Width="70" Content="New Arena" Margin="0 0 8 0" Click="Button1_Click" />
-                    <Button x:Name="Button2" Width="70" Content="Save Deck" Margin="0 0 8 0" Click="Button2_Click" />
+                    <Button x:Name="Button1" Width="70" Content="New Arena" Margin="0 0 8 0" Click="ButtonNewArena_Click" />
+                    <Button x:Name="Button2" Width="70" Content="Save Deck" Margin="0 0 8 0" Click="ButtonSave_Click" />
                 </WrapPanel>
             </Grid>
             <Separator/>
         </StackPanel>
-        <StackPanel x:Name="DetectingPanel" Grid.Row="1" Width="200" Visibility="Hidden">
+        <StackPanel x:Name="DetectingPanel" Grid.Row="1" Width="200" Visibility="Visible">
             <local:OutlinedTextBlock x:Name="DetectingHeader" HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="Title" Margin="0,4,0,0" />
             <TextBlock x:Name="DetectingText" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Margin="0,12,0,0">text</TextBlock>
         </StackPanel>
@@ -47,21 +79,21 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">
-                    <Border x:Name="HeroBorder0" Height="40" Width="40"  Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,16,0,0">
+                    <Border x:Name="HeroBorder0" Height="40" Width="40"  Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,16,0,0" MouseUp="HeroBorder0_MouseUp">
                         <Image x:Name="HeroImage0" Width="32" Height="32"  Margin="0,0,0,0" />
                     </Border>
                     <local:OutlinedTextBlock x:Name="Hero0" Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Paladin" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" TextAlignment="Left" FontSize="13" Margin="0,4,0,0" />
                 </StackPanel>
 
                 <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
-                    <Border x:Name="HeroBorder1" Height="40" Width="40" Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,16,0,0">
+                    <Border x:Name="HeroBorder1" Height="40" Width="40" Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,16,0,0" MouseUp="HeroBorder1_MouseUp">
                         <Image x:Name="HeroImage1" Width="32" Height="32"  Margin="0,0,0,0" />
                     </Border>
                     <local:OutlinedTextBlock x:Name="Hero1" Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Paladin" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" TextAlignment="Left" FontSize="13" Margin="0,4,0,0" />
                 </StackPanel>
 
                 <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center">
-                    <Border x:Name="HeroBorder2" Height="40" Width="40" Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,16,0,0">
+                    <Border x:Name="HeroBorder2" Height="40" Width="40" Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,16,0,0" MouseUp="HeroBorder2_MouseUp">
                         <Image x:Name="HeroImage2" Width="32" Height="32"  Margin="0,0,0,0" />
                     </Border>
                     <local:OutlinedTextBlock x:Name="Hero2" Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Paladin" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" TextAlignment="Left" FontSize="13" Margin="0,4,0,0" />
@@ -76,9 +108,9 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
                 <local:OutlinedTextBlock x:Name="Header" HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="header" Margin="0,4,0,0" />
-                <localcontrols:Card x:Name="CardControl0" DataContext="{Binding Card0}" HorizontalAlignment="Center" Margin="0,12,0,0" />
-                <localcontrols:Card x:Name="CardControl1" DataContext="{Binding Card1}" HorizontalAlignment="Center" Margin="0,4,0,0" />
-                <localcontrols:Card x:Name="CardControl2" DataContext="{Binding Card2}" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                <localcontrols:Card x:Name="CardControl0" DataContext="{Binding Card0}" HorizontalAlignment="Center" Margin="0,12,0,0" MouseUp="CardControl0_MouseUp" />
+                <localcontrols:Card x:Name="CardControl1" DataContext="{Binding Card1}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl1_MouseUp" />
+                <localcontrols:Card x:Name="CardControl2" DataContext="{Binding Card2}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl2_MouseUp" />
             </StackPanel>
             <StackPanel Grid.Column="1" Visibility="Visible" HorizontalAlignment="Center" Margin="32,0,0,0">
                 <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="Value" Margin="0,4,0,0" />
