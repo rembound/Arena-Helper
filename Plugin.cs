@@ -42,16 +42,6 @@ namespace ArenaHelper
             }
         }
 
-        public class CardInfo
-        {
-            public Card card;
-
-            public CardInfo(Card card)
-            {
-                this.card = card;
-            }
-        }
-
         public class CardTierInfo
         {
             public string id;
@@ -171,12 +161,12 @@ namespace ArenaHelper
         private const UInt16 VK_LBUTTON = 0x01; // left mouse button
         private const UInt16 VK_RBUTTON = 0x02; // right mouse button
 
-        enum PluginState { Idle, SearchHeroes, SearchBigHero, DetectedHeroes, SearchCards, DetectedCards, Done };
+        public enum PluginState { Idle, SearchHeroes, SearchBigHero, DetectedHeroes, SearchCards, DetectedCards, Done };
 
         private List<DetectedInfo> detectedcards = new List<DetectedInfo>();
         private List<DetectedInfo> detectedheroes = new List<DetectedInfo>();
         private List<DetectedInfo> detectedbighero = new List<DetectedInfo>();
-        private PluginState state;
+        private static PluginState state;
         private List<int> mouseindex = new List<int>();
         private ArenaData arenadata = new ArenaData();
         private string currentfilename = "";
@@ -188,10 +178,10 @@ namespace ArenaHelper
         private HearthstoneTextBlock testtext = null;
         private List<System.Windows.Controls.Image> testimages = new List<System.Windows.Controls.Image>();
         
-        private List<CardInfo> cardlist = new List<CardInfo>();
+        public static List<Card> cardlist = new List<Card>();
         private List<CardHashData> cardhashlist = new List<CardHashData>();
-        private List<HeroHashData> herohashlist = new List<HeroHashData>();
-        private List<CardTierInfo> cardtierlist = new List<CardTierInfo>();
+        public static List<HeroHashData> herohashlist = new List<HeroHashData>();
+        public static List<CardTierInfo> cardtierlist = new List<CardTierInfo>();
 
         private Bitmap fullcapture;
 
@@ -274,7 +264,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.2.0"); }
+            get { return new Version("0.2.1"); }
         }
 
         public MenuItem MenuItem
@@ -345,6 +335,7 @@ namespace ArenaHelper
                 ApplyConfig();
                 arenawindow.Closed += (sender, args) =>
                 {
+                    plugins.CloseArena(arenadata, state);
                     SaveConfig();
                     RemoveElements();
                     arenawindow = null;
@@ -542,12 +533,12 @@ namespace ArenaHelper
 
             foreach (var cardid in arenadata.pickedcards)
             {
-                CardInfo cardinfo = GetCard(cardid);
+                Card pickedcard = GetCard(cardid);
 
-                if (cardinfo == null)
+                if (pickedcard == null)
                     continue;
 
-                Card card = (Card)cardinfo.card.Clone();
+                Card card = (Card)pickedcard.Clone();
                 card.Count = 1;
 
                 // Find out hero
@@ -642,13 +633,18 @@ namespace ArenaHelper
                     }
                 }
 
+                // Resume arena
+                plugins.ResumeArena(arenadata, state);
+
                 UpdateTitle();
                 UpdateHero();
             }
             else
             {
+                // No arena found, started a new one
                 // Save the arena data
                 SaveArenaData();
+                plugins.NewArena(arenadata);
             }
         }
 
@@ -852,7 +848,7 @@ namespace ArenaHelper
         {
             state = newstate;
 
-            if (!stablearena)
+            if (!stablearena && state != PluginState.Done)
             {
                 ShowOverlay(false);
                 SetDetectingText("Detecting arena...", DetectionWarning);
@@ -1141,7 +1137,7 @@ namespace ArenaHelper
                 List<Card> newcards = new List<Card>();
                 for (int i = 0; i < 3; i++)
                 {
-                    newcards.Add(cardlist[detectedcards[i].index].card);
+                    newcards.Add(cardlist[detectedcards[i].index]);
                 }
 
                 // Show the cards
@@ -1197,7 +1193,7 @@ namespace ArenaHelper
             }
         }
 
-        private string GetCardValue(string id)
+        public string GetCardValue(string id)
         {
             string value = "";
             HeroHashData herodata = GetHero(arenadata.pickedhero);
@@ -1223,16 +1219,16 @@ namespace ArenaHelper
             testtext.Text += "\nPicking card " + (arenadata.pickedcards.Count + 1) + "/" + MaxCardCount;
             for (int i = 0; i < detectedcards.Count; i++)
             {
-                testtext.Text += "\nDetected " + i + ": " + cardlist[detectedcards[i].index].card.Name;
+                testtext.Text += "\nDetected " + i + ": " + cardlist[detectedcards[i].index].Name;
             }
 
             // Display picked cards
             for (int i = 0; i < arenadata.pickedcards.Count; i++)
             {
-                CardInfo card = GetCard(arenadata.pickedcards[i]);
+                Card card = GetCard(arenadata.pickedcards[i]);
                 if (card != null)
                 {
-                    testtext.Text += "\nPicked " + i + ": " + card.card.Name;
+                    testtext.Text += "\nPicked " + i + ": " + card.Name;
                 }
             }
 
@@ -1283,21 +1279,23 @@ namespace ArenaHelper
 
         private void PickCard(int pickindex)
         {
-            string cardid0 = cardlist[detectedcards[0].index].card.Id;
-            string cardid1 = cardlist[detectedcards[1].index].card.Id;
-            string cardid2 = cardlist[detectedcards[2].index].card.Id;
+            string cardid0 = cardlist[detectedcards[0].index].Id;
+            string cardid1 = cardlist[detectedcards[1].index].Id;
+            string cardid2 = cardlist[detectedcards[2].index].Id;
             arenadata.detectedcards.Add(new Tuple<string, string, string>(cardid0, cardid1, cardid2));
 
             // Add to pickedcards
             string cardid = "";
+            Card pickedcard = null;
             if (pickindex >= 0)
             {
-                cardid = cardlist[detectedcards[pickindex].index].card.Id;
+                pickedcard = cardlist[detectedcards[pickindex].index];
+                cardid = pickedcard.Id;
             }
             arenadata.pickedcards.Add(cardid);
             SaveArenaData();
 
-            plugins.CardPicked(arenadata, pickindex, cardid);
+            plugins.CardPicked(arenadata, pickindex, pickedcard);
 
             if (arenawindow != null)
             {
@@ -1317,10 +1315,10 @@ namespace ArenaHelper
             UpdateTitle();
         }
 
-        private CardInfo GetCard(string id)
+        public static Card GetCard(string id)
         {
             for (int i=0; i<cardlist.Count; i++) {
-                if (cardlist[i].card.Id == id) {
+                if (cardlist[i].Id == id) {
                     return cardlist[i];
                 }
             }
@@ -1328,7 +1326,7 @@ namespace ArenaHelper
             return null;
         }
 
-        private HeroHashData GetHero(string name)
+        public static HeroHashData GetHero(string name)
         {
             for (int i = 0; i < herohashlist.Count; i++)
             {
@@ -1341,7 +1339,7 @@ namespace ArenaHelper
             return null;
         }
 
-        private CardTierInfo GetCardTierInfo(string id)
+        public static CardTierInfo GetCardTierInfo(string id)
         {
             for (int i = 0; i < cardtierlist.Count; i++)
             {
@@ -1352,6 +1350,11 @@ namespace ArenaHelper
             }
 
             return null;
+        }
+
+        public static PluginState GetState()
+        {
+            return state;
         }
 
         private static int GetUndectectedCount(List<int> indices)
@@ -1402,7 +1405,7 @@ namespace ArenaHelper
                 testtext.Text += "\nHash" + i + ": " + string.Format("0x{0:X}", cardhash);
                 foreach (Tuple<int, int> cardindex in cardindices)
                 {
-                    testtext.Text += ", " + cardlist[cardindex.Item1].card.Name + " (" + cardindex.Item2 + ")";
+                    testtext.Text += ", " + cardlist[cardindex.Item1].Name + " (" + cardindex.Item2 + ")";
                 }
             }
             return indices;
@@ -1808,7 +1811,7 @@ namespace ArenaHelper
             foreach (var card in cards)
             {
                 // Add to the list
-                cardlist.Add(new CardInfo(card));
+                cardlist.Add((Card)card.Clone());
             }
 
             string cardhashesfile = Path.Combine(assemblylocation, "data", "cardhashes.json");

@@ -24,7 +24,7 @@ namespace TestPlugin
 
         public override Version Version
         {
-            get { return new Version("0.0.1"); }
+            get { return new Version("0.0.2"); }
         }
 
         public TestPlugin()
@@ -86,11 +86,11 @@ namespace TestPlugin
         // Called when a card is picked
         // arendata: As before
         // pickindex: index of the picked card in the range -1 to 2, if -1, no valid pick was detected
-        // cardid: id of the card like "CS2_029"
-        public override void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, string cardid)
+        // card: card information, null if invalid card
+        public override void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
         {
             // Do something with the information
-            Logger.WriteLine("Card Picked: " + cardid);
+            Logger.WriteLine("Card Picked: " + card.Name);
         }
 
         // Called when all cards are picked
@@ -99,6 +99,41 @@ namespace TestPlugin
         {
             // Do something with the information
             Logger.WriteLine("Done");
+        }
+
+        // Called when Arena Helper window is opened
+        // arendata: As before
+        // state: the current state of Arena Helper
+        public override void ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        {
+            Logger.WriteLine("Resuming Arena");
+            foreach (var cardid in arenadata.pickedcards)
+            {
+                Card card = ArenaHelper.Plugin.GetCard(cardid);
+                Logger.WriteLine(card.Name);
+            }
+
+            foreach (var heroname in arenadata.detectedheroes)
+            {
+                ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(heroname);
+                Logger.WriteLine("Detected hero: " + hero.name);
+            }
+
+            if (arenadata.pickedhero != "")
+            {
+                ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(arenadata.pickedhero);
+                Logger.WriteLine("Picked hero: " + hero.name);
+            }
+
+            Logger.WriteLine("State: " + ArenaHelper.Plugin.GetState().ToString());
+        }
+
+        // Called when Arena Helper window is closed
+        // arendata: As before
+        public override void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        {
+            // Closing the window, to maybe resume at a later time
+            Logger.WriteLine("Closing");
         }
     }
 }

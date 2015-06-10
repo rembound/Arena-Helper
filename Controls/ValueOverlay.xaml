@@ -10,6 +10,6 @@
         <local:OutlinedTextBlock x:Name="ValueText" VerticalAlignment="Bottom" HorizontalAlignment="Center"
                                  Text="text"
                                  FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT"
-                                 TextAlignment="Center" FontSize="24" />
+                                 TextAlignment="Center" FontSize="28" />
     </Grid>
 </UserControl>

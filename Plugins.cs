@@ -45,12 +45,22 @@ namespace AHPlugins
         // Called when a card is picked
         // arendata: As before
         // pickindex: index of the picked card in the range -1 to 2, if -1, no valid pick was detected
-        // cardid: id of the card like "CS2_029"
-        public virtual void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, string cardid) { }
+        // card: card information, null if invalid card
+        public virtual void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card) { }
 
         // Called when all cards are picked
         // arendata: As before
         public virtual void Done(ArenaHelper.Plugin.ArenaData arenadata) { }
+
+        // Called when Arena Helper window is opened
+        // arendata: As before
+        // state: the current state of Arena Helper
+        public virtual void ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state) {}
+
+        // Called when Arena Helper window is closed
+        // arendata: As before
+        // state: the current state of Arena Helper
+        public virtual void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state) { }
     }
 } 
 
@@ -167,11 +177,11 @@ namespace ArenaHelper
             }
         }
 
-        public void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, string cardid)
+        public void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
         {
             foreach (var plugin in plugins)
             {
-                plugin.CardPicked(arenadata, pickindex, cardid);
+                plugin.CardPicked(arenadata, pickindex, card);
                 return;
             }
         }
@@ -181,6 +191,24 @@ namespace ArenaHelper
             foreach (var plugin in plugins)
             {
                 plugin.Done(arenadata);
+                return;
+            }
+        }
+
+        public void ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        {
+            foreach (var plugin in plugins)
+            {
+                plugin.ResumeArena(arenadata, state);
+                return;
+            }
+        }
+
+        public void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        {
+            foreach (var plugin in plugins)
+            {
+                plugin.CloseArena(arenadata, state);
                 return;
             }
         }
