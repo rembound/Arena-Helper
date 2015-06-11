@@ -18,6 +18,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using MahApps.Metro.Controls.Dialogs;
+using System.Text.RegularExpressions;
 
 namespace ArenaHelper
 {
@@ -182,6 +183,8 @@ namespace ArenaHelper
         private List<CardHashData> cardhashlist = new List<CardHashData>();
         public static List<HeroHashData> herohashlist = new List<HeroHashData>();
         public static List<CardTierInfo> cardtierlist = new List<CardTierInfo>();
+
+        System.Windows.Shapes.Rectangle highlightcard = null;
 
         private Bitmap fullcapture;
 
@@ -409,6 +412,11 @@ namespace ArenaHelper
             if (show)
             {
                 vis = System.Windows.Visibility.Visible;
+            }
+
+            if ( highlightcard != null )
+            {
+                highlightcard.Visibility = vis;
             }
 
             foreach (var overlay in valueoverlays)
@@ -1129,6 +1137,70 @@ namespace ArenaHelper
             }
         }
 
+        private int findBestIndex(List<string> values)
+        {
+            // High light the best card.
+            int bestindex = 0;
+            double highestvalue = 0;
+            Regex rgx = new Regex(@"([\.\d]+)");
+            for (int i = 0; i < 3; i++)
+            {
+                // strip any junk
+                MatchCollection matches = rgx.Matches(values[i]);
+                if (matches.Count > 0)
+                {
+                    double value = 0;
+                    try
+                    {
+                        value = Convert.ToDouble(matches[0].ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.WriteLine("We got an exception " + e.Message);
+                    }
+                    if (value > highestvalue)
+                    {
+                        bestindex = i;
+                        highestvalue = value;
+                    }
+                }
+                else
+                {
+                    Logger.WriteLine("Failed to get valid score from: " + values[i]);
+                }
+            }
+            return bestindex;
+        }
+
+        private void highLightBestCard(int bestindex)
+        {
+            var hsrect = Helper.GetHearthstoneRect(false);
+
+            // just to be safe
+            if (highlightcard!=null)
+            {
+                Hearthstone_Deck_Tracker.API.Overlay.OverlayCanvas.Children.Remove(highlightcard);
+                highlightcard = null;
+            }
+            
+            // Get the position and size of the card
+            Point cardpos = GetHSPos(hsrect, (bestindex * cardwidth) + cardrect.X, cardrect.Y + 40, scalewidth, scaleheight);
+            Point cardsize = GetHSSize(hsrect, cardrect.Width, cardrect.Height-50, scalewidth, scaleheight);
+
+            highlightcard = new System.Windows.Shapes.Rectangle
+            {
+                Stroke = System.Windows.Media.Brushes.Red,
+                StrokeThickness = 10
+            };
+            highlightcard.Width = cardsize.X;
+            highlightcard.Height = cardsize.Y;
+
+            Canvas.SetLeft(highlightcard, cardpos.X);
+            Canvas.SetTop(highlightcard, cardpos.Y);
+
+            Hearthstone_Deck_Tracker.API.Overlay.OverlayCanvas.Children.Add(highlightcard);
+        }
+
         private void SearchCards(List<int> cardindices)
         {
             if (ConfirmDetected(detectedcards, cardindices, CardConfirmations) == 3)
@@ -1186,6 +1258,9 @@ namespace ArenaHelper
                     valueoverlays[i].ValueText.Text = values[i];
                 }
                 adviceoverlay.AdviceText.Text = advice;
+
+                int bestindex = findBestIndex(values);
+                highLightBestCard(bestindex);
 
                 arenawindow.Update();
 
@@ -1265,6 +1340,7 @@ namespace ArenaHelper
             if ((newcard || GetUndectectedCount(cardindices) == 3) && mouseindex.Count >= 1)
             {
                 // New card or no cards detected, the player picked a card
+
                 int pickindex = -1;
                 if (mouseindex.Count > 0)
                 {
@@ -1279,6 +1355,12 @@ namespace ArenaHelper
 
         private void PickCard(int pickindex)
         {
+            if (highlightcard != null)
+            {
+                Hearthstone_Deck_Tracker.API.Overlay.OverlayCanvas.Children.Remove(highlightcard);
+                highlightcard = null;
+            }
+
             string cardid0 = cardlist[detectedcards[0].index].Id;
             string cardid1 = cardlist[detectedcards[1].index].Id;
             string cardid2 = cardlist[detectedcards[2].index].Id;
@@ -1956,6 +2038,15 @@ namespace ArenaHelper
                 {
                     Hearthstone_Deck_Tracker.API.Overlay.OverlayCanvas.Children.Remove(testtext);
                     testtext = null;
+                }
+            }
+
+            if (highlightcard != null)
+            {
+                if (Helper.MainWindow.Overlay != null)
+                {
+                    Hearthstone_Deck_Tracker.API.Overlay.OverlayCanvas.Children.Remove(highlightcard);
+                    highlightcard = null;
                 }
             }
 
