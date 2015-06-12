@@ -8,7 +8,10 @@ The plugin uses perceptual hashing to detect the Hearthstone arena heroes and ca
 
 1) Download the latest release from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
 2) Unzip the archive to the Plugins directory of Hearthstone Deck Tracker  
-3) If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll.
+3) If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll.  
+4) If the plugin is missing the dll MSVCP110.dll, install the following Redistributable Packages:  
+[Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)](http://www.microsoft.com/en-us/download/details.aspx?id=8328)  
+[Microsoft Visual C++ 2010 SP1 Redistributable Package (x64)](http://www.microsoft.com/en-us/download/details.aspx?id=13523)
 
 ## How to use
 
