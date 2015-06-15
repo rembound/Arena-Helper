@@ -4,6 +4,10 @@ Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix3
 
 The plugin uses perceptual hashing to detect the Hearthstone arena heroes and cards. The technique is based on the article [Looks Like It](http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html). Implementation details of a similar project can be found here: [Hearthstone Image Recognition](https://github.com/wittenbe/Hearthstone-Image-Recognition).
 
+## Creating Plugins
+
+Arena Helper now has support for plugins within the plugin. If you are a site owner that has an API or if you want to create a website that integrates with Hearthstone to automatically detect the Arena cards and present a value and possible advice to the player, you can create your own plugin. Check out my article [How To Write Plugins For Arena Helper](http://rembound.com/articles/how-to-write-plugins-for-arena-helper) to read a tutorial on how to create such a plugin. If you want to see how it works immediately, you can find a TestPlugin project in the latest source code.
+
 ## How to Install
 
 1) Download the latest release from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
