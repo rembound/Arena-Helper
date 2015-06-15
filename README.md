@@ -48,3 +48,8 @@ All cards are picked. The deck can be saved to Hearthstone Deck Tracker, without
 All arena decks are saved in the AppData directory: HearthstoneDeckTracker\ArenaHelper\Decks
 If the plugin made a mistake, you can override or reset the cards and card picks manually by editing the .json files in the decks directory.
 The position of the Arena Helper window is saved automatically in a config file.
+
+## Support
+
+If you like to support me and the continued development of this plugin, any donations are greatly appreciated. Thank you for your support!  
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40rembound%2ecom&lc=NL&item_name=Rembound%2ecom&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
