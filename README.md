@@ -40,7 +40,7 @@ Arena Helper has detected the cards and displays the value from [ADWCTA's Arena 
 
 ![Arena Helper](http://i.imgur.com/olNe9D7.png)
 
-All cards are picked. The deck can be saved to Hearthstone Deck Tracker, without needing to use the Import function. The Arena Helper window can be closed.
+All cards are picked. The deck can be saved to Hearthstone Deck Tracker, without needing to use the Import function. The Arena Helper window can be closed. Make sure to check the deck for errors, because sometimes detection is not flawless.
 
 ![Arena Helper](http://i.imgur.com/AnPaN4L.png)
 
