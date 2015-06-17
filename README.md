@@ -18,7 +18,8 @@ Arena Helper now has support for plugins within the plugin. If you are a site ow
 5) If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll.  
 6) If the plugin is missing MSVCP120.dll, install the following Redistributable Package (Select vcredist_x86.exe):  
 [Visual C++ Redistributable Packages for Visual Studio 2013](http://www.microsoft.com/en-us/download/details.aspx?id=40784)  
-7) If it is not working you can enable a debug mode in the options window
+7) If it is not working you can enable a debug mode in the options window  
+8) If all else fails, copy the dlls from the x86 directory to the C:/windows/SysWOW64 directory.
 
 ## How to use
 
