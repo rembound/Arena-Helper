@@ -28,14 +28,17 @@ namespace ArenaHelper
         public OnEvent onbuttonsaveclick = null;
         public OnEvent onwindowlocation = null;
         public OnEvent onaboutclick = null;
+        public OnEvent onconfigurehero = null;
 
         public delegate void OnOverrideClick(int index);
         public OnOverrideClick onheroclick = null;
         public OnOverrideClick oncardclick = null;
+        public OnOverrideClick oncheroclick = null;
 
         public delegate void OnCheckbox(bool check);
         public OnCheckbox oncheckboxoverlay = null;
         public OnCheckbox oncheckboxmanual = null;
+        public OnCheckbox oncheckboxdebug = null;
 
         public bool initconfig = false;
 
@@ -44,6 +47,18 @@ namespace ArenaHelper
             InitializeComponent();
 
             DataContext = this;
+
+            // Add handlers
+            CHero0.heromouseup += CHero0MouseUp;
+            CHero1.heromouseup += CHero1MouseUp;
+            CHero2.heromouseup += CHero2MouseUp;
+            CHero3.heromouseup += CHero3MouseUp;
+            CHero4.heromouseup += CHero4MouseUp;
+            CHero5.heromouseup += CHero5MouseUp;
+            CHero6.heromouseup += CHero6MouseUp;
+            CHero7.heromouseup += CHero7MouseUp;
+            CHero8.heromouseup += CHero8MouseUp;
+            CHero9.heromouseup += CHero9MouseUp;
         }
 
         public Card Card0
@@ -175,6 +190,87 @@ namespace ArenaHelper
             }
         }
 
+
+        private void CHero0MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(0);
+            }
+        }
+
+        private void CHero1MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(1);
+            }
+        }
+
+        private void CHero2MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(2);
+            }
+        }
+
+        private void CHero3MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(3);
+            }
+        }
+
+        private void CHero4MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(4);
+            }
+        }
+
+        private void CHero5MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(5);
+            }
+        }
+
+        private void CHero6MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(6);
+            }
+        }
+
+        private void CHero7MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(7);
+            }
+        }
+
+        private void CHero8MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(8);
+            }
+        }
+
+        private void CHero9MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(9);
+            }
+        }
+
         private void CheckBoxOverlay_Checked(object sender, RoutedEventArgs e)
         {
             if (oncheckboxoverlay != null)
@@ -204,6 +300,31 @@ namespace ArenaHelper
             if (oncheckboxmanual != null)
             {
                 oncheckboxmanual(false);
+            }
+        }
+
+        private void CheckBoxDebug_Checked(object sender, RoutedEventArgs e)
+        {
+            if (oncheckboxdebug != null)
+            {
+                oncheckboxdebug(true);
+            }
+        }
+
+        private void CheckBoxDebug_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (oncheckboxdebug != null)
+            {
+                oncheckboxdebug(false);
+            }
+        }
+
+        private void ConfigureHero_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // Override hero detection
+            if (onconfigurehero != null)
+            {
+                onconfigurehero();
             }
         }
     }

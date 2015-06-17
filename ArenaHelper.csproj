@@ -31,14 +31,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV">
-      <HintPath>..\..\..\..\CSharp\EmguCV\bin\Emgu.CV.dll</HintPath>
+      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2132-rc1\bin\Emgu.CV.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Emgu.CV.OCR">
-      <HintPath>..\..\..\..\CSharp\EmguCV\bin\Emgu.CV.OCR.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.Util, Version=2.4.10.1940, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\CSharp\EmguCV\bin\Emgu.Util.dll</HintPath>
+    <Reference Include="Emgu.Util">
+      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2132-rc1\bin\Emgu.Util.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Hearthstone Deck Tracker">
       <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
@@ -79,6 +77,9 @@
     <Compile Include="Controls\Card.xaml.cs">
       <DependentUpon>Card.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Hero.xaml.cs">
+      <DependentUpon>Hero.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\OutlinedTextBlock.cs" />
     <Compile Include="Controls\ValueOverlay.xaml.cs">
       <DependentUpon>ValueOverlay.xaml</DependentUpon>
@@ -101,6 +102,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\Card.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Hero.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

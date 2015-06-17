@@ -18,6 +18,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using MahApps.Metro.Controls.Dialogs;
+using System.Text.RegularExpressions;
 
 namespace ArenaHelper
 {
@@ -161,7 +162,7 @@ namespace ArenaHelper
         private const UInt16 VK_LBUTTON = 0x01; // left mouse button
         private const UInt16 VK_RBUTTON = 0x02; // right mouse button
 
-        public enum PluginState { Idle, SearchHeroes, SearchBigHero, DetectedHeroes, SearchCards, DetectedCards, Done };
+        public enum PluginState { Idle, SearchHeroes, SearchBigHero, DetectedHeroes, SearchCards, SearchCardValues, DetectedCards, Done };
 
         private List<DetectedInfo> detectedcards = new List<DetectedInfo>();
         private List<DetectedInfo> detectedheroes = new List<DetectedInfo>();
@@ -195,10 +196,13 @@ namespace ArenaHelper
         // Arena detection
         Rectangle arenarect = new Rectangle(305, 0, 349, 69);
         ulong arenahash = 14739256890895383027;
-        ulong arenahash2 = 16000266435827628787; // Dark arena hash in PluginState.DetectedHeroes
+        ulong arenahash2 = 18342314164188135155; // Dark arena hash in PluginState.DetectedHeroes
         bool inarena = false;
         bool stablearena = false;
         Stopwatch arenastopwatch;
+
+        // Configure heroes
+        bool configurehero = false;
 
         // Portrait detection
         Rectangle portraitcroprect = new Rectangle(143, 321, 173, 107);
@@ -264,7 +268,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.2.1"); }
+            get { return new Version("0.3.0"); }
         }
 
         public MenuItem MenuItem
@@ -342,6 +346,9 @@ namespace ArenaHelper
                     configinit = false;
                 };
 
+                // Init
+                InitConfigureHero();
+
                 arenawindow.onbuttonnewarenaclick = new ArenaWindow.OnEvent(OnButtonNewArenaClick);
                 arenawindow.onbuttonsaveclick = new ArenaWindow.OnEvent(OnButtonSaveClick);
                 arenawindow.onwindowlocation = new ArenaWindow.OnEvent(OnWindowLocation);
@@ -349,9 +356,12 @@ namespace ArenaHelper
 
                 arenawindow.onheroclick = new ArenaWindow.OnOverrideClick(OnHeroClick);
                 arenawindow.oncardclick = new ArenaWindow.OnOverrideClick(OnCardClick);
+                arenawindow.onconfigurehero = new ArenaWindow.OnEvent(OnConfigureHero);
+                arenawindow.oncheroclick = new ArenaWindow.OnOverrideClick(OnCHeroClick);
 
                 arenawindow.oncheckboxoverlay = new ArenaWindow.OnCheckbox(OnCheckboxOverlay);
                 arenawindow.oncheckboxmanual = new ArenaWindow.OnCheckbox(OnCheckboxManual);
+                arenawindow.oncheckboxdebug = new ArenaWindow.OnCheckbox(OnCheckboxDebug);
 
                 // Get the latest arena data
                 string newestfilename = "";
@@ -365,6 +375,24 @@ namespace ArenaHelper
                 }
                 LoadArenaData(newestfilename);
             }
+        }
+
+        private void InitConfigureHero()
+        {
+            configurehero = false;
+
+            SetHeroControl(arenawindow.CHero0, herohashlist[0].name);
+            SetHeroControl(arenawindow.CHero1, herohashlist[1].name);
+            SetHeroControl(arenawindow.CHero2, herohashlist[2].name);
+            SetHeroControl(arenawindow.CHero3, herohashlist[3].name);
+            SetHeroControl(arenawindow.CHero4, herohashlist[4].name);
+            SetHeroControl(arenawindow.CHero5, herohashlist[5].name);
+            SetHeroControl(arenawindow.CHero6, herohashlist[6].name);
+            SetHeroControl(arenawindow.CHero7, herohashlist[7].name);
+            SetHeroControl(arenawindow.CHero8, herohashlist[8].name);
+
+            arenawindow.CHero9.HeroName.Text = "Cancel";
+            arenawindow.Update();
         }
 
         private void LoadConfig()
@@ -382,6 +410,7 @@ namespace ArenaHelper
                 // Set options
                 arenawindow.CheckBoxOverlay.IsChecked = configdata.overlay;
                 arenawindow.CheckBoxManual.IsChecked = configdata.manualclicks;
+                arenawindow.CheckBoxDebug.IsChecked = configdata.debug;
             }
 
             configinit = true;
@@ -424,7 +453,7 @@ namespace ArenaHelper
             if (!Directory.Exists(DataDir))
                 Directory.CreateDirectory(DataDir);
 
-            string json = JsonConvert.SerializeObject(configdata, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(configdata, Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(filename, json);
         }
 
@@ -448,12 +477,12 @@ namespace ArenaHelper
                 if (arenawindow != null)
                 {
                     var result = await arenawindow.ShowMessageAsync("About",
-                        "Thank you for using my plugin! This plugin was made by Rembound. Do you want to visit my site?",
+                        "Thank you for using my plugin! This plugin was made by Rembound. Do you want to visit my website?",
                         MessageDialogStyle.AffirmativeAndNegative, settings);
 
                     if (result == MessageDialogResult.Affirmative)
                     {
-                        Process.Start(@"http://rembound.com");
+                        Process.Start(@"http://rembound.com/?from=ArenaHelper");
                     }
                 }
             }
@@ -493,6 +522,37 @@ namespace ArenaHelper
 
         }
 
+        public void OnConfigureHero()
+        {
+            // Override hero detection
+            if (!configurehero)
+            {
+                configurehero = true;
+                SetState(state);
+            }
+            else
+            {
+                // Cancel
+                OnCHeroClick(9);
+            }
+
+        }
+
+        // Configure hero click
+        public void OnCHeroClick(int index)
+        {
+            configurehero = false;
+
+            if (index >= 0 && index < herohashlist.Count)
+            {
+                PickHero(index);
+            }
+            else
+            {
+                SetState(state);
+            }
+        }
+
         public void OnCheckboxOverlay(bool check)
         {
             if (configinit)
@@ -509,6 +569,16 @@ namespace ArenaHelper
             if (configinit)
             {
                 configdata.manualclicks = check;
+                SaveConfig();
+                ApplyConfig();
+            }
+        }
+
+        public void OnCheckboxDebug(bool check)
+        {
+            if (configinit)
+            {
+                configdata.debug = check;
                 SaveConfig();
                 ApplyConfig();
             }
@@ -579,7 +649,7 @@ namespace ArenaHelper
                 currentfilename = CreateDeckFilename();
             }
 
-            string json = JsonConvert.SerializeObject(arenadata, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(arenadata, Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(currentfilename, json);
         }
 
@@ -607,11 +677,21 @@ namespace ArenaHelper
                 if (arenadata.pickedhero != "")
                 {
                     // Hero is picked
-                    if (arenadata.pickedcards.Count == MaxCardCount) {
+                    if (arenadata.pickedcards.Count == MaxCardCount)
+                    {
                         // All cards picked
                         SetState(PluginState.Done);
-                    } else {
-                        // Not all cards picked
+                    }
+                    else if ((arenadata.detectedcards.Count - 1) == arenadata.pickedcards.Count)
+                    {
+                        // Cards detected, but not picked
+                        UpdateDetectedCards();
+                        SetState(PluginState.SearchCardValues);
+                    }
+                    else
+                    {
+                        // Not all cards picked, not picking a card
+                        // Search for new cards
                         SetState(PluginState.SearchCards);
                     }
                 }
@@ -655,9 +735,9 @@ namespace ArenaHelper
 
             ClearDetected();
 
-            arenawindow.HeroImage0.Source = null;
-            arenawindow.HeroImage1.Source = null;
-            arenawindow.HeroImage2.Source = null;
+            arenawindow.Hero0.HeroImage.Source = null;
+            arenawindow.Hero1.HeroImage.Source = null;
+            arenawindow.Hero2.HeroImage.Source = null;
 
             arenawindow.Card0 = null;
             arenawindow.Card1 = null;
@@ -789,7 +869,7 @@ namespace ArenaHelper
             Point advpos = GetHSPos(hsrect, cardrect.X, cardrect.Y + cardrect.Height - 8, scalewidth, scaleheight);
             //Point advsize = GetHSSize(hsrect, cardrect.Width, cardrect.Height, scalewidth, scaleheight);
             Canvas.SetLeft(adviceoverlay, advpos.X);
-            Canvas.SetTop(adviceoverlay, advpos.Y + 50);
+            Canvas.SetTop(adviceoverlay, advpos.Y + 52);
         }
 
         // Check if there are plugin updates
@@ -848,19 +928,28 @@ namespace ArenaHelper
         {
             state = newstate;
 
-            if (!stablearena && state != PluginState.Done)
+            if (configurehero)
             {
                 ShowOverlay(false);
-                SetDetectingText("Detecting arena...", DetectionWarning);
+                arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+            } else if (!stablearena && state != PluginState.Done)
+            {
+                ShowOverlay(false);
+                SetDetectingText("Detecting arena...", DetectionWarning, "");
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.SearchHeroes)
             {
                 ShowOverlay(false);
-                SetDetectingText("Detecting heroes...", DetectionWarning);
+                SetDetectingText("Detecting heroes...", DetectionWarning, "Override hero selection by clicking the rectangle in the top-left corner.");
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
             }
@@ -869,6 +958,7 @@ namespace ArenaHelper
                 ShowOverlay(false);
                 arenawindow.DetectedHeroesWarning.Text = "";
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Visible;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
             }
@@ -877,6 +967,7 @@ namespace ArenaHelper
                 ShowOverlay(false);
                 arenawindow.DetectedHeroesWarning.Text = "";
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Visible;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
             }
@@ -884,8 +975,18 @@ namespace ArenaHelper
             {
                 ShowOverlay(false);
                 ClearDetected();
-                SetDetectingText("Detecting cards...", DetectionWarning);
+                SetDetectingText("Detecting cards...", DetectionWarning, "");
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+            }
+            else if (newstate == PluginState.SearchCardValues)
+            {
+                ShowOverlay(false);
+                SetDetectingText("Getting card values...", DetectionWarning, "");
+                arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
             }
@@ -893,14 +994,16 @@ namespace ArenaHelper
             {
                 ShowOverlay(configdata.overlay);
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Visible;
             }
             else if (newstate == PluginState.Done)
             {
                 ShowOverlay(false);
-                SetDetectingText("Done", DoneMessage);
+                SetDetectingText("Done", DoneMessage, "");
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
             }
@@ -990,6 +1093,11 @@ namespace ArenaHelper
                     // Searching for cards
                     SearchCards(cardindices);
                 }
+                else if (state == PluginState.SearchCardValues)
+                {
+                    // Get card values
+                    SearchCardValues(cardindices);
+                }
                 else if (state == PluginState.DetectedCards)
                 {
                     // Cards detected, waiting
@@ -1068,30 +1176,30 @@ namespace ArenaHelper
         private void ChangeHeroSize(int index, int width, int height, int margin)
         {
             var newmargin = new System.Windows.Thickness(0, margin, 0, 0);
-            arenawindow.HeroBorder0.Margin = newmargin;
-            arenawindow.HeroBorder1.Margin = newmargin;
-            arenawindow.HeroBorder2.Margin = newmargin;
+            arenawindow.Hero0.HeroBorder.Margin = newmargin;
+            arenawindow.Hero1.HeroBorder.Margin = newmargin;
+            arenawindow.Hero2.HeroBorder.Margin = newmargin;
 
             switch (index)
             {
                 case 0:
-                    arenawindow.HeroImage0.Width = width;
-                    arenawindow.HeroImage0.Height = height;
-                    arenawindow.HeroBorder0.Width = width+8;
-                    arenawindow.HeroBorder0.Height = height+8;
+                    arenawindow.Hero0.HeroImage.Width = width;
+                    arenawindow.Hero0.HeroImage.Height = height;
+                    arenawindow.Hero0.HeroBorder.Width = width + 8;
+                    arenawindow.Hero0.HeroBorder.Height = height + 8;
                     break;
                 case 1:
-                    arenawindow.HeroImage1.Width = width;
-                    arenawindow.HeroImage1.Height = height;
-                    arenawindow.HeroBorder1.Width = width+8;
-                    arenawindow.HeroBorder1.Height = height+8;
+                    arenawindow.Hero1.HeroImage.Width = width;
+                    arenawindow.Hero1.HeroImage.Height = height;
+                    arenawindow.Hero1.HeroBorder.Width = width + 8;
+                    arenawindow.Hero1.HeroBorder.Height = height + 8;
 
                     break;
                 case 2:
-                    arenawindow.HeroImage2.Width = width;
-                    arenawindow.HeroImage2.Height = height;
-                    arenawindow.HeroBorder2.Width = width+8;
-                    arenawindow.HeroBorder2.Height = height+8;
+                    arenawindow.Hero2.HeroImage.Width = width;
+                    arenawindow.Hero2.HeroImage.Height = height;
+                    arenawindow.Hero2.HeroBorder.Width = width + 8;
+                    arenawindow.Hero2.HeroBorder.Height = height + 8;
                     break;
                 default:
                     break;
@@ -1108,15 +1216,7 @@ namespace ArenaHelper
             {
                 // No heroes detected, at least one card detected
                 // The player picked a hero
-                arenadata.pickedhero = herohashlist[detectedbighero[0].index].name;
-                SaveArenaData();
-
-                UpdateHero();
-
-                plugins.HeroPicked(arenadata, arenadata.pickedhero);
-
-                // Show the card panel
-                SetState(PluginState.SearchCards);
+                PickHero(detectedbighero[0].index);
             }
             else if (GetUndectectedCount(heroindices) == 0)
             {
@@ -1129,68 +1229,147 @@ namespace ArenaHelper
             }
         }
 
+        private void PickHero(int heroindex)
+        {
+            arenadata.pickedhero = herohashlist[heroindex].name;
+            SaveArenaData();
+
+            UpdateHero();
+
+            plugins.HeroPicked(arenadata, arenadata.pickedhero);
+
+            // Show the card panel
+            SetState(PluginState.SearchCards);
+        }
+
         private void SearchCards(List<int> cardindices)
         {
             if (ConfirmDetected(detectedcards, cardindices, CardConfirmations) == 3)
             {
                 // All cards detected
-                List<Card> newcards = new List<Card>();
-                for (int i = 0; i < 3; i++)
-                {
-                    newcards.Add(cardlist[detectedcards[i].index]);
-                }
 
-                // Show the cards
-                arenawindow.Card0 = newcards[0];
-                arenawindow.Card1 = newcards[1];
-                arenawindow.Card2 = newcards[2];
+                // Save detected cards
+                Card card0 = cardlist[detectedcards[0].index];
+                Card card1 = cardlist[detectedcards[1].index];
+                Card card2 = cardlist[detectedcards[2].index];
+                arenadata.detectedcards.Add(new Tuple<string, string, string>(card0.Id, card1.Id, card2.Id));
+                SaveArenaData();
 
-                // Add default values from the tierlist
-                List<string> values = new List<string>();
-                for (int i = 0; i < 3; i++)
-                {
-                    values.Add(GetCardValue(newcards[i].Id));
-                }
+                // Update the plugin
+                plugins.CardsDetected(arenadata, card0, card1, card2);
 
-                // Get the plugin result
-                List<string> pvalues = plugins.GetCardValues(arenadata, newcards, values);
+                UpdateDetectedCards();
 
-                // Override the values if the plugin has a result
-                string advice = "";
-                if (pvalues != null)
-                {
-                    if (pvalues.Count >= 3)
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            values[i] = pvalues[i];
-                        }
-                    }
+                SetState(PluginState.SearchCardValues);
 
-                    // Set advice text
-                    if (pvalues.Count >= 4)
-                    {
-                        //adviceoverlay.AdviceText.Text = "Pick one! The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. dsf sThe quick brown fox jumps over the lazy dog.The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. dsf sThe quick brown fox jumps over the lazy dog.";
-                        advice = pvalues[3];
-                    }
-                }
-
-                // Show the card value
-                arenawindow.Value0.Content = values[0];
-                arenawindow.Value1.Content = values[1];
-                arenawindow.Value2.Content = values[2];
-
-                // Set value text
-                for (int i=0; i<valueoverlays.Count; i++)
-                {
-                    valueoverlays[i].ValueText.Text = values[i];
-                }
-                adviceoverlay.AdviceText.Text = advice;
-
-                arenawindow.Update();
-
-                SetState(PluginState.DetectedCards);
+                // Call it immediately
+                SearchCardValues(cardindices);
             }
+        }
+
+        private void SearchCardValues(List<int> cardindices)
+        {
+            int lastindex = arenadata.detectedcards.Count - 1;
+            if (lastindex < 0)
+            {
+                // This shouldn't happen
+                return;
+            }
+
+            List<Card> newcards = new List<Card>();
+            newcards.Add(GetCard(arenadata.detectedcards[lastindex].Item1));
+            newcards.Add(GetCard(arenadata.detectedcards[lastindex].Item2));
+            newcards.Add(GetCard(arenadata.detectedcards[lastindex].Item3));
+
+            // Add default values from the tierlist
+            List<string> values = new List<string>();
+            for (int i = 0; i < 3; i++)
+            {
+                values.Add(GetCardValue(newcards[i].Id));
+            }
+
+            // Get the plugin result
+            List<string> pvalues = plugins.GetCardValues(arenadata, newcards, values);
+
+            // Override the values if the plugin has a result
+            string advice = "";
+            if (pvalues != null)
+            {
+                if (pvalues.Count >= 3)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        values[i] = pvalues[i];
+                    }
+                }
+
+                // Set advice text
+                if (pvalues.Count >= 4)
+                {
+                    advice = pvalues[3];
+                }
+            }
+
+            // Show the card value
+            arenawindow.Value0.Content = values[0];
+            arenawindow.Value1.Content = values[1];
+            arenawindow.Value2.Content = values[2];
+
+            // Get the actual numerical value
+            double maxvalue = 0;
+            int maxvalueindex = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                double dval = GetNumericalValue(values[i]);
+                if (i == 0 || dval > maxvalue)
+                {
+                    maxvalue = dval;
+                    maxvalueindex = i;
+                }
+            }
+
+            // Set value text
+            for (int i = 0; i < valueoverlays.Count; i++)
+            {
+                valueoverlays[i].ValueText.Text = values[i];
+                if (i == maxvalueindex)
+                {
+                    valueoverlays[i].GradientStop1.Color = System.Windows.Media.Color.FromArgb(0xFF, 0xf5, 0xdb, 0x4c);
+                    valueoverlays[i].GradientStop2.Color = System.Windows.Media.Color.FromArgb(0xFF, 0x8b, 0x68, 0x11);
+                }
+                else
+                {
+                    valueoverlays[i].GradientStop1.Color = System.Windows.Media.Color.FromArgb(0xFF, 0x51, 0x51, 0x51);
+                    valueoverlays[i].GradientStop2.Color = System.Windows.Media.Color.FromArgb(0xFF, 0x2D, 0x2D, 0x2D);
+                }
+
+                valueoverlays[i].UpdateLayout();
+            }
+            UpdateSize(); // Update size to center the labels
+            adviceoverlay.AdviceText.Text = advice;
+
+            arenawindow.Update();
+
+            SetState(PluginState.DetectedCards);
+
+            // Call it immediately
+            WaitCardPick(cardindices);
+        }
+
+        public double GetNumericalValue(string str)
+        {
+            // Strip everything except numbers and dots
+            var nstr = Regex.Replace(str, "[^0-9.]", "");
+            double dvalue = 0;
+            try
+            {
+                dvalue = System.Xml.XmlConvert.ToDouble(nstr);
+            }
+            catch (Exception)
+            {
+            }
+
+            return dvalue;
         }
 
         public string GetCardValue(string id)
@@ -1215,21 +1394,37 @@ namespace ArenaHelper
         {
             // All cards detected, wait for new pick
 
+            int lastindex = arenadata.detectedcards.Count - 1;
+            if (lastindex < 0)
+                return;
+
             // Display detected cards
             testtext.Text += "\nPicking card " + (arenadata.pickedcards.Count + 1) + "/" + MaxCardCount;
-            for (int i = 0; i < detectedcards.Count; i++)
+
+            List<Card> dcards = new List<Card>();
+            dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item1));
+            dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item2));
+            dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item3));
+            for (int i = 0; i < dcards.Count; i++)
             {
-                testtext.Text += "\nDetected " + i + ": " + cardlist[detectedcards[i].index].Name;
+                string cardname = "";
+                if (dcards[i] != null)
+                {
+                    cardname = dcards[i].Name;
+                }
+                testtext.Text += "\nDetected " + i + ": " + cardname;
             }
 
             // Display picked cards
             for (int i = 0; i < arenadata.pickedcards.Count; i++)
             {
                 Card card = GetCard(arenadata.pickedcards[i]);
+                string cardname = "";
                 if (card != null)
                 {
-                    testtext.Text += "\nPicked " + i + ": " + card.Name;
+                    cardname = card.Name;
                 }
+                testtext.Text += "\nPicked " + i + ": " + cardname;
             }
 
             // Skip this if we only allow manual picking
@@ -1247,50 +1442,72 @@ namespace ArenaHelper
                 testtext.Text += mouseindex[i] + " ";
             }
 
-
             // Check if a new card was detected
             bool newcard = false;
             for (int i = 0; i < 3; i++) {
                 int cardindex = cardindices[i];
                 if (cardindex != -1)
                 {
-                    if (detectedcards[i].index != cardindex)
+                    if (dcards[i] != null)
                     {
-                        newcard = true;
-                        break;
+                        if (dcards[i].Id != cardlist[cardindex].Id)
+                        {
+                            newcard = true;
+                            break;
+                        }
                     }
                 }
             }
 
-            if ((newcard || GetUndectectedCount(cardindices) == 3) && mouseindex.Count >= 1)
+            if ((newcard || GetUndectectedCount(cardindices) == 3))
             {
-                // New card or no cards detected, the player picked a card
-                int pickindex = -1;
-                if (mouseindex.Count > 0)
+                if (mouseindex.Count >= 1)
                 {
-                    pickindex = mouseindex[mouseindex.Count - 1];
-                }
-                PickCard(pickindex);
+                    // New card or no cards detected, the player picked a card
+                    PickCard(mouseindex[mouseindex.Count - 1]);
 
-                // Clear the mouse data to avoid double detection of clicks
-                mouseindex.Clear();
+                    // Clear the mouse data to avoid double detection of clicks
+                    mouseindex.Clear();
+                }
+                else
+                {
+                    // No click detected, missed a pick
+                    // TODO: Missed a pick
+                    Logger.WriteLine("Missed a pick");
+                    PickCard(-1);
+                }
             }
         }
 
         private void PickCard(int pickindex)
         {
-            string cardid0 = cardlist[detectedcards[0].index].Id;
-            string cardid1 = cardlist[detectedcards[1].index].Id;
-            string cardid2 = cardlist[detectedcards[2].index].Id;
-            arenadata.detectedcards.Add(new Tuple<string, string, string>(cardid0, cardid1, cardid2));
+            int lastindex = arenadata.detectedcards.Count - 1;
+            if (lastindex < 0)
+                return;
 
             // Add to pickedcards
             string cardid = "";
             Card pickedcard = null;
-            if (pickindex >= 0)
+            if (pickindex >= 0 && pickindex < 3)
             {
-                pickedcard = cardlist[detectedcards[pickindex].index];
-                cardid = pickedcard.Id;
+                List<Card> dcards = new List<Card>();
+                dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item1));
+                dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item2));
+                dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item3));
+
+                pickedcard = dcards[pickindex];
+                if (pickedcard != null)
+                {
+                    cardid = pickedcard.Id;
+                }
+                else
+                {
+                    pickindex = -1;
+                }
+            }
+            else
+            {
+                pickindex = -1;
             }
             arenadata.pickedcards.Add(cardid);
             SaveArenaData();
@@ -1317,9 +1534,14 @@ namespace ArenaHelper
 
         public static Card GetCard(string id)
         {
-            for (int i=0; i<cardlist.Count; i++) {
-                if (cardlist[i].Id == id) {
-                    return cardlist[i];
+            if (id != "")
+            {
+                for (int i = 0; i < cardlist.Count; i++)
+                {
+                    if (cardlist[i].Id == id)
+                    {
+                        return cardlist[i];
+                    }
                 }
             }
 
@@ -1328,11 +1550,14 @@ namespace ArenaHelper
 
         public static HeroHashData GetHero(string name)
         {
-            for (int i = 0; i < herohashlist.Count; i++)
+            if (name != "")
             {
-                if (herohashlist[i].name == name)
+                for (int i = 0; i < herohashlist.Count; i++)
                 {
-                    return herohashlist[i];
+                    if (herohashlist[i].name == name)
+                    {
+                        return herohashlist[i];
+                    }
                 }
             }
 
@@ -1341,11 +1566,14 @@ namespace ArenaHelper
 
         public static CardTierInfo GetCardTierInfo(string id)
         {
-            for (int i = 0; i < cardtierlist.Count; i++)
+            if (id != "")
             {
-                if (cardtierlist[i].id == id)
+                for (int i = 0; i < cardtierlist.Count; i++)
                 {
-                    return cardtierlist[i];
+                    if (cardtierlist[i].id == id)
+                    {
+                        return cardtierlist[i];
+                    }
                 }
             }
 
@@ -1467,10 +1695,11 @@ namespace ArenaHelper
             arenawindow.DeckName.Content = arenadata.deckname;
         }
 
-        private void SetDetectingText(string title, string text)
+        private void SetDetectingText(string title, string text, string text2)
         {
             arenawindow.DetectingHeader.Text = title;
             arenawindow.DetectingText.Text = text;
+            arenawindow.DetectingText2.Text = text2;
         }
 
         private void UpdateHero()
@@ -1491,23 +1720,39 @@ namespace ArenaHelper
             if (arenadata.detectedheroes.Count != 3)
                 return;
 
-            // All heroes detected
-            HeroHashData hero0 = GetHero(arenadata.detectedheroes[0]);
-            HeroHashData hero1 = GetHero(arenadata.detectedheroes[1]);
-            HeroHashData hero2 = GetHero(arenadata.detectedheroes[2]);
+            // All heroes detected, show them
+            SetHeroControl(arenawindow.Hero0, arenadata.detectedheroes[0]);
+            SetHeroControl(arenawindow.Hero1, arenadata.detectedheroes[1]);
+            SetHeroControl(arenawindow.Hero2, arenadata.detectedheroes[2]);
 
-            if (hero0 == null || hero1 == null || hero2 == null)
+            // Update window
+            arenawindow.Update();
+        }
+
+        private void UpdateDetectedCards()
+        {
+            int lastindex = arenadata.detectedcards.Count - 1;
+            if (lastindex < 0)
                 return;
 
-            // Show the heroes
-            arenawindow.HeroImage0.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero0.image, UriKind.Relative));
-            arenawindow.HeroImage1.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero1.image, UriKind.Relative));
-            arenawindow.HeroImage2.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero2.image, UriKind.Relative));
+            // All cards detected, show them
+            arenawindow.Card0 = GetCard(arenadata.detectedcards[lastindex].Item1);
+            arenawindow.Card1 = GetCard(arenadata.detectedcards[lastindex].Item2);
+            arenawindow.Card2 = GetCard(arenadata.detectedcards[lastindex].Item3);
 
-            arenawindow.Hero0.Text = hero0.name;
-            arenawindow.Hero1.Text = hero1.name;
-            arenawindow.Hero2.Text = hero2.name;
+            // Update window
             arenawindow.Update();
+        }
+
+        private void SetHeroControl(Controls.Hero herocontrol, string heroname)
+        {
+            HeroHashData hero = GetHero(heroname);
+
+            if (hero == null)
+                return;
+
+            herocontrol.HeroImage.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero.image, UriKind.Relative));
+            herocontrol.HeroName.Text = hero.name;
         }
 
         private void CheckMouse()
@@ -1655,8 +1900,12 @@ namespace ArenaHelper
                     System.Windows.Controls.Image imagecontrol = testimages[0];
                     hash = GetImageHash(capture, ref imagecontrol);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    if (testtext != null)
+                    {
+                        testtext.Text = "Error4: " + e.Message + "\n" + e.ToString();
+                    }
                 }
             }
 
@@ -1671,21 +1920,22 @@ namespace ArenaHelper
             Image<Gray, float> sourceimage = new Image<Gray, float>(sourcebm);
 
             // Apply a convolution filter
-            Matrix<float> kernel = ((double)1 / 16) * new Matrix<float>(new float[4, 4] { { 1, 1, 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 }, { 1, 1, 1, 1 } });
-            Point anchor = new Point(-1, -1);
-            CvInvoke.cvFilter2D(sourceimage, sourceimage, kernel, anchor);
+            CvInvoke.Blur(sourceimage, sourceimage, new Size(4, 4), new Point(-1, -1));
 
             // Show image for debugging
             Image<Bgra, Byte> convimage = Image<Bgra, Byte>.FromIplImagePtr(sourceimage);
             ShowBitmap(convimage.ToBitmap(), ref imagecontrol);
 
             // Resize
-            sourceimage = sourceimage.Resize(64, 64, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
+            Image<Gray, float> resimage = new Image<Gray, float>(new Size(64, 64));
+            CvInvoke.Resize(sourceimage, resimage, new Size(64, 64));
+            ShowBitmap(resimage.ToBitmap(), ref imagecontrol);
 
             // DCT
-            IntPtr compleximage = CvInvoke.cvCreateImage(sourceimage.Size, Emgu.CV.CvEnum.IPL_DEPTH.IPL_DEPTH_32F, 1);
-            CvInvoke.cvDCT(sourceimage, compleximage, Emgu.CV.CvEnum.CV_DCT_TYPE.CV_DXT_FORWARD);
-            Image<Gray, float> dctimage = Image<Gray, float>.FromIplImagePtr(compleximage);
+            IntPtr compleximage = CvInvoke.cvCreateImage(resimage.Size, Emgu.CV.CvEnum.IplDepth.IplDepth32F, 1);
+            CvInvoke.Dct(resimage, resimage, Emgu.CV.CvEnum.DctType.Forward);
+
+            Image<Gray, float> dctimage = Image<Gray, float>.FromIplImagePtr(resimage);
 
             // Calculate the mean
             double mean = 0;

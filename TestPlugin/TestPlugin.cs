@@ -24,7 +24,7 @@ namespace TestPlugin
 
         public override Version Version
         {
-            get { return new Version("0.0.2"); }
+            get { return new Version("0.0.4"); }
         }
 
         public TestPlugin()
@@ -46,7 +46,8 @@ namespace TestPlugin
             // Add the three card values
             for (int i = 0; i < 3; i++)
             {
-                values.Add("p" + i.ToString() + " " + defaultvalues[i]);
+                // Add the prefix "p" to the default values as a test
+                values.Add("p" + defaultvalues[i]);
             }
 
             // Optionally add an advice as a 4th list element
@@ -83,6 +84,17 @@ namespace TestPlugin
             Logger.WriteLine("Hero Picked: " + heroname);
         }
 
+        // Called when the cards are detected
+        // arendata: As before
+        // card0: card 0
+        // card1: card 1
+        // card2: card 2
+        public override void CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2)
+        {
+            // Do something with the information
+            Logger.WriteLine("Cards Detected: " + card0.Name + ", " + card1.Name + ", " + card2.Name);
+        }
+
         // Called when a card is picked
         // arendata: As before
         // pickindex: index of the picked card in the range -1 to 2, if -1, no valid pick was detected
@@ -90,7 +102,12 @@ namespace TestPlugin
         public override void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
         {
             // Do something with the information
-            Logger.WriteLine("Card Picked: " + card.Name);
+            string cardname = "";
+            if (card != null)
+            {
+                cardname = card.Name;
+            }
+            Logger.WriteLine("Card Picked: " + cardname);
         }
 
         // Called when all cards are picked
@@ -110,7 +127,12 @@ namespace TestPlugin
             foreach (var cardid in arenadata.pickedcards)
             {
                 Card card = ArenaHelper.Plugin.GetCard(cardid);
-                Logger.WriteLine(card.Name);
+                string cardname = "-";
+                if (card != null)
+                {
+                    cardname = card.Name;
+                }
+                Logger.WriteLine(cardname);
             }
 
             foreach (var heroname in arenadata.detectedheroes)

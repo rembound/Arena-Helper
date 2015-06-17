@@ -42,6 +42,13 @@ namespace AHPlugins
         // heroname: name of the hero
         public virtual void HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname) { }
 
+        // Called when the cards are detected
+        // arendata: As before
+        // card0: card 0
+        // card1: card 1
+        // card2: card 2
+        public virtual void CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2) { }
+
         // Called when a card is picked
         // arendata: As before
         // pickindex: index of the picked card in the range -1 to 2, if -1, no valid pick was detected
@@ -62,7 +69,7 @@ namespace AHPlugins
         // state: the current state of Arena Helper
         public virtual void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state) { }
     }
-} 
+}
 
 namespace ArenaHelper
 {
@@ -173,6 +180,15 @@ namespace ArenaHelper
             foreach (var plugin in plugins)
             {
                 plugin.HeroPicked(arenadata, heroname);
+                return;
+            }
+        }
+
+        public void CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2)
+        {
+            foreach (var plugin in plugins)
+            {
+                plugin.CardsDetected(arenadata, card0, card1, card2);
                 return;
             }
         }

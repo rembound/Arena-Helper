@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="ArenaHelper.Controls.Hero"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ArenaHelper"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="200">
+    <StackPanel VerticalAlignment="Center">
+        <Border x:Name="HeroBorder" Height="40" Width="40"  Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,0,0,0" MouseUp="Hero_MouseUp">
+            <Image x:Name="HeroImage" Width="32" Height="32"  Margin="0,0,0,0" />
+        </Border>
+        <local:OutlinedTextBlock x:Name="HeroName" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Paladin" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" TextAlignment="Left" FontSize="13" Margin="0,4,0,0" />
+    </StackPanel>
+</UserControl>

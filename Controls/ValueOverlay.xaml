@@ -5,11 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ArenaHelper"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Width="150">
-        <local:OutlinedTextBlock x:Name="ValueText" VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                                 Text="text"
-                                 FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT"
-                                 TextAlignment="Center" FontSize="28" />
+             d:DesignHeight="200" d:DesignWidth="300">
+    <Grid HorizontalAlignment="Center">
+        <Border VerticalAlignment="Top" BorderBrush="#FF000000" BorderThickness="1,1,1,1" CornerRadius="8,8,8,8">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0.5,0.5" EndPoint="0.5,1" SpreadMethod="Pad" ColorInterpolationMode="SRgbLinearInterpolation" >
+                    <GradientStop x:Name="GradientStop1" Color="#fff5db4c"  Offset="0" />
+                    <GradientStop x:Name="GradientStop2" Color="#ff8b6811" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <local:OutlinedTextBlock x:Name="ValueText" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="8,0,8,2"
+                            Text="text"
+                            FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT"
+                            TextAlignment="Center" FontSize="28" />
+        </Border>
     </Grid>
 </UserControl>
