@@ -13,13 +13,12 @@ Arena Helper now has support for plugins within the plugin. If you are a site ow
 1) Download the latest release from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
 2) Unblock the zip file before unzipping, by [right-clicking it and choosing properties](http://blogs.msdn.com/b/delay/p/unblockingdownloadedfile.aspx):
 ![Unblock](http://blogs.msdn.com/cfs-file.ashx/__key/CommunityServer-Blogs-Components-WeblogFiles/00-00-00-60-92-metablogapi/1425.FilePropertiesUnblock.png)  
-3) Unzip the archive to the Plugins directory of Hearthstone Deck Tracker  
-4) If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll.  
-5) If the plugin is missing the dll MSVCP110.dll, install the following Redistributable Packages:  
-[Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)](http://www.microsoft.com/en-us/download/details.aspx?id=8328)  
-[Microsoft Visual C++ 2010 SP1 Redistributable Package (x64)](http://www.microsoft.com/en-us/download/details.aspx?id=13523)  
-6) If it is not working you can enable a debug mode to see what is wrong:
->You can enable some on-screen debug information by going to the AppData directory: >HearthstoneDeckTracker\ArenaHelper\ opening arenahelper.json and modifying: "debug": true
+3) Make sure you remove any old versions of the ArenaHelper directory in the plugins directory of Hearthstone Deck Tracker completely, before upgrading versions.  
+4) Unzip the archive to the Plugins directory of Hearthstone Deck Tracker  
+5) If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll. 
+6) If the plugin is missing MSVCP120.dll, install the following Redistributable Package (Select vcredist_x86.exe):  
+[Visual C++ Redistributable Packages for Visual Studio 2013](http://www.microsoft.com/en-us/download/details.aspx?id=40784)  
+7) If it is not working you can enable a debug mode in the options window
 
 ## How to use
 
