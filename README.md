@@ -33,13 +33,17 @@ When you see that a detected hero becomes bigger in the Arena Helper window, you
 
 ![Arena Helper](http://i.imgur.com/aMFJba9.png)
 
+If hero detection doesn't work, you can use the manual hero selection override by clicking on the top-left portrait rectangle.
+
+![Arena Helper](http://i.imgur.com/NLMyHbv.png)
+
 Wait for the plugin to finish detecting the cards.
 
 ![Arena Helper](http://i.imgur.com/ShfMZnw.png)
 
-Arena Helper has detected the cards and displays the value from [ADWCTA's Arena Tier List](http://www.heartharena.com/tierlist).
+Arena Helper has detected the cards and displays the value from [ADWCTA's Arena Tier List](http://www.heartharena.com/tierlist) in the window and the overlay.
 
-![Arena Helper](http://i.imgur.com/olNe9D7.png)
+![Arena Helper](http://i.imgur.com/5G7qDQL.png)
 
 All cards are picked. The deck can be saved to Hearthstone Deck Tracker, without needing to use the Import function. The Arena Helper window can be closed. Make sure to check the deck for errors, because sometimes detection is not flawless.
 
