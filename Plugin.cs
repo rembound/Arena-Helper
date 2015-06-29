@@ -1358,15 +1358,11 @@ namespace ArenaHelper
 
         public double GetNumericalValue(string str)
         {
-            // Strip everything except numbers and dots
-            var nstr = Regex.Replace(str, "[^0-9.]", "");
             double dvalue = 0;
-            try
+            var match = Regex.Match(str, @"\d+(?:\.\d+)?");
+            if (match.Success)
             {
-                dvalue = System.Xml.XmlConvert.ToDouble(nstr);
-            }
-            catch (Exception)
-            {
+                Double.TryParse(match.Value, out dvalue);
             }
 
             return dvalue;
