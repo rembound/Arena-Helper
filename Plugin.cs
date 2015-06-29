@@ -586,9 +586,12 @@ namespace ArenaHelper
 
         public void OnWindowLocation()
         {
-            // Set window location
-            configdata.windowx = (int)arenawindow.Left;
-            configdata.windowy = (int)arenawindow.Top;
+            // Set window location if not minimized
+            if (arenawindow.Left > -32000 && arenawindow.Top > -32000)
+            {
+                configdata.windowx = (int)arenawindow.Left;
+                configdata.windowy = (int)arenawindow.Top;
+            }
 
             // Don't save yet
             //SaveConfig();
