@@ -59,11 +59,17 @@ namespace ArenaHelper
 
         public class HashData
         {
-            public ulong hash;
+            public List<ulong> hashes;
 
-            public HashData(ulong hash)
+            public HashData(params ulong[] hashes)
             {
-                this.hash = hash;
+                this.hashes = new List<ulong>();
+
+                // Store hashes
+                for (int i = 0; i < hashes.Length; i++)
+                {
+                    this.hashes.Add(hashes[i]);
+                }
             }
         }
 
@@ -84,8 +90,8 @@ namespace ArenaHelper
             public string name;
             public string image;
 
-            public HeroHashData(int index, string name, ulong hash, string image)
-                : base(hash)
+            public HeroHashData(int index, string name, string image, params ulong[] hashes)
+                : base(hashes)
             {
                 this.index = index;
                 this.name = name;
@@ -228,6 +234,8 @@ namespace ArenaHelper
         private const int HeroConfirmations = 3;
         private const int CardConfirmations = 3;
         private const int BigHeroConfirmations = 0; // Confirm immediately
+        private const int maxcarddistance = 10;
+        private const int maxherodistance = 14;
         private const string DetectionWarning = "Please make sure nothing overlaps the arena heroes and cards and the Hearthstone window has the focus. Don't make a selection yet!";
         private const string DoneMessage = "All cards are picked. You can start a new arena run or save the deck.";
         private const string ConfigFile = "arenahelper.json";
@@ -284,15 +292,15 @@ namespace ArenaHelper
 
             // Set hashes
             herohashlist.Clear();
-            herohashlist.Add(new HeroHashData(0, "Warrior", 13776678289873991291, "warrior_small.png"));
-            herohashlist.Add(new HeroHashData(1, "Shaman", 18366959783178990451, "shaman_small.png"));
-            herohashlist.Add(new HeroHashData(2, "Rogue", 5643619427529904809, "rogue_small.png"));
-            herohashlist.Add(new HeroHashData(3, "Paladin", 11505795398351105139, "paladin_small.png"));
-            herohashlist.Add(new HeroHashData(4, "Hunter", 2294799430464257123, "hunter_small.png"));
-            herohashlist.Add(new HeroHashData(5, "Druid", 5433851923975358071, "druid_small.png"));
-            herohashlist.Add(new HeroHashData(6, "Warlock", 10186248321710093033, "warlock_small.png"));
-            herohashlist.Add(new HeroHashData(7, "Mage", 15770007155810004267, "mage_small.png"));
-            herohashlist.Add(new HeroHashData(8, "Priest", 15052908377040876499, "priest_small.png"));
+            herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 13071189497635732127, 12080542990295427731)); // Garrosh, Magni small, Magni big
+            herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451));
+            herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809));
+            herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139));
+            herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123));
+            herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433851923975358071));
+            herohashlist.Add(new HeroHashData(6, "Warlock", "warlock_small.png", 10186248321710093033));
+            herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373)); // Jaina, Medivh small, Medivh big
+            herohashlist.Add(new HeroHashData(8, "Priest", "priest_small.png", 15052908377040876499));
 
             AddMenuItem();
 
@@ -323,6 +331,10 @@ namespace ArenaHelper
             }
             else
             {
+                // Reset window position when reactivating
+                arenawindow.Left = 100;
+                arenawindow.Top = 100;
+                arenawindow.WindowState = System.Windows.WindowState.Normal;
                 arenawindow.Activate();
             }
         }
@@ -340,6 +352,15 @@ namespace ArenaHelper
                 arenawindow.Closed += (sender, args) =>
                 {
                     plugins.CloseArena(arenadata, state);
+
+                    // Save window location
+                    if (arenawindow.WindowState != System.Windows.WindowState.Minimized)
+                    {
+                        // Set window location
+                        configdata.windowx = (int)arenawindow.Left;
+                        configdata.windowy = (int)arenawindow.Top;
+                    }
+
                     SaveConfig();
                     RemoveElements();
                     arenawindow = null;
@@ -351,7 +372,6 @@ namespace ArenaHelper
 
                 arenawindow.onbuttonnewarenaclick = new ArenaWindow.OnEvent(OnButtonNewArenaClick);
                 arenawindow.onbuttonsaveclick = new ArenaWindow.OnEvent(OnButtonSaveClick);
-                arenawindow.onwindowlocation = new ArenaWindow.OnEvent(OnWindowLocation);
                 arenawindow.onaboutclick = new ArenaWindow.OnEvent(OnAboutClick);
 
                 arenawindow.onheroclick = new ArenaWindow.OnOverrideClick(OnHeroClick);
@@ -582,16 +602,6 @@ namespace ArenaHelper
                 SaveConfig();
                 ApplyConfig();
             }
-        }
-
-        public void OnWindowLocation()
-        {
-            // Set window location
-            configdata.windowx = (int)arenawindow.Left;
-            configdata.windowy = (int)arenawindow.Top;
-
-            // Don't save yet
-            //SaveConfig();
         }
 
         private void SaveDeck()
@@ -1358,6 +1368,13 @@ namespace ArenaHelper
 
         public double GetNumericalValue(string str)
         {
+            // Ignore everything after the first space
+            int space = str.IndexOf(' ');
+            if (space != -1)
+            {
+                str = str.Substring(0, space);
+            }
+
             // Strip everything except numbers and dots
             var nstr = Regex.Replace(str, "[^0-9.]", "");
             double dvalue = 0;
@@ -1619,7 +1636,7 @@ namespace ArenaHelper
             for (int i = 0; i < 3; i++)
             {
                 ulong cardhash = GetScreenCardHash(i);
-                List<Tuple<int, int>> cardindices = FindHashIndex(cardhash, cardhashlist);
+                List<Tuple<int, int>> cardindices = FindHashIndex(cardhash, cardhashlist, maxcarddistance);
 
                 if (cardindices.Count == 1)
                 {
@@ -1645,7 +1662,7 @@ namespace ArenaHelper
             for (int i = 0; i < 3; i++)
             {
                 ulong herohash = GetScreenHeroHash(i);
-                List<Tuple<int, int>> heroindices = FindHashIndex(herohash, herohashlist);
+                List<Tuple<int, int>> heroindices = FindHashIndex(herohash, herohashlist, maxherodistance);
                 if (heroindices.Count == 1)
                 {
                     indices.Add(heroindices[0].Item1);
@@ -1668,7 +1685,7 @@ namespace ArenaHelper
             List<int> indices = new List<int>();
 
             ulong bigherohash = GetScreenHash(portraitbigcroprect, scalewidth, scaleheight);
-            List<Tuple<int, int>> bigheroindices = FindHashIndex(bigherohash, herohashlist);
+            List<Tuple<int, int>> bigheroindices = FindHashIndex(bigherohash, herohashlist, maxherodistance);
             if (bigheroindices.Count == 1)
             {
                 indices.Add(bigheroindices[0].Item1);
@@ -1993,7 +2010,7 @@ namespace ArenaHelper
             return distance;
         }
 
-        private List<Tuple<int, int>> FindHashIndex(ulong hash, IEnumerable<HashData> hashlist)
+        private List<Tuple<int, int>> FindHashIndex(ulong hash, IEnumerable<HashData> hashlist, int maxdistance)
         {
             int bestindex = -1;
             int bestdistance = 100;
@@ -2002,22 +2019,25 @@ namespace ArenaHelper
             int i = 0;
             foreach (var item in hashlist)
             {
-                //int distance = GetHashDistance(hash, hashlist[i].hash);
-                int distance = GetHashDistance(hash, item.hash);
-                if (distance < 10)
+                // Check all item hashes
+                foreach (var itemhash in item.hashes)
                 {
-                    if (distance < bestdistance)
+                    int distance = GetHashDistance(hash, itemhash);
+                    if (distance < maxdistance)
                     {
-                        bestindex = i;
-                        bestdistance = distance;
+                        if (distance < bestdistance)
+                        {
+                            bestindex = i;
+                            bestdistance = distance;
 
-                        indices.Clear();
-                        indices.Add(new Tuple<int, int>(i, distance));
-                    }
-                    else if (distance == bestdistance)
-                    {
-                        // Collision
-                        indices.Add(new Tuple<int, int>(i, distance));
+                            indices.Clear();
+                            indices.Add(new Tuple<int, int>(i, distance));
+                        }
+                        else if (bestindex != i && distance == bestdistance)
+                        {
+                            // Collision
+                            indices.Add(new Tuple<int, int>(i, distance));
+                        }
                     }
                 }
                 i++;
