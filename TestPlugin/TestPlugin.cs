@@ -27,6 +27,11 @@ namespace TestPlugin
             get { return new Version("0.0.4"); }
         }
 
+        public override bool IsAsync
+        {
+            get { return false; }
+        }
+
         public TestPlugin()
         {
             // Plugin constructor
