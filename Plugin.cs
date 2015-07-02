@@ -228,6 +228,8 @@ namespace ArenaHelper
 
         protected MenuItem MainMenuItem { get; set; }
         protected static ArenaWindow arenawindow;
+        
+        private SemaphoreSlim mutex = new SemaphoreSlim(1);
 
         private const int ArenaDetectionTime = 750;
         private const int MaxCardCount = 30;
@@ -322,11 +324,11 @@ namespace ArenaHelper
             };
         }
 
-        private void ActivateArenaWindow()
+        private async void ActivateArenaWindow()
         {
             if (arenawindow == null)
             {
-                InitializeMainWindow();
+                await InitializeMainWindow();
                 arenawindow.Show();
             }
             else
@@ -339,7 +341,7 @@ namespace ArenaHelper
             }
         }
 
-        protected void InitializeMainWindow()
+        protected async Task InitializeMainWindow()
         {
             if (arenawindow == null)
             {
@@ -349,9 +351,9 @@ namespace ArenaHelper
                 LoadConfig();
                 AddElements();
                 ApplyConfig();
-                arenawindow.Closed += (sender, args) =>
+                arenawindow.Closed += async (sender, args) =>
                 {
-                    plugins.CloseArena(arenadata, state);
+                    await plugins.CloseArena(arenadata, state);
 
                     // Save window location
                     if (arenawindow.WindowState != System.Windows.WindowState.Minimized)
@@ -393,7 +395,7 @@ namespace ArenaHelper
                         newestfilename = newest.FullName;
                     }
                 }
-                LoadArenaData(newestfilename);
+                await LoadArenaData(newestfilename);
             }
         }
 
@@ -477,11 +479,11 @@ namespace ArenaHelper
             File.WriteAllText(filename, json);
         }
 
-        public void OnButtonNewArenaClick()
+        public async void OnButtonNewArenaClick()
         {
             NewArena();
             SaveArenaData();
-            plugins.NewArena(arenadata);
+            await plugins.NewArena(arenadata);
         }
 
         public void OnAboutClick()
@@ -526,7 +528,7 @@ namespace ArenaHelper
             }
         }
 
-        public void OnCardClick(int index)
+        public async void OnCardClick(int index)
         {
             // Override detection
             if (!configdata.manualclicks)
@@ -537,7 +539,7 @@ namespace ArenaHelper
             if (state == PluginState.DetectedCards)
             {
                 // Manually pick a card
-                PickCard(index);
+                await PickCard(index);
             }
 
         }
@@ -545,27 +547,18 @@ namespace ArenaHelper
         public void OnConfigureHero()
         {
             // Override hero detection
-            if (!configurehero)
-            {
-                configurehero = true;
-                SetState(state);
-            }
-            else
-            {
-                // Cancel
-                OnCHeroClick(9);
-            }
-
+            configurehero = !configurehero;
+            SetState(state);
         }
 
         // Configure hero click
-        public void OnCHeroClick(int index)
+        public async void OnCHeroClick(int index)
         {
             configurehero = false;
 
             if (index >= 0 && index < herohashlist.Count)
             {
-                PickHero(index);
+                await PickHero(index);
             }
             else
             {
@@ -669,7 +662,7 @@ namespace ArenaHelper
             return Helper.GetValidFilePath(DeckDataDir, filename, ".json");
         }
 
-        private void LoadArenaData(string filename)
+        private async Task LoadArenaData(string filename)
         {
             // Init state
             SetState(PluginState.Idle);
@@ -724,7 +717,7 @@ namespace ArenaHelper
                 }
 
                 // Resume arena
-                plugins.ResumeArena(arenadata, state);
+                await plugins.ResumeArena(arenadata, state);
 
                 UpdateTitle();
                 UpdateHero();
@@ -734,7 +727,7 @@ namespace ArenaHelper
                 // No arena found, started a new one
                 // Save the arena data
                 SaveArenaData();
-                plugins.NewArena(arenadata);
+                await plugins.NewArena(arenadata);
             }
         }
 
@@ -809,49 +802,57 @@ namespace ArenaHelper
             ActivateArenaWindow();
         }
 
-        public void OnUpdate()
+        public async void OnUpdate()
         {
             // Check for plugin updates
             CheckUpdate();
-
-            if (arenawindow != null && state != PluginState.Done)
+            
+            await mutex.WaitAsync();
+            try
             {
-                testtext.Text = "";
-                stopwatch.Restart();
-
-                // Size updates
-                UpdateSize();
-
-                // Capture the screen
-                var hsrect = Helper.GetHearthstoneRect(false);
-                if (hsrect.Width > 0 && hsrect.Height > 0)
+                if (arenawindow != null && state != PluginState.Done)
                 {
-                    bool needsfocus = true;
-                    if (configdata.manualclicks)
+                    testtext.Text = "";
+                    stopwatch.Restart();
+
+                    // Size updates
+                    UpdateSize();
+
+                    // Capture the screen
+                    var hsrect = Helper.GetHearthstoneRect(false);
+                    if (hsrect.Width > 0 && hsrect.Height > 0)
                     {
-                        // With manual clicks, we don't need the focus
-                        needsfocus = false;
+                        bool needsfocus = true;
+                        if (configdata.manualclicks)
+                        {
+                            // With manual clicks, we don't need the focus
+                            needsfocus = false;
+                        }
+                        fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
                     }
-                    fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
-                }
-                else
-                {
-                    fullcapture = null;
-                }
+                    else
+                    {
+                        fullcapture = null;
+                    }
+                
+                    if (fullcapture != null)
+                    {
+                        await Detect();
+                    }
+                    else
+                    {
+                        // Invalidate arena
+                        inarena = false;
+                        stablearena = false;
+                        SetState(state);
+                    }
 
-                if (fullcapture != null)
-                {
-                    Detect();
+                    testtext.Text += "\nElapsed: " + stopwatch.ElapsedMilliseconds;
                 }
-                else
-                {
-                    // Invalidate arena
-                    inarena = false;
-                    stablearena = false;
-                    SetState(state);
-                }
-
-                testtext.Text += "\nElapsed: " + stopwatch.ElapsedMilliseconds;
+            }
+            finally
+            {
+                mutex.Release();
             }
         }
 
@@ -884,7 +885,7 @@ namespace ArenaHelper
 
         // Check if there are plugin updates
         // Code from: Hearthstone Collection Tracker Plugin
-        private async Task CheckUpdate()
+        private async void CheckUpdate()
         {
             if (!hasupdates)
             {
@@ -1019,7 +1020,7 @@ namespace ArenaHelper
             }
         }
 
-        private void Detect()
+        private async Task Detect()
         {
             try
             {
@@ -1086,32 +1087,32 @@ namespace ArenaHelper
                 if (state == PluginState.SearchHeroes)
                 {
                     // Searching for heroes
-                    SearchHeroes(heroindices, cardindices);
+                    await SearchHeroes(heroindices, cardindices);
                 }
                 else if (state == PluginState.SearchBigHero)
                 {
                     // Heroes detected, searching for big hero selection
-                    SearchBigHero(heroindices, cardindices);
+                    await SearchBigHero(heroindices, cardindices);
                 }
                 else if (state == PluginState.DetectedHeroes)
                 {
                     // Heroes detected, waiting
-                    WaitHeroPick(heroindices, cardindices);
+                    await WaitHeroPick(heroindices, cardindices);
                 }
                 else if (state == PluginState.SearchCards)
                 {
                     // Searching for cards
-                    SearchCards(cardindices);
+                    await SearchCards(cardindices);
                 }
                 else if (state == PluginState.SearchCardValues)
                 {
                     // Get card values
-                    SearchCardValues(cardindices);
+                    await SearchCardValues(cardindices);
                 }
                 else if (state == PluginState.DetectedCards)
                 {
                     // Cards detected, waiting
-                    WaitCardPick(cardindices);
+                    await WaitCardPick(cardindices);
                 }
             }
             catch (Exception e)
@@ -1124,7 +1125,7 @@ namespace ArenaHelper
 
         }
 
-        private void SearchHeroes(List<int> heroindices, List<int> cardindices)
+        private async Task SearchHeroes(List<int> heroindices, List<int> cardindices)
         {
             if (ConfirmDetected(detectedheroes, heroindices, HeroConfirmations) == 3)
             {
@@ -1139,7 +1140,7 @@ namespace ArenaHelper
                 arenadata.detectedheroes.Add(hero2.name);
                 SaveArenaData();
 
-                plugins.HeroesDetected(arenadata, hero0.name, hero1.name, hero2.name);
+                await plugins.HeroesDetected(arenadata, hero0.name, hero1.name, hero2.name);
 
                 // Show the heroes
                 UpdateDetectedHeroes();
@@ -1148,7 +1149,7 @@ namespace ArenaHelper
             }
         }
 
-        private void SearchBigHero(List<int> heroindices, List<int> cardindices)
+        private async Task SearchBigHero(List<int> heroindices, List<int> cardindices)
         {
             List<int> bigheroindices = DetectBigHero();
             if (ConfirmDetected(detectedbighero, bigheroindices, BigHeroConfirmations) == 1)
@@ -1171,7 +1172,7 @@ namespace ArenaHelper
                 SetState(PluginState.DetectedHeroes);
 
                 // Call it immediately
-                WaitHeroPick(heroindices, cardindices);
+                await WaitHeroPick(heroindices, cardindices);
             }
         }
 
@@ -1217,7 +1218,7 @@ namespace ArenaHelper
             arenawindow.Update();
         }
 
-        private void WaitHeroPick(List<int> heroindices, List<int> cardindices)
+        private async Task WaitHeroPick(List<int> heroindices, List<int> cardindices)
         {
             testtext.Text += "\nChoosing: " + herohashlist[detectedbighero[0].index].name + "\n";
 
@@ -1226,7 +1227,7 @@ namespace ArenaHelper
             {
                 // No heroes detected, at least one card detected
                 // The player picked a hero
-                PickHero(detectedbighero[0].index);
+                await PickHero(detectedbighero[0].index);
             }
             else if (GetUndectectedCount(heroindices) == 0)
             {
@@ -1239,20 +1240,20 @@ namespace ArenaHelper
             }
         }
 
-        private void PickHero(int heroindex)
+        private async Task PickHero(int heroindex)
         {
             arenadata.pickedhero = herohashlist[heroindex].name;
             SaveArenaData();
 
             UpdateHero();
 
-            plugins.HeroPicked(arenadata, arenadata.pickedhero);
+            await plugins.HeroPicked(arenadata, arenadata.pickedhero);
 
             // Show the card panel
             SetState(PluginState.SearchCards);
         }
 
-        private void SearchCards(List<int> cardindices)
+        private async Task SearchCards(List<int> cardindices)
         {
             if (ConfirmDetected(detectedcards, cardindices, CardConfirmations) == 3)
             {
@@ -1266,18 +1267,18 @@ namespace ArenaHelper
                 SaveArenaData();
 
                 // Update the plugin
-                plugins.CardsDetected(arenadata, card0, card1, card2);
+                await plugins.CardsDetected(arenadata, card0, card1, card2);
 
                 UpdateDetectedCards();
 
                 SetState(PluginState.SearchCardValues);
 
                 // Call it immediately
-                SearchCardValues(cardindices);
+                await SearchCardValues(cardindices);
             }
         }
 
-        private void SearchCardValues(List<int> cardindices)
+        private async Task SearchCardValues(List<int> cardindices)
         {
             int lastindex = arenadata.detectedcards.Count - 1;
             if (lastindex < 0)
@@ -1299,7 +1300,7 @@ namespace ArenaHelper
             }
 
             // Get the plugin result
-            List<string> pvalues = plugins.GetCardValues(arenadata, newcards, values);
+            List<string> pvalues = await plugins.GetCardValues(arenadata, newcards, values);
 
             // Override the values if the plugin has a result
             string advice = "";
@@ -1363,7 +1364,7 @@ namespace ArenaHelper
             SetState(PluginState.DetectedCards);
 
             // Call it immediately
-            WaitCardPick(cardindices);
+            await WaitCardPick(cardindices);
         }
 
         public double GetNumericalValue(string str)
@@ -1407,7 +1408,7 @@ namespace ArenaHelper
             return value;
         }
 
-        private void WaitCardPick(List<int> cardindices)
+        private async Task WaitCardPick(List<int> cardindices)
         {
             // All cards detected, wait for new pick
 
@@ -1481,7 +1482,7 @@ namespace ArenaHelper
                 if (mouseindex.Count >= 1)
                 {
                     // New card or no cards detected, the player picked a card
-                    PickCard(mouseindex[mouseindex.Count - 1]);
+                    await PickCard(mouseindex[mouseindex.Count - 1]);
 
                     // Clear the mouse data to avoid double detection of clicks
                     mouseindex.Clear();
@@ -1491,12 +1492,12 @@ namespace ArenaHelper
                     // No click detected, missed a pick
                     // TODO: Missed a pick
                     Logger.WriteLine("Missed a pick");
-                    PickCard(-1);
+                    await PickCard(-1);
                 }
             }
         }
 
-        private void PickCard(int pickindex)
+        private async Task PickCard(int pickindex)
         {
             int lastindex = arenadata.detectedcards.Count - 1;
             if (lastindex < 0)
@@ -1529,7 +1530,7 @@ namespace ArenaHelper
             arenadata.pickedcards.Add(cardid);
             SaveArenaData();
 
-            plugins.CardPicked(arenadata, pickindex, pickedcard);
+            await plugins.CardPicked(arenadata, pickindex, pickedcard);
 
             if (arenawindow != null)
             {
@@ -1539,7 +1540,7 @@ namespace ArenaHelper
             if (arenadata.pickedcards.Count == MaxCardCount)
             {
                 SetState(PluginState.Done);
-                plugins.Done(arenadata);
+                await plugins.Done(arenadata);
             }
             else
             {
