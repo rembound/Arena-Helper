@@ -33,6 +33,7 @@
                     <CheckBox x:Name="CheckBoxManual" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxManual_Checked" Unchecked="CheckBoxManual_Unchecked">
                         <TextBlock TextWrapping="Wrap" VerticalAlignment="Top">Manual card picking<LineBreak />Pick a card in Hearthstone, afterwards, click the card in the Arena Helper window. Don't detect picks automatically.</TextBlock>
                     </CheckBox>
+                    <CheckBox x:Name="CheckBoxAutoSave" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxAutoSave_Checked" Unchecked="CheckBoxAutoSave_Unchecked" Content="Automatically save and use the deck" />
                     <CheckBox x:Name="CheckBoxDebug" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxDebug_Checked" Unchecked="CheckBoxDebug_Unchecked" Content="Enable debug mode" />
                 </StackPanel>
             </controls:Flyout>

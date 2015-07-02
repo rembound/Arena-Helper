@@ -38,6 +38,7 @@ namespace ArenaHelper
         public delegate void OnCheckbox(bool check);
         public OnCheckbox oncheckboxoverlay = null;
         public OnCheckbox oncheckboxmanual = null;
+        public OnCheckbox oncheckboxautosave = null;
         public OnCheckbox oncheckboxdebug = null;
 
         public bool initconfig = false;
@@ -300,6 +301,22 @@ namespace ArenaHelper
             if (oncheckboxmanual != null)
             {
                 oncheckboxmanual(false);
+            }
+        }
+
+        private void CheckBoxAutoSave_Checked(object sender, RoutedEventArgs e)
+        {
+            if (oncheckboxautosave != null)
+            {
+                oncheckboxautosave(true);
+            }
+        }
+
+        private void CheckBoxAutoSave_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (oncheckboxautosave != null)
+            {
+                oncheckboxautosave(false);
             }
         }
 

@@ -47,6 +47,9 @@ namespace TestPlugin
         {
             List<string> values = new List<string>();
 
+            // Add a test delay to simulate an API call
+            await Task.Delay(1000);
+
             // Add the three card values
             for (int i = 0; i < 3; i++)
             {
