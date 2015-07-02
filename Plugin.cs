@@ -834,7 +834,7 @@ namespace ArenaHelper
                     {
                         fullcapture = null;
                     }
-                
+
                     if (fullcapture != null)
                     {
                         await Detect();
