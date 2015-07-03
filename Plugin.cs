@@ -304,7 +304,7 @@ namespace ArenaHelper
             herohashlist.Clear();
             herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 13071189497635732127, 12080542990295427731)); // Garrosh, Magni small, Magni big
             herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451));
-            herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809));
+            herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096827)); // Valeera, Valeera golden small, Valeera golden big
             herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139));
             herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 12942361696967163803, 17552924014479703963)); // Rexxar, Alleria small, Alleria big
             herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433851923975358071));
@@ -1008,9 +1008,7 @@ namespace ArenaHelper
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
             } else if (!stablearena && state != PluginState.Done)
             {
-                ShowValueOverlay(false);
-                SetAdviceText(DetectingArena);
-                ShowAdviceOverlay(configdata.overlay);
+                ShowOverlay(false);
 
                 SetDetectingText(DetectingArena, DetectionWarning, "");
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Visible;
