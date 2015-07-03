@@ -31,46 +31,46 @@ namespace AHPlugins
 
         // Called when a new arena is started
         // arendata: As before
-        public virtual async Task NewArena(ArenaHelper.Plugin.ArenaData arenadata) { }
+        public virtual async void NewArena(ArenaHelper.Plugin.ArenaData arenadata) { }
 
         // Called when the heroes are detected
         // arendata: As before
         // heroname0: name of hero 0
         // heroname1: name of hero 1
         // heroname2: name of hero 2
-        public virtual async Task HeroesDetected(ArenaHelper.Plugin.ArenaData arenadata, string heroname0, string heroname1, string heroname2) { }
+        public virtual async void HeroesDetected(ArenaHelper.Plugin.ArenaData arenadata, string heroname0, string heroname1, string heroname2) { }
 
         // Called when a hero is picked
         // arendata: As before
         // heroname: name of the hero
-        public virtual async Task HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname) { }
+        public virtual async void HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname) { }
 
         // Called when the cards are detected
         // arendata: As before
         // card0: card 0
         // card1: card 1
         // card2: card 2
-        public virtual async Task CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2) { }
+        public virtual async void CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2) { }
 
         // Called when a card is picked
         // arendata: As before
         // pickindex: index of the picked card in the range -1 to 2, if -1, no valid pick was detected
         // card: card information, null if invalid card
-        public virtual async Task CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card) { }
+        public virtual async void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card) { }
 
         // Called when all cards are picked
         // arendata: As before
-        public virtual async Task Done(ArenaHelper.Plugin.ArenaData arenadata) { }
+        public virtual async void Done(ArenaHelper.Plugin.ArenaData arenadata) { }
 
         // Called when Arena Helper window is opened
         // arendata: As before
         // state: the current state of Arena Helper
-        public virtual async Task ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state) { }
+        public virtual async void ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state) { }
 
         // Called when Arena Helper window is closed
         // arendata: As before
         // state: the current state of Arena Helper
-        public virtual async Task CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state) { }
+        public virtual async void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state) { }
     }
 }
 
@@ -160,74 +160,74 @@ namespace ArenaHelper
             return null;
         }
 
-        public async Task NewArena(ArenaHelper.Plugin.ArenaData arenadata)
+        public async void NewArena(ArenaHelper.Plugin.ArenaData arenadata)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.NewArena(arenadata);
+                plugin.NewArena(arenadata);
                 return;
             }
         }
 
-        public async Task HeroesDetected(ArenaHelper.Plugin.ArenaData arenadata, string heroname0, string heroname1, string heroname2)
+        public async void HeroesDetected(ArenaHelper.Plugin.ArenaData arenadata, string heroname0, string heroname1, string heroname2)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.HeroesDetected(arenadata, heroname0, heroname1, heroname2);
+                plugin.HeroesDetected(arenadata, heroname0, heroname1, heroname2);
                 return;
             }
         }
 
-        public async Task HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname)
+        public async void HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.HeroPicked(arenadata, heroname);
+                plugin.HeroPicked(arenadata, heroname);
                 return;
             }
         }
 
-        public async Task CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2)
+        public async void CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.CardsDetected(arenadata, card0, card1, card2);
+                plugin.CardsDetected(arenadata, card0, card1, card2);
                 return;
             }
         }
 
-        public async Task CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
+        public async void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.CardPicked(arenadata, pickindex, card);
+                plugin.CardPicked(arenadata, pickindex, card);
                 return;
             }
         }
 
-        public async Task Done(ArenaHelper.Plugin.ArenaData arenadata)
+        public async void Done(ArenaHelper.Plugin.ArenaData arenadata)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.Done(arenadata);
+                plugin.Done(arenadata);
                 return;
             }
         }
 
-        public async Task ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        public async void ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.ResumeArena(arenadata, state);
+                plugin.ResumeArena(arenadata, state);
                 return;
             }
         }
 
-        public async Task CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        public async void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
         {
             foreach (var plugin in plugins)
             {
-                await plugin.CloseArena(arenadata, state);
+                plugin.CloseArena(arenadata, state);
                 return;
             }
         }
