@@ -17,8 +17,7 @@ namespace TestPlugin
 {
     public class TestPlugin : AHPlugin
     {
-        private SemaphoreSlim _mutex = new SemaphoreSlim(1);
-        private List<string> _cardNames = new List<string>(); 
+        private SemaphoreSlim mutex = new SemaphoreSlim(1);
 
         public override string Name
         {
@@ -113,7 +112,7 @@ namespace TestPlugin
         public override async void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
         {
             // Ensure cards are added sequentially
-            await _mutex.WaitAsync();
+            await mutex.WaitAsync();
             try
             {
                 // Do something with the information
@@ -123,18 +122,17 @@ namespace TestPlugin
                     cardname = card.Name;
                 }
 
-                int currentCount = arenadata.pickedcards.Count;
+                int cardcount = arenadata.pickedcards.Count;
                 await Task.Delay(1000);
-                _cardNames.Add(cardname);
 
                 // Be careful when manipulating values on the ArenaData as they might have changed while making your API calls
-                bool hasChanged = currentCount != arenadata.pickedcards.Count;
+                bool changed = cardcount != arenadata.pickedcards.Count;
 
                 Logger.WriteLine("Card Picked: " + cardname);
             }
             finally
             {
-                _mutex.Release();
+                mutex.Release();
             }
         }
 

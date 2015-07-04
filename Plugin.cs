@@ -36,12 +36,17 @@ namespace ArenaHelper
 
             public ConfigData()
             {
-                windowx = 100;
-                windowy = 100;
+                ResetWindow();
                 manualclicks = false;
                 overlay = true;
                 debug = false;
                 autosave = false;
+            }
+
+            public void ResetWindow()
+            {
+                windowx = 100;
+                windowy = 100;
             }
         }
 
@@ -286,7 +291,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.4.0"); }
+            get { return new Version("0.4.1"); }
         }
 
         public MenuItem MenuItem
@@ -363,14 +368,6 @@ namespace ArenaHelper
                 {
                     plugins.CloseArena(arenadata, state);
 
-                    // Save window location
-                    if (arenawindow.WindowState != System.Windows.WindowState.Minimized)
-                    {
-                        // Set window location
-                        configdata.windowx = (int)arenawindow.Left;
-                        configdata.windowy = (int)arenawindow.Top;
-                    }
-
                     SaveConfig();
                     RemoveElements();
                     arenawindow = null;
@@ -383,6 +380,7 @@ namespace ArenaHelper
                 arenawindow.onbuttonnewarenaclick = new ArenaWindow.OnEvent(OnButtonNewArenaClick);
                 arenawindow.onbuttonsaveclick = new ArenaWindow.OnEvent(OnButtonSaveClick);
                 arenawindow.onaboutclick = new ArenaWindow.OnEvent(OnAboutClick);
+                arenawindow.onwindowlocation = new ArenaWindow.OnEvent(OnWindowLocation);
 
                 arenawindow.onheroclick = new ArenaWindow.OnOverrideClick(OnHeroClick);
                 arenawindow.oncardclick = new ArenaWindow.OnOverrideClick(OnCardClick);
@@ -433,6 +431,12 @@ namespace ArenaHelper
             {
                 // Load the data
                 configdata = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(filename));
+
+                // Fix window position for legacy configs
+                if (!(configdata.windowx > -32000 && configdata.windowy > -32000))
+                {
+                    configdata.ResetWindow();
+                }
 
                 // Set window position
                 arenawindow.Left = configdata.windowx;
@@ -627,6 +631,16 @@ namespace ArenaHelper
                 configdata.debug = check;
                 SaveConfig();
                 ApplyConfig();
+            }
+        }
+
+        public void OnWindowLocation()
+        {
+            // Set window location if not minimized
+            if (arenawindow.Left > -32000 && arenawindow.Top > -32000)
+            {
+                configdata.windowx = (int)arenawindow.Left;
+                configdata.windowy = (int)arenawindow.Top;
             }
         }
 
