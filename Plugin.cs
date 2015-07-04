@@ -332,11 +332,11 @@ namespace ArenaHelper
             };
         }
 
-        private async void ActivateArenaWindow()
+        private void ActivateArenaWindow()
         {
             if (arenawindow == null)
             {
-                await InitializeMainWindow();
+                InitializeMainWindow();
                 arenawindow.Show();
             }
             else
@@ -349,7 +349,7 @@ namespace ArenaHelper
             }
         }
 
-        protected async Task InitializeMainWindow()
+        protected void InitializeMainWindow()
         {
             if (arenawindow == null)
             {
@@ -359,9 +359,9 @@ namespace ArenaHelper
                 LoadConfig();
                 AddElements();
                 ApplyConfig();
-                arenawindow.Closed += async (sender, args) =>
+                arenawindow.Closed += (sender, args) =>
                 {
-                    await plugins.CloseArena(arenadata, state);
+                    plugins.CloseArena(arenadata, state);
 
                     // Save window location
                     if (arenawindow.WindowState != System.Windows.WindowState.Minimized)
@@ -404,7 +404,7 @@ namespace ArenaHelper
                         newestfilename = newest.FullName;
                     }
                 }
-                await LoadArenaData(newestfilename);
+                LoadArenaData(newestfilename);
             }
         }
 
@@ -502,11 +502,11 @@ namespace ArenaHelper
             File.WriteAllText(filename, json);
         }
 
-        public async void OnButtonNewArenaClick()
+        public void OnButtonNewArenaClick()
         {
             NewArena();
             SaveArenaData();
-            await plugins.NewArena(arenadata);
+            plugins.NewArena(arenadata);
         }
 
         public void OnAboutClick()
@@ -551,7 +551,7 @@ namespace ArenaHelper
             }
         }
 
-        public async void OnCardClick(int index)
+        public void OnCardClick(int index)
         {
             // Override detection
             if (!configdata.manualclicks)
@@ -562,7 +562,7 @@ namespace ArenaHelper
             if (state == PluginState.DetectedCards)
             {
                 // Manually pick a card
-                await PickCard(index);
+                PickCard(index);
             }
 
         }
@@ -575,13 +575,13 @@ namespace ArenaHelper
         }
 
         // Configure hero click
-        public async void OnCHeroClick(int index)
+        public void OnCHeroClick(int index)
         {
             configurehero = false;
 
             if (index >= 0 && index < herohashlist.Count)
             {
-                await PickHero(index);
+                PickHero(index);
             }
             else
             {
@@ -714,7 +714,7 @@ namespace ArenaHelper
             return Helper.GetValidFilePath(DeckDataDir, filename, ".json");
         }
 
-        private async Task LoadArenaData(string filename)
+        private void LoadArenaData(string filename)
         {
             // Init state
             SetState(PluginState.Idle);
@@ -776,7 +776,7 @@ namespace ArenaHelper
                 }
 
                 // Resume arena
-                await plugins.ResumeArena(arenadata, state);
+                plugins.ResumeArena(arenadata, state);
 
                 UpdateTitle();
                 UpdateHero();
@@ -786,7 +786,7 @@ namespace ArenaHelper
                 // No arena found, started a new one
                 // Save the arena data
                 SaveArenaData();
-                await plugins.NewArena(arenadata);
+                plugins.NewArena(arenadata);
             }
         }
 
@@ -1157,17 +1157,17 @@ namespace ArenaHelper
                 if (state == PluginState.SearchHeroes)
                 {
                     // Searching for heroes
-                    await SearchHeroes(heroindices, cardindices);
+                    SearchHeroes(heroindices, cardindices);
                 }
                 else if (state == PluginState.SearchBigHero)
                 {
                     // Heroes detected, searching for big hero selection
-                    await SearchBigHero(heroindices, cardindices);
+                    SearchBigHero(heroindices, cardindices);
                 }
                 else if (state == PluginState.DetectedHeroes)
                 {
                     // Heroes detected, waiting
-                    await WaitHeroPick(heroindices, cardindices);
+                    WaitHeroPick(heroindices, cardindices);
                 }
                 else if (state == PluginState.SearchCards)
                 {
@@ -1182,7 +1182,7 @@ namespace ArenaHelper
                 else if (state == PluginState.DetectedCards)
                 {
                     // Cards detected, waiting
-                    await WaitCardPick(cardindices);
+                    WaitCardPick(cardindices);
                 }
             }
             catch (Exception e)
@@ -1195,7 +1195,7 @@ namespace ArenaHelper
 
         }
 
-        private async Task SearchHeroes(List<int> heroindices, List<int> cardindices)
+        private void SearchHeroes(List<int> heroindices, List<int> cardindices)
         {
             if (ConfirmDetected(detectedheroes, heroindices, HeroConfirmations) == 3)
             {
@@ -1210,7 +1210,7 @@ namespace ArenaHelper
                 arenadata.detectedheroes.Add(hero2.name);
                 SaveArenaData();
 
-                await plugins.HeroesDetected(arenadata, hero0.name, hero1.name, hero2.name);
+                plugins.HeroesDetected(arenadata, hero0.name, hero1.name, hero2.name);
 
                 // Show the heroes
                 UpdateDetectedHeroes();
@@ -1219,7 +1219,7 @@ namespace ArenaHelper
             }
         }
 
-        private async Task SearchBigHero(List<int> heroindices, List<int> cardindices)
+        private void SearchBigHero(List<int> heroindices, List<int> cardindices)
         {
             List<int> bigheroindices = DetectBigHero();
             if (ConfirmDetected(detectedbighero, bigheroindices, BigHeroConfirmations) == 1)
@@ -1242,7 +1242,7 @@ namespace ArenaHelper
                 SetState(PluginState.DetectedHeroes);
 
                 // Call it immediately
-                await WaitHeroPick(heroindices, cardindices);
+                WaitHeroPick(heroindices, cardindices);
             }
         }
 
@@ -1288,7 +1288,7 @@ namespace ArenaHelper
             arenawindow.Update();
         }
 
-        private async Task WaitHeroPick(List<int> heroindices, List<int> cardindices)
+        private void WaitHeroPick(List<int> heroindices, List<int> cardindices)
         {
             testtext.Text += "\nChoosing: " + herohashlist[detectedbighero[0].index].name + "\n";
 
@@ -1297,7 +1297,7 @@ namespace ArenaHelper
             {
                 // No heroes detected, at least one card detected
                 // The player picked a hero
-                await PickHero(detectedbighero[0].index);
+                PickHero(detectedbighero[0].index);
             }
             else if (GetUndectectedCount(heroindices) == 0)
             {
@@ -1310,14 +1310,14 @@ namespace ArenaHelper
             }
         }
 
-        private async Task PickHero(int heroindex)
+        private void PickHero(int heroindex)
         {
             arenadata.pickedhero = herohashlist[heroindex].name;
             SaveArenaData();
 
             UpdateHero();
 
-            await plugins.HeroPicked(arenadata, arenadata.pickedhero);
+            plugins.HeroPicked(arenadata, arenadata.pickedhero);
 
             // Show the card panel
             SetState(PluginState.SearchCards);
@@ -1337,7 +1337,7 @@ namespace ArenaHelper
                 SaveArenaData();
 
                 // Update the plugin
-                await plugins.CardsDetected(arenadata, card0, card1, card2);
+                plugins.CardsDetected(arenadata, card0, card1, card2);
 
                 UpdateDetectedCards();
 
@@ -1435,7 +1435,7 @@ namespace ArenaHelper
             SetState(PluginState.DetectedCards);
 
             // Call it immediately
-            await WaitCardPick(cardindices);
+            WaitCardPick(cardindices);
         }
 
         private void SetValueText(int index, string value)
@@ -1492,7 +1492,7 @@ namespace ArenaHelper
             return value;
         }
 
-        private async Task WaitCardPick(List<int> cardindices)
+        private void WaitCardPick(List<int> cardindices)
         {
             // All cards detected, wait for new pick
 
@@ -1566,7 +1566,7 @@ namespace ArenaHelper
                 if (mouseindex.Count >= 1)
                 {
                     // New card or no cards detected, the player picked a card
-                    await PickCard(mouseindex[mouseindex.Count - 1]);
+                    PickCard(mouseindex[mouseindex.Count - 1]);
 
                     // Clear the mouse data to avoid double detection of clicks
                     mouseindex.Clear();
@@ -1576,12 +1576,12 @@ namespace ArenaHelper
                     // No click detected, missed a pick
                     // TODO: Missed a pick
                     Logger.WriteLine("Missed a pick");
-                    await PickCard(-1);
+                    PickCard(-1);
                 }
             }
         }
 
-        private async Task PickCard(int pickindex)
+        private void PickCard(int pickindex)
         {
             int lastindex = arenadata.detectedcards.Count - 1;
             if (lastindex < 0)
@@ -1614,7 +1614,7 @@ namespace ArenaHelper
             arenadata.pickedcards.Add(cardid);
             SaveArenaData();
 
-            await plugins.CardPicked(arenadata, pickindex, pickedcard);
+            plugins.CardPicked(arenadata, pickindex, pickedcard);
 
             if (arenawindow != null)
             {
@@ -1624,7 +1624,7 @@ namespace ArenaHelper
             if (arenadata.pickedcards.Count == MaxCardCount)
             {
                 SetState(PluginState.Done);
-                await plugins.Done(arenadata);
+                plugins.Done(arenadata);
             }
             else
             {

@@ -3,6 +3,7 @@ using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Hearthstone;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 // Ignore the warning, not every function needs an 'await'
@@ -16,6 +17,9 @@ namespace TestPlugin
 {
     public class TestPlugin : AHPlugin
     {
+        private SemaphoreSlim _mutex = new SemaphoreSlim(1);
+        private List<string> _cardNames = new List<string>(); 
+
         public override string Name
         {
             get { return "TestPlugin"; }
@@ -65,7 +69,7 @@ namespace TestPlugin
 
         // Called when a new arena is started
         // arendata: As before
-        public override async Task NewArena(ArenaHelper.Plugin.ArenaData arenadata)
+        public override async void NewArena(ArenaHelper.Plugin.ArenaData arenadata)
         {
             // Do something with the information
             Logger.WriteLine("New Arena: " + arenadata.deckname);
@@ -76,7 +80,7 @@ namespace TestPlugin
         // heroname0: name of hero 0
         // heroname1: name of hero 1
         // heroname2: name of hero 2
-        public override async Task HeroesDetected(ArenaHelper.Plugin.ArenaData arenadata, string heroname0, string heroname1, string heroname2)
+        public override async void HeroesDetected(ArenaHelper.Plugin.ArenaData arenadata, string heroname0, string heroname1, string heroname2)
         {
             // Do something with the information
             Logger.WriteLine("Heroes Detected: " + heroname0 + ", " + heroname1 + ", " + heroname2);
@@ -85,7 +89,7 @@ namespace TestPlugin
         // Called when a hero is picked
         // arendata: As before
         // heroname: name of the hero
-        public override async Task HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname)
+        public override async void HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname)
         {
             // Do something with the information
             Logger.WriteLine("Hero Picked: " + heroname);
@@ -96,7 +100,7 @@ namespace TestPlugin
         // card0: card 0
         // card1: card 1
         // card2: card 2
-        public override async Task CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2)
+        public override async void CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2)
         {
             // Do something with the information
             Logger.WriteLine("Cards Detected: " + card0.Name + ", " + card1.Name + ", " + card2.Name);
@@ -106,20 +110,37 @@ namespace TestPlugin
         // arendata: As before
         // pickindex: index of the picked card in the range -1 to 2, if -1, no valid pick was detected
         // card: card information, null if invalid card
-        public override async Task CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
+        public override async void CardPicked(ArenaHelper.Plugin.ArenaData arenadata, int pickindex, Card card)
         {
-            // Do something with the information
-            string cardname = "";
-            if (card != null)
+            // Ensure cards are added sequentially
+            await _mutex.WaitAsync();
+            try
             {
-                cardname = card.Name;
+                // Do something with the information
+                string cardname = "";
+                if (card != null)
+                {
+                    cardname = card.Name;
+                }
+
+                int currentCount = arenadata.pickedcards.Count;
+                await Task.Delay(1000);
+                _cardNames.Add(cardname);
+
+                // Be careful when manipulating values on the ArenaData as they might have changed while making your API calls
+                bool hasChanged = currentCount != arenadata.pickedcards.Count;
+
+                Logger.WriteLine("Card Picked: " + cardname);
             }
-            Logger.WriteLine("Card Picked: " + cardname);
+            finally
+            {
+                _mutex.Release();
+            }
         }
 
         // Called when all cards are picked
         // arendata: As before
-        public override async Task Done(ArenaHelper.Plugin.ArenaData arenadata)
+        public override async void Done(ArenaHelper.Plugin.ArenaData arenadata)
         {
             // Do something with the information
             Logger.WriteLine("Done");
@@ -128,7 +149,7 @@ namespace TestPlugin
         // Called when Arena Helper window is opened
         // arendata: As before
         // state: the current state of Arena Helper
-        public override async Task ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        public override async void ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
         {
             Logger.WriteLine("Resuming Arena");
             foreach (var cardid in arenadata.pickedcards)
@@ -159,7 +180,7 @@ namespace TestPlugin
 
         // Called when Arena Helper window is closed
         // arendata: As before
-        public override async Task CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
+        public override async void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
         {
             // Closing the window, to maybe resume at a later time
             Logger.WriteLine("Closing");
