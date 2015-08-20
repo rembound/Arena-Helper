@@ -291,7 +291,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.4.1"); }
+            get { return new Version("0.5.0"); }
         }
 
         public MenuItem MenuItem
@@ -307,11 +307,11 @@ namespace ArenaHelper
 
             // Set hashes
             herohashlist.Clear();
-            herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 13071189497635732127, 12080542990295427731)); // Garrosh, Magni small, Magni big
+            herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 14776501596708557433, 13071189497635732127, 12080542990295427731)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
             herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451));
             herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096827)); // Valeera, Valeera golden small, Valeera golden big
             herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139));
-            herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 12942361696967163803, 17552924014479703963)); // Rexxar, Alleria small, Alleria big
+            herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590197, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
             herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433851923975358071));
             herohashlist.Add(new HeroHashData(6, "Warlock", "warlock_small.png", 10186248321710093033));
             herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373)); // Jaina, Medivh small, Medivh big
@@ -2037,18 +2037,18 @@ namespace ArenaHelper
         // Perceptual hash using the techniques from: http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html
         private ulong GetImageHash(Bitmap bitmap, ref System.Windows.Controls.Image imagecontrol)
         {
+            // Copy the image and convert to grayscale
             Bitmap sourcebm = new Bitmap(bitmap);
-
             Image<Gray, float> sourceimage = new Image<Gray, float>(sourcebm);
 
-            // Apply a convolution filter
+            // Apply a convolution filter of 4x4
             CvInvoke.Blur(sourceimage, sourceimage, new Size(4, 4), new Point(-1, -1));
 
             // Show image for debugging
             Image<Bgra, Byte> convimage = Image<Bgra, Byte>.FromIplImagePtr(sourceimage);
             ShowBitmap(convimage.ToBitmap(), ref imagecontrol);
 
-            // Resize
+            // Resize to 64x64 pixels
             Image<Gray, float> resimage = new Image<Gray, float>(new Size(64, 64));
             CvInvoke.Resize(sourceimage, resimage, new Size(64, 64));
             ShowBitmap(resimage.ToBitmap(), ref imagecontrol);
