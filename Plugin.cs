@@ -291,7 +291,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.5.1"); }
+            get { return new Version("0.5.2"); }
         }
 
         public MenuItem MenuItem
@@ -1412,14 +1412,15 @@ namespace ArenaHelper
 
             // Get the actual numerical value
             double maxvalue = 0;
-            int maxvalueindex = 0;
+            List<double> cardvalues = new List<double>();
             for (int i = 0; i < 3; i++)
             {
                 double dval = GetNumericalValue(values[i]);
+                cardvalues.Add(dval);
+
                 if (i == 0 || dval > maxvalue)
                 {
                     maxvalue = dval;
-                    maxvalueindex = i;
                 }
             }
 
@@ -1427,7 +1428,7 @@ namespace ArenaHelper
             for (int i = 0; i < valueoverlays.Count; i++)
             {
                 SetValueText(i, values[i]);
-                if (i == maxvalueindex)
+                if (cardvalues[i] == maxvalue)
                 {
                     valueoverlays[i].GradientStop1.Color = System.Windows.Media.Color.FromArgb(0xFF, 0xf5, 0xdb, 0x4c);
                     valueoverlays[i].GradientStop2.Color = System.Windows.Media.Color.FromArgb(0xFF, 0x8b, 0x68, 0x11);
@@ -1588,7 +1589,6 @@ namespace ArenaHelper
                 else
                 {
                     // No click detected, missed a pick
-                    // TODO: Missed a pick
                     Logger.WriteLine("Missed a pick");
                     PickCard(-1);
                 }

@@ -12,7 +12,7 @@ namespace ArenaHelper
     {
         // Code from: Hearthstone Collection Tracker Plugin
 
-        public const string releaseDownloadUrl = @"https://github.com/rembound/Arena-Helper/releases/latest";
+        public const string releaseDownloadUrl = @"https://github.com/rembound/Arena-Helper";
         public const string latestReleaseRequestUrl = @"https://api.github.com/repos/rembound/Arena-Helper/releases/latest";
 
         public static async Task<Version> GetLatestVersion()
