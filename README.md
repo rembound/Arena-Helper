@@ -9,9 +9,12 @@ More technical information about how the plugin uses image recognition and how i
 If you like to support me and the continued development of this plugin, any donations are greatly appreciated. Thank you for your support!  
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40rembound%2ecom&lc=NL&item_name=Rembound%2ecom&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
 
-## Creating Plugins
+## Plugins For Arena Helper
 
 Arena Helper now has support for plugins within the plugin. If you are a site owner that has an API or if you want to create a website that integrates with Hearthstone to automatically detect the Arena cards and present a value and possible advice to the player, you can create your own plugin. Check out my article [How To Write Plugins For Arena Helper](http://rembound.com/articles/how-to-write-plugins-for-arena-helper) to read a tutorial on how to create such a plugin. If you want to see how it works immediately, you can find a TestPlugin project in the latest source code.
+
+Available plugins:
+* [Hearth Arena Plugin (Unofficial)](https://github.com/corlettb/HDTAHPluginHAPlugin) by [@corlettb](https://github.com/corlettb)
 
 ## How to Install
 
