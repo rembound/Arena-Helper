@@ -2238,19 +2238,16 @@ namespace ArenaHelper
             // Value overlay
             if (valueoverlays.Count == 0)
             {
-                for (int i = 0; i < 3; i++)
-                {
-                    if (Helper.MainWindow.Overlay != null)
-                    {
-                        ArenaHelper.Controls.ValueOverlay valuetext = new ArenaHelper.Controls.ValueOverlay();
-                        valuetext.ValueText.Text = "Value";
-                        Canvas.SetLeft(valuetext, 5);
-                        Canvas.SetTop(valuetext, 5);
-                        Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(valuetext);
-                        valuetext.Visibility = System.Windows.Visibility.Hidden;
-                        valueoverlays.Add(valuetext);
-                    }
-                }
+	            for(int i = 0; i < 3; i++)
+	            {
+		            ArenaHelper.Controls.ValueOverlay valuetext = new ArenaHelper.Controls.ValueOverlay();
+		            valuetext.ValueText.Text = "Value";
+		            Canvas.SetLeft(valuetext, 5);
+		            Canvas.SetTop(valuetext, 5);
+		            Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(valuetext);
+		            valuetext.Visibility = System.Windows.Visibility.Hidden;
+		            valueoverlays.Add(valuetext);
+	            }
             }
 
             // Advice overlay
@@ -2265,83 +2262,65 @@ namespace ArenaHelper
             }
 
             // Test text
-            if (testtext == null)
-            {
-                if (Helper.MainWindow.Overlay != null)
-                {
-                    testtext = new HearthstoneTextBlock();
-                    testtext.FontSize = 12;
-                    testtext.Text = "Arena Helper";
-                    Canvas.SetLeft(testtext, 5);
-                    Canvas.SetTop(testtext, 5);
+	        if(testtext == null)
+	        {
+		        testtext = new HearthstoneTextBlock();
+		        testtext.FontSize = 12;
+		        testtext.Text = "Arena Helper";
+		        Canvas.SetLeft(testtext, 5);
+		        Canvas.SetTop(testtext, 5);
 
-                    //Canvas CanvasInfo = (Canvas)Helper.MainWindow.Overlay.FindName("CanvasInfo");
-                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(testtext);
+		        //Canvas CanvasInfo = (Canvas)Helper.MainWindow.Overlay.FindName("CanvasInfo");
+		        Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(testtext);
 
-                    testtext.Visibility = System.Windows.Visibility.Hidden;
-                }
-            }
+		        testtext.Visibility = System.Windows.Visibility.Hidden;
+	        }
 
-            // Test images
+	        // Test images
             if (testimages.Count == 0)
             {
-                for (int i = 0; i < 4; i++)
-                {
-                    if (Helper.MainWindow.Overlay != null)
-                    {
-                        System.Windows.Controls.Image testimage = new System.Windows.Controls.Image();
+	            for(int i = 0; i < 4; i++)
+	            {
+		            System.Windows.Controls.Image testimage = new System.Windows.Controls.Image();
 
-                        Canvas.SetLeft(testimage, 5 + i * 210);
-                        Canvas.SetTop(testimage, 550);
+		            Canvas.SetLeft(testimage, 5 + i * 210);
+		            Canvas.SetTop(testimage, 550);
 
-                        Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(testimage);
+		            Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(testimage);
 
-                        testimage.Visibility = System.Windows.Visibility.Hidden;
-                        testimages.Add(testimage);
-                    }
-                }
+		            testimage.Visibility = System.Windows.Visibility.Hidden;
+		            testimages.Add(testimage);
+	            }
             }
         }
 
         private void RemoveElements()
         {
             // Value overlay
-            for (int i = 0; i < valueoverlays.Count; i++)
-            {
-                if (Helper.MainWindow.Overlay != null)
-                {
-                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(valueoverlays[i]);
-                }
-            }
-            valueoverlays.Clear();
+	        for(int i = 0; i < valueoverlays.Count; i++)
+	        {
+		        Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(valueoverlays[i]);
+	        }
+	        valueoverlays.Clear();
 
             // Advice overlay
-            if (adviceoverlay != null)
-            {
-                if (Helper.MainWindow.Overlay != null)
-                {
-                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(adviceoverlay);
-                    adviceoverlay = null;
-                }
-            }
+	        if(adviceoverlay != null)
+	        {
+		        Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(adviceoverlay);
+		        adviceoverlay = null;
+	        }
 
-            if (testtext != null)
-            {
-                if (Helper.MainWindow.Overlay != null)
-                {
-                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(testtext);
-                    testtext = null;
-                }
-            }
+	        if(testtext != null)
+	        {
+		        Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(testtext);
+		        testtext = null;
+	        }
 
-            for (int i = 0; i < testimages.Count; i++)
-            {
-                if (Helper.MainWindow.Overlay != null)
-                {
-                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(testimages[i]);
-                }
-            }
-            testimages.Clear();
+	        for(int i = 0; i < testimages.Count; i++)
+	        {
+		        Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(testimages[i]);
+	        }
+	        testimages.Clear();
         }
 
     }
