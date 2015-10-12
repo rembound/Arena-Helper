@@ -291,7 +291,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.5.4"); }
+            get { return new Version("0.5.5"); }
         }
 
         public MenuItem MenuItem
@@ -690,21 +690,21 @@ namespace ArenaHelper
             if (!autosave)
             {
                 // Set the new deck
-                Helper.MainWindow.SetNewDeck(deck);
+                Hearthstone_Deck_Tracker.API.Core.MainWindow.SetNewDeck(deck);
 
                 // Activate the window
-                Helper.MainWindow.ActivateWindow();
+                Hearthstone_Deck_Tracker.API.Core.MainWindow.ActivateWindow();
             }
             else
             {
                 // Set the new deck in editing mode
-                Helper.MainWindow.SetNewDeck(deck, true);
+                Hearthstone_Deck_Tracker.API.Core.MainWindow.SetNewDeck(deck, true);
 
                 // Save the deck
-                Helper.MainWindow.SaveDeck(true, SerializableVersion.Default, true);
+                Hearthstone_Deck_Tracker.API.Core.MainWindow.SaveDeck(true, SerializableVersion.Default, true);
 
                 // Select the deck and make it active
-                Helper.MainWindow.SelectDeck(deck, true);
+                Hearthstone_Deck_Tracker.API.Core.MainWindow.SelectDeck(deck, true);
             }
         }
 
