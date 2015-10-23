@@ -291,7 +291,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.5.5"); }
+            get { return new Version("0.5.6"); }
         }
 
         public MenuItem MenuItem
