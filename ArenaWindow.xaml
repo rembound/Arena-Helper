@@ -6,6 +6,11 @@
                       xmlns:localcontrols="clr-namespace:ArenaHelper.Controls"
                       Title="Arena Helper" Height="255" MinHeight="255" MaxHeight="255" Width="400" MinWidth="400" MaxWidth="400"
                       Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Topmost="True" LocationChanged="MetroWindow_LocationChanged">
+    <controls:MetroWindow.Resources>
+        <Style TargetType="{x:Type Hyperlink}" BasedOn="{StaticResource {x:Type Hyperlink}}" x:Key="HyperlinkAboutStyle">
+            <Setter Property="Foreground" Value="#0088ff" />
+        </Style>
+    </controls:MetroWindow.Resources>
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
             <Button Click="ButtonOptions_Click">
@@ -20,13 +25,20 @@
             </Button>
             <Button Click="ButtonAbout_Click">
                 <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="16" Height="16">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_heart}" />
+                        </Rectangle.Fill>
+                    </Rectangle>
                     <TextBlock Margin="4" VerticalAlignment="Center" Text="About" />
                 </StackPanel>
             </Button>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
+
     <controls:MetroWindow.Flyouts>
         <controls:FlyoutsControl Margin="{Binding TitleBarMargin, RelativeSource={RelativeSource AncestorType=local:ArenaWindow}}">
+            <!-- Options -->
             <controls:Flyout x:Name="FlyoutOptions" Header="Options" Position="Left" Width="400">
                 <StackPanel>
                     <CheckBox x:Name="CheckBoxOverlay" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" Checked="CheckBoxOverlay_Checked" Unchecked="CheckBoxOverlay_Unchecked" Content="Show values in overlay" />
@@ -35,6 +47,25 @@
                     </CheckBox>
                     <CheckBox x:Name="CheckBoxAutoSave" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxAutoSave_Checked" Unchecked="CheckBoxAutoSave_Unchecked" Content="Automatically save and use the deck" />
                     <CheckBox x:Name="CheckBoxDebug" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxDebug_Checked" Unchecked="CheckBoxDebug_Unchecked" Content="Enable debug mode" />
+                </StackPanel>
+            </controls:Flyout>
+
+            <!-- About -->
+            <controls:Flyout x:Name="FlyoutAbout" Header="About" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+                <StackPanel Margin="5">
+                    <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" TextWrapping="Wrap">
+                        <Run Text="Thank you for using my plugin! Arena Helper was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
+                        <Run Text="with support from the community at " /><Hyperlink NavigateUri="{Binding StringGitHub}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">GitHub</Hyperlink><Run Text="." />
+                        <LineBreak />
+                        <Run Text="If you like to support me and the continued development of this plugin, any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donations</Hyperlink>
+                        <Run Text="are greatly appreciated. Thank you for your support!" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Name="AboutDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>
+                        <Button Name="AboutVisitWebsite" Content="rembound.com" Margin="10,0,0,0" Width="100" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutVisitWebsite_Click"/>
+                        <Button Name="AboutVisitGitHub" Content="github" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutVisitGitHub_Click"/>
+                        <Button Name="AboutButtonClose" Content="close" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutButtonClose_Click"/>
+                    </StackPanel>
                 </StackPanel>
             </controls:Flyout>
         </controls:FlyoutsControl>

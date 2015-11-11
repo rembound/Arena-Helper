@@ -12,6 +12,8 @@ using Point = System.Drawing.Point;
 using Hearthstone_Deck_Tracker.Hearthstone.Entities;
 using Hearthstone_Deck_Tracker.Hearthstone;
 using MahApps.Metro.Controls.Dialogs;
+using System.Windows.Navigation;
+using System.Diagnostics;
 
 #endregion
 
@@ -27,7 +29,6 @@ namespace ArenaHelper
         public OnEvent onbuttonnewarenaclick = null;
         public OnEvent onbuttonsaveclick = null;
         public OnEvent onwindowlocation = null;
-        public OnEvent onaboutclick = null;
         public OnEvent onconfigurehero = null;
 
         public delegate void OnOverrideClick(int index);
@@ -89,6 +90,22 @@ namespace ArenaHelper
             }
         }
 
+        public string StringDonate
+        {
+            get { return "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40rembound%2ecom&lc=NL&item_name=Rembound%2ecom&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted"; }
+        }
+
+        public string StringWebsite
+        {
+            get { return "http://rembound.com/?from=ArenaHelper"; }
+        }
+
+        public string StringGitHub
+        {
+            get { return "https://github.com/rembound/Arena-Helper"; }
+        }
+
+
         public void Update()
         {
             DataContext = null;
@@ -115,10 +132,32 @@ namespace ArenaHelper
 
         private void ButtonAbout_Click(object sender, RoutedEventArgs e)
         {
-            if (onaboutclick != null)
-            {
-                onaboutclick();
-            }
+            FlyoutAbout.IsOpen = true;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(e.Uri.AbsoluteUri);
+        }
+
+        private void AboutDonate_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(StringDonate);
+        }
+
+        private void AboutVisitWebsite_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(StringWebsite);
+        }
+
+        private void AboutVisitGitHub_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(StringGitHub);
+        } 
+
+        private void AboutButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            FlyoutAbout.IsOpen = false;
         }
 
         private void ButtonNewArena_Click(object sender, RoutedEventArgs e)

@@ -227,6 +227,16 @@ namespace ArenaHelper
         // Big portrait detection
         Rectangle portraitbigcroprect = new Rectangle(381, 376, 471, 291);
 
+        // Log reader
+        private bool uselogreader = true;
+        private DateTime loglasttime = DateTime.MinValue;
+        private string loglastline = "";
+        private DateTime loglastchoice = DateTime.MinValue;
+        private string loglastheroname = "";
+        private string loglastcardid = "";
+        //"DraftManager.OnChosen(): hero=HERO_03 premium=STANDARD"
+        public static readonly Regex HeroChosenRegex = new Regex(@"DraftManager\.OnChosen\(\): hero=(?<id>(.+)) .*");
+
         // Updates
         private DateTime lastupdatecheck = DateTime.MinValue;
         private bool hasupdates = false;
@@ -291,7 +301,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.5.6"); }
+            get { return new Version("0.6.0"); }
         }
 
         public MenuItem MenuItem
@@ -322,6 +332,9 @@ namespace ArenaHelper
             stopwatch = Stopwatch.StartNew();
 
             LoadCards();
+
+            // Add log events
+            Hearthstone_Deck_Tracker.API.LogEvents.OnArenaLogLine.Add(OnArenaLogLine);
         }
 
         private void AddMenuItem()
@@ -379,7 +392,6 @@ namespace ArenaHelper
 
                 arenawindow.onbuttonnewarenaclick = new ArenaWindow.OnEvent(OnButtonNewArenaClick);
                 arenawindow.onbuttonsaveclick = new ArenaWindow.OnEvent(OnButtonSaveClick);
-                arenawindow.onaboutclick = new ArenaWindow.OnEvent(OnAboutClick);
                 arenawindow.onwindowlocation = new ArenaWindow.OnEvent(OnWindowLocation);
 
                 arenawindow.onheroclick = new ArenaWindow.OnOverrideClick(OnHeroClick);
@@ -511,34 +523,6 @@ namespace ArenaHelper
             NewArena();
             SaveArenaData();
             plugins.NewArena(arenadata);
-        }
-
-        public void OnAboutClick()
-        {
-            ShowDialog();
-        }
-
-        private async void ShowDialog()
-        {
-            var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" };
-            try
-            {
-                if (arenawindow != null)
-                {
-                    var result = await arenawindow.ShowMessageAsync("About",
-                        "Thank you for using my plugin! This plugin was made by Rembound. Do you want to visit my website?",
-                        MessageDialogStyle.AffirmativeAndNegative, settings);
-
-                    if (result == MessageDialogResult.Affirmative)
-                    {
-                        Process.Start(@"http://rembound.com/?from=ArenaHelper");
-                    }
-                }
-            }
-            catch
-            {
-
-            }
         }
 
         public void OnButtonSaveClick()
@@ -808,6 +792,11 @@ namespace ArenaHelper
         {
             // Initialize variables
             currentfilename = "";
+            loglasttime = DateTime.MinValue;
+            loglastline = "";
+            loglastchoice = DateTime.MinValue;
+            loglastheroname = "";
+            loglastcardid = "";
 
             ClearDetected();
 
@@ -897,9 +886,9 @@ namespace ArenaHelper
                     if (hsrect.Width > 0 && hsrect.Height > 0)
                     {
                         bool needsfocus = true;
-                        if (configdata.manualclicks)
+                        if (configdata.manualclicks || uselogreader)
                         {
-                            // With manual clicks, we don't need the focus
+                            // With manual clicks or logreader, we don't need the focus
                             needsfocus = false;
                         }
                         fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
@@ -927,6 +916,90 @@ namespace ArenaHelper
             finally
             {
                 mutex.Release();
+            }
+        }
+
+        public void OnArenaLogLine(string logline)
+        {
+            if (arenawindow == null)
+                return;
+
+            //Logger.WriteLine("AH LogLine: " + logline);
+
+            // Only process new lines
+            DateTime loglinetime;
+            if (logline.Length > 20 && DateTime.TryParse(logline.Substring(2, 16), out loglinetime))
+            {
+                if (loglinetime > DateTime.Now)
+                {
+                    loglinetime = loglinetime.AddDays(-1);
+                }
+
+                if (loglinetime < loglasttime || (loglinetime == loglasttime && logline == loglastline))
+                {
+                    // Skip old lines and the previous line
+                    // Lines with the same timestamp could be needed, if it is not the same as the previous
+                    return;
+                }
+
+                //Logger.WriteLine("AH LogLine process");
+                // Set new time
+                loglasttime = loglinetime;
+                loglastline = logline;
+            }
+            else
+            {
+                return;
+            }
+
+            // Modified from ArenaHandler.cs
+            var heromatch = HeroChosenRegex.Match(logline);
+            var match = Hearthstone_Deck_Tracker.LogReader.HsLogReaderConstants.NewChoiceRegex.Match(logline);
+            if (heromatch.Success)
+            {
+                // Hero chosen
+                string heroname = Database.GetHeroNameFromId(heromatch.Groups["id"].Value, false);
+                if (heroname != null)
+                {
+                    HeroHashData hero = GetHero(heroname);
+                    if (hero != null)
+                    {
+                        // Hero choice detection, final
+                        Logger.WriteLine("AH Hero chosen: " + heroname);
+                        PickHero(hero.index);
+                    }
+                }
+            }
+            else if (match.Success)
+            {
+                string heroname = Database.GetHeroNameFromId(match.Groups["id"].Value, false);
+                if (heroname != null)
+                {
+                    if (GetHero(heroname) != null)
+                    {
+                        // Hero choice detection, not final
+                        Logger.WriteLine("AH Hero choice: " + heroname);
+                        loglastheroname = heroname;
+                    }
+                }
+                else
+                {
+                    // Card choice detection
+                    var cardid = match.Groups["id"].Value;
+                    var dtime = DateTime.Now.Subtract(loglastchoice).Milliseconds;
+
+                    // This should not be necessary, but HDT does it
+                    if (loglastcardid == cardid && dtime < 1000)
+                    {
+                        Logger.WriteLine(string.Format("AH Card with the same ID ({0}) was chosen less {1} ms ago. Ignoring.", cardid, dtime));
+                        return;
+                    }
+
+                    Logger.WriteLine("AH Card choice: " + cardid);
+
+                    loglastchoice = DateTime.Now;
+                    loglastcardid = cardid;
+                }
             }
         }
 
@@ -1304,13 +1377,7 @@ namespace ArenaHelper
             testtext.Text += "\nChoosing: " + herohashlist[detectedbighero[0].index].name + "\n";
 
             // All heroes detected, wait for pick
-            if (GetUndectectedCount(heroindices) == 3 && GetUndectectedCount(cardindices) < 3)
-            {
-                // No heroes detected, at least one card detected
-                // The player picked a hero
-                PickHero(detectedbighero[0].index);
-            }
-            else if (GetUndectectedCount(heroindices) == 0)
+            if (GetUndetectedCount(heroindices) == 0)
             {
                 // Cancelled the choice
                 ClearDetected();
@@ -1318,6 +1385,12 @@ namespace ArenaHelper
 
                 // Restore gui
                 ResetHeroSize();
+            }
+            else if (!uselogreader && GetUndetectedCount(heroindices) == 3 && GetUndetectedCount(cardindices) < 3)
+            {
+                // No heroes detected, at least one card detected
+                // The player picked a hero
+                PickHero(detectedbighero[0].index);
             }
         }
 
@@ -1446,6 +1519,9 @@ namespace ArenaHelper
 
             SetState(PluginState.DetectedCards);
 
+            // Reset choice
+            loglastcardid = "";
+
             // Call it immediately
             WaitCardPick(cardindices);
         }
@@ -1546,7 +1622,24 @@ namespace ArenaHelper
             {
                 return;
             }
+            else if (uselogreader)
+            {
+                // Logreader
+                if (loglastcardid != "")
+                {
+                    Logger.WriteLine("AH Card choice pick: " + loglastcardid);
+                    PickCard(loglastcardid);
+                    loglastcardid = "";
+                }
+            }
+            else
+            {
+                CardClickDetection(cardindices, dcards);
+            }
+        }
 
+        private void CardClickDetection(List<int> cardindices, List<Card> dcards)
+        {
             // Get the click position
             CheckMouse();
 
@@ -1558,7 +1651,8 @@ namespace ArenaHelper
 
             // Check if a new card was detected
             bool newcard = false;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++)
+            {
                 int cardindex = cardindices[i];
                 if (cardindex != -1)
                 {
@@ -1573,7 +1667,7 @@ namespace ArenaHelper
                 }
             }
 
-            if ((newcard || GetUndectectedCount(cardindices) == 3))
+            if ((newcard || GetUndetectedCount(cardindices) == 3))
             {
                 if (mouseindex.Count >= 1)
                 {
@@ -1586,12 +1680,38 @@ namespace ArenaHelper
                 else
                 {
                     // No click detected, missed a pick
-                    Logger.WriteLine("Missed a pick");
                     PickCard(-1);
                 }
             }
         }
 
+        // PickCard using the cardid
+        private void PickCard(string cardid)
+        {
+            int lastindex = arenadata.detectedcards.Count - 1;
+            if (lastindex < 0)
+                return;
+
+            // Determine the index of the picked card
+            int pickindex = -1;
+            var dc = arenadata.detectedcards[lastindex];
+            if (cardid == dc.Item1)
+            {
+                pickindex = 0;
+            }
+            else if (cardid == dc.Item2)
+            {
+                pickindex = 1;
+            }
+            else if (cardid == dc.Item3)
+            {
+                pickindex = 2;
+            }
+
+            PickCard(pickindex);
+        }
+
+        // PickCard using the pickindex
         private void PickCard(int pickindex)
         {
             int lastindex = arenadata.detectedcards.Count - 1;
@@ -1622,6 +1742,12 @@ namespace ArenaHelper
             {
                 pickindex = -1;
             }
+
+            if (pickindex == -1)
+            {
+                Logger.WriteLine("AH: Missed a pick");
+            }
+
             arenadata.pickedcards.Add(cardid);
             SaveArenaData();
 
@@ -1704,7 +1830,7 @@ namespace ArenaHelper
             return state;
         }
 
-        private static int GetUndectectedCount(List<int> indices)
+        private static int GetUndetectedCount(List<int> indices)
         {
             int undetected = 0;
             for (int i = 0; i < indices.Count; i++)

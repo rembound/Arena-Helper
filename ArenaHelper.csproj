@@ -31,12 +31,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV">
-      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2132-rc1\bin\Emgu.CV.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2157\bin\Emgu.CV.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.Util">
-      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2132-rc1\bin\Emgu.Util.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2157\bin\Emgu.Util.dll</HintPath>
     </Reference>
     <Reference Include="Hearthstone Deck Tracker">
       <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
