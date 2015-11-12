@@ -1,6 +1,6 @@
 # Arena Helper
 
-Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [ADWCTA's Arena Tier List](http://www.heartharena.com/tierlist). The created deck can be saved to Hearthstone Deck Tracker.
+Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist). The created deck can be saved to Hearthstone Deck Tracker.
 
 The plugin uses perceptual hashing to detect the Hearthstone arena heroes and cards. The technique is based on the article [Looks Like It](http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html). Implementation details of a similar project can be found here: [Hearthstone Image Recognition](https://github.com/wittenbe/Hearthstone-Image-Recognition).
 
@@ -49,7 +49,7 @@ Wait for the plugin to finish detecting the cards.
 
 ![Arena Helper](http://i.imgur.com/ShfMZnw.png)
 
-Arena Helper has detected the cards and displays the value from [ADWCTA's Arena Tier List](http://www.heartharena.com/tierlist) in the window and the overlay.
+Arena Helper has detected the cards and displays the value from [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist) in the window and the overlay.
 
 ![Arena Helper](http://i.imgur.com/5G7qDQL.png)
 
