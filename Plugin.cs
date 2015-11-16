@@ -301,7 +301,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.0"); }
+            get { return new Version("0.6.1"); }
         }
 
         public MenuItem MenuItem
@@ -1053,7 +1053,7 @@ namespace ArenaHelper
                     var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "Not now" };
                     try
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(5));
+                        await Task.Delay(TimeSpan.FromSeconds(1));
                         if (arenawindow != null)
                         {
                             var result = await arenawindow.ShowMessageAsync("New Update available!",
@@ -1475,6 +1475,17 @@ namespace ArenaHelper
                 }
             }
 
+            // Check if values are missing
+            bool missing = false;
+            for (int i = 0; i < values.Count; i++)
+            {
+                if (values[i] == "")
+                {
+                    values[i] = "n/a";
+                    missing = true;
+                }
+            }
+
             // Show the card value
             arenawindow.Value0.Content = values[0];
             arenawindow.Value1.Content = values[1];
@@ -1498,7 +1509,9 @@ namespace ArenaHelper
             for (int i = 0; i < valueoverlays.Count; i++)
             {
                 SetValueText(i, values[i]);
-                if (cardvalues[i] == maxvalue)
+                
+                // Highlight the card with the highest value, if no cards are missing
+                if (!missing && cardvalues[i] == maxvalue)
                 {
                     valueoverlays[i].GradientStop1.Color = System.Windows.Media.Color.FromArgb(0xFF, 0xf5, 0xdb, 0x4c);
                     valueoverlays[i].GradientStop2.Color = System.Windows.Media.Color.FromArgb(0xFF, 0x8b, 0x68, 0x11);
