@@ -18,7 +18,7 @@ Available plugins:
 
 ## How to Install
 
-1) Download the latest release from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
+1) Download the latest ArenaHelper.zip from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
 2) Unblock the zip file before unzipping, by [right-clicking it and choosing properties](http://blogs.msdn.com/b/delay/p/unblockingdownloadedfile.aspx):
 ![Unblock](http://blogs.msdn.com/cfs-file.ashx/__key/CommunityServer-Blogs-Components-WeblogFiles/00-00-00-60-92-metablogapi/1425.FilePropertiesUnblock.png)  
 3) Make sure you remove any old versions of the ArenaHelper directory in the plugins directory of Hearthstone Deck Tracker completely, before upgrading versions.  
