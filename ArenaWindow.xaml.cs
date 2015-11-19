@@ -100,6 +100,11 @@ namespace ArenaHelper
             get { return "http://rembound.com/?from=ArenaHelper"; }
         }
 
+        public string StringTierList
+        {
+            get { return "http://ggoatgaming.com/tierlist"; }
+        }
+
         public string StringGitHub
         {
             get { return "https://github.com/rembound/Arena-Helper"; }
