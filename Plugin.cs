@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using MahApps.Metro.Controls.Dialogs;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Converters;
 
 namespace ArenaHelper
 {
@@ -193,7 +194,11 @@ namespace ArenaHelper
         private ArenaHelper.Controls.AdviceOverlay adviceoverlay = null;
         private HearthstoneTextBlock testtext = null;
         private List<System.Windows.Controls.Image> testimages = new List<System.Windows.Controls.Image>();
-        
+
+        private Update.AHDataVersion dataversion;
+        private const string DataVersionFile = "version.json";
+        private const string HashListFile = "cardhashes.json";
+        private const string TierListFile = "cardtier.json";
         public static List<Card> cardlist = new List<Card>();
         private List<CardHashData> cardhashlist = new List<CardHashData>();
         public static List<HeroHashData> herohashlist = new List<HeroHashData>();
@@ -238,10 +243,13 @@ namespace ArenaHelper
         public static readonly Regex HeroChosenRegex = new Regex(@"DraftManager\.OnChosen\(\): hero=(?<id>(.+)) .*");
 
         // Updates
-        private DateTime lastupdatecheck = DateTime.MinValue;
-        private bool hasupdates = false;
-        private TimeSpan updatecheckinterval = TimeSpan.FromHours(1);
+        private DateTime lastpluginupdatecheck = DateTime.MinValue;
+        private bool haspluginupdates = false;
+        private TimeSpan pluginupdatecheckinterval = TimeSpan.FromHours(1);
         private bool showingupdatemessage = false;
+        private DateTime lastdataupdatecheck = DateTime.MinValue;
+        private bool hasdataupdates = false;
+        private TimeSpan dataupdatecheckinterval = TimeSpan.FromHours(1);
 
         Stopwatch stopwatch;
 
@@ -301,7 +309,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.1"); }
+            get { return new Version("0.6.2"); }
         }
 
         public MenuItem MenuItem
@@ -331,7 +339,16 @@ namespace ArenaHelper
 
             stopwatch = Stopwatch.StartNew();
 
-            LoadCards();
+            // Init card list
+            List<Card> cards = Database.GetActualCards();
+            foreach (var card in cards)
+            {
+                // Add to the list
+                cardlist.Add((Card)card.Clone());
+            }
+
+            // Load data
+            LoadData();
 
             // Add log events
             Hearthstone_Deck_Tracker.API.LogEvents.OnArenaLogLine.Add(OnArenaLogLine);
@@ -1028,23 +1045,29 @@ namespace ArenaHelper
         }
 
         // Check if there are plugin updates
-        // Code from: Hearthstone Collection Tracker Plugin
+        // Update code adapted from Hearthstone Collection Tracker Plugin
         private async void CheckUpdate()
         {
-            if (!hasupdates)
+            await CheckPluginUpdate();
+            await CheckDataUpdate();
+        }
+
+        private async Task CheckPluginUpdate()
+        {
+            if (!haspluginupdates)
             {
-                if ((DateTime.Now - lastupdatecheck) > updatecheckinterval)
+                if ((DateTime.Now - lastpluginupdatecheck) > pluginupdatecheckinterval)
                 {
-                    lastupdatecheck = DateTime.Now;
+                    lastpluginupdatecheck = DateTime.Now;
                     var latestversion = await Update.GetLatestVersion();
                     if (latestversion != null)
                     {
-                        hasupdates = latestversion > Version;
+                        haspluginupdates = latestversion > Version;
                     }
                 }
             }
 
-            if (hasupdates)
+            if (haspluginupdates)
             {
                 if (!Hearthstone_Deck_Tracker.API.Core.Game.IsRunning && arenawindow != null && !showingupdatemessage)
                 {
@@ -1053,10 +1076,9 @@ namespace ArenaHelper
                     var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "Not now" };
                     try
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(1));
                         if (arenawindow != null)
                         {
-                            var result = await arenawindow.ShowMessageAsync("New Update available!",
+                            var result = await arenawindow.ShowMessageAsync("New update available!",
                                 "Do you want to download it?",
                                 MessageDialogStyle.AffirmativeAndNegative, settings);
 
@@ -1064,8 +1086,8 @@ namespace ArenaHelper
                             {
                                 Process.Start(Update.releaseDownloadUrl);
                             }
-                            hasupdates = false;
-                            lastupdatecheck = DateTime.Now.AddDays(1);
+                            haspluginupdates = false;
+                            lastpluginupdatecheck = DateTime.Now.AddDays(1);
                         }
                     }
                     catch
@@ -1074,6 +1096,75 @@ namespace ArenaHelper
                     finally
                     {
                         showingupdatemessage = false;
+                    }
+                }
+            }
+        }
+
+        private async Task CheckDataUpdate()
+        {
+            if (!hasdataupdates && !Hearthstone_Deck_Tracker.API.Core.Game.IsRunning && arenawindow != null && !showingupdatemessage)
+            {
+                if ((DateTime.Now - lastdataupdatecheck) > dataupdatecheckinterval)
+                {
+                    lastdataupdatecheck = DateTime.Now;
+                    Update.AHDataVersion latestdataversion = await Update.GetDataVersion();
+                    if (latestdataversion != null)
+                    {
+                        string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+                        if (latestdataversion.hashlist > dataversion.hashlist)
+                        {
+                            // Hash list updated, download the new hash list
+                            string hashliststr = await Update.DownloadString(Update.HashListUrl);
+                            if (hashliststr != null)
+                            {
+                                string hashlistfile = Path.Combine(assemblylocation, "data", HashListFile);
+                                File.WriteAllText(hashlistfile, hashliststr);
+                            }
+
+                            hasdataupdates = true;
+                        }
+
+                        if (latestdataversion.tierlist > dataversion.tierlist)
+                        {
+                            // Tier list updated, download the new tier list
+                            string tierliststr = await Update.DownloadString(Update.TierListUrl);
+                            if (tierliststr != null)
+                            {
+                                string tierlistfile = Path.Combine(assemblylocation, "data", TierListFile);
+                                File.WriteAllText(tierlistfile, tierliststr);
+                            }
+                            hasdataupdates = true;
+                        }
+
+                        if (hasdataupdates)
+                        {
+                            // Set the new data version
+                            dataversion = latestdataversion;
+
+                            // Write the new version file
+                            string dataversionfile = Path.Combine(assemblylocation, "data", DataVersionFile);
+                            string json = JsonConvert.SerializeObject(dataversion, Newtonsoft.Json.Formatting.Indented, new VersionConverter());
+                            File.WriteAllText(dataversionfile, json);
+
+                            // Load the new data
+                            LoadData();
+
+                            if (arenawindow != null)
+                            {
+                                var settings = new MetroDialogSettings { AffirmativeButtonText = "OK"};
+                                var result = await arenawindow.ShowMessageAsync("Data update applied!",
+                                    "The tier list and card data was updated to the latest version.",
+                                    MessageDialogStyle.Affirmative, settings);
+                                haspluginupdates = false;
+                                lastpluginupdatecheck = DateTime.Now.AddDays(1);
+                            }
+
+                            // Delay checking for updates
+                            hasdataupdates = false;
+                            lastdataupdatecheck = DateTime.Now.AddDays(1);
+                        }
                     }
                 }
             }
@@ -1396,6 +1487,9 @@ namespace ArenaHelper
 
         private void PickHero(int heroindex)
         {
+            if (state == PluginState.Done)
+                return;
+
             arenadata.pickedhero = herohashlist[heroindex].name;
             SaveArenaData();
 
@@ -2315,21 +2409,20 @@ namespace ArenaHelper
             }
         }
 
-        private void LoadCards()
+        private void LoadData()
         {
             string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            List<Card> cards = Database.GetActualCards();
-            foreach (var card in cards)
-            {
-                // Add to the list
-                cardlist.Add((Card)card.Clone());
-            }
 
-            string cardhashesfile = Path.Combine(assemblylocation, "data", "cardhashes.json");
+            // Load data version
+            string dataversionfile = Path.Combine(assemblylocation, "data", DataVersionFile);
+            dataversion = JsonConvert.DeserializeObject<Update.AHDataVersion>(File.ReadAllText(dataversionfile), new VersionConverter());
+
+            // Load card hashes
+            string cardhashesfile = Path.Combine(assemblylocation, "data", HashListFile);
             cardhashlist = JsonConvert.DeserializeObject<List<CardHashData>>(File.ReadAllText(cardhashesfile));
 
             // Load card tier info
-            string cardtierfile = Path.Combine(assemblylocation, "data", "cardtier.json");
+            string cardtierfile = Path.Combine(assemblylocation, "data", TierListFile);
             cardtierlist = JsonConvert.DeserializeObject<List<CardTierInfo>>(File.ReadAllText(cardtierfile));
         }
 

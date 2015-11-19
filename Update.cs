@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,19 @@ namespace ArenaHelper
 {
     public static class Update
     {
-        // Code from: Hearthstone Collection Tracker Plugin
+        // Update code adapted from Hearthstone Collection Tracker Plugin
 
+        // Plugin updates
         public const string releaseDownloadUrl = @"https://github.com/rembound/Arena-Helper";
         public const string latestReleaseRequestUrl = @"https://api.github.com/repos/rembound/Arena-Helper/releases/latest";
+
+        // Data updates
+        public const string DataVersionUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/version.json";
+        public const string HashListUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/cardhashes.json";
+        public const string TierListUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/cardtier.json";
+
+
+        public const string userAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
 
         public static async Task<Version> GetLatestVersion()
         {
@@ -22,7 +32,7 @@ namespace ArenaHelper
                 string versionStr;
                 using (var wc = new WebClient())
                 {
-                    wc.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+                    wc.Headers.Add("user-agent", userAgent);
                     versionStr = await wc.DownloadStringTaskAsync(latestReleaseRequestUrl);
                 }
                 var versionObj = JsonConvert.DeserializeObject<GithubRelease>(versionStr);
@@ -38,6 +48,57 @@ namespace ArenaHelper
         {
             [JsonProperty("tag_name")]
             public string TagName { get; set; }
+        }
+
+
+        // AHDataVersion
+        public class AHDataVersion
+        {
+            public Version hashlist;
+            public Version tierlist;
+
+            public AHDataVersion(Version hashlist, Version tierlist)
+            {
+                this.hashlist = hashlist;
+                this.tierlist = tierlist;
+            }
+        }
+
+        public static async Task<AHDataVersion> GetDataVersion()
+        {
+            try
+            {
+                string versionStr;
+                using (var wc = new WebClient())
+                {
+                    wc.Headers.Add("user-agent", userAgent);
+                    versionStr = await wc.DownloadStringTaskAsync(DataVersionUrl);
+                }
+                return JsonConvert.DeserializeObject<AHDataVersion>(versionStr, new VersionConverter());
+            }
+            catch (Exception)
+            {
+            }
+            return null;
+        }
+
+        // Download a string from a URL
+        public static async Task<string> DownloadString(string url)
+        {
+            try
+            {
+                string str;
+                using (var wc = new WebClient())
+                {
+                    wc.Headers.Add("user-agent", userAgent);
+                    str = await wc.DownloadStringTaskAsync(url);
+                }
+                return str;
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
     }
 }
