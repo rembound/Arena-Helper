@@ -2,6 +2,8 @@
 
 Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist). The created deck can be saved to Hearthstone Deck Tracker.
 
+![Arena Helper](images/arena-helper.png?raw=true)
+
 The plugin uses perceptual hashing to detect the Hearthstone arena heroes and cards. The technique is based on the article [Looks Like It](http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html). Implementation details of a similar project can be found here: [Hearthstone Image Recognition](https://github.com/wittenbe/Hearthstone-Image-Recognition).
 
 More technical information about how the plugin uses image recognition and how it calculates the perceptual hashes can be found in my article [Arena Helper](http://rembound.com/projects/arena-helper).
@@ -20,7 +22,7 @@ Available plugins:
 
 1. Download the latest ArenaHelper.zip from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
 2. Unblock the zip file before unzipping, by [right-clicking it and choosing properties](http://blogs.msdn.com/b/delay/p/unblockingdownloadedfile.aspx):
-![Unblock](http://blogs.msdn.com/cfs-file.ashx/__key/CommunityServer-Blogs-Components-WeblogFiles/00-00-00-60-92-metablogapi/1425.FilePropertiesUnblock.png)  
+![Unblock](images/unblock.png?raw=true)  
 3. Make sure you remove any old versions of the ArenaHelper directory in the plugins directory of Hearthstone Deck Tracker completely, before upgrading versions.  
 4. Unzip the archive to `Hearthstone Deck Tracker/Plugins`  
 5. If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll.  
@@ -36,27 +38,27 @@ When you start a new arena run, open up the Arena Helper window from the plugins
 
 The plugin has detected the heroes. Select a hero.
 
-![Arena Helper](http://i.imgur.com/H4Of3ps.png)
+![Arena Helper](images/arena-helper-1.png?raw=true)
 
 When you see that a detected hero becomes bigger in the Arena Helper window, you can confirm your selection.
 
-![Arena Helper](http://i.imgur.com/aMFJba9.png)
+![Arena Helper](images/arena-helper-2.png?raw=true)
 
 If hero detection doesn't work, you can use the manual hero selection override by clicking on the top-left portrait rectangle.
 
-![Arena Helper](http://i.imgur.com/NLMyHbv.png)
+![Arena Helper](images/arena-helper-hero-selection.png?raw=true)
 
 Wait for the plugin to finish detecting the cards.
 
-![Arena Helper](http://i.imgur.com/ShfMZnw.png)
+![Arena Helper](images/arena-helper-3.png?raw=true)
 
 Arena Helper has detected the cards and displays the value from [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist) in the window and the overlay.
 
-![Arena Helper](http://i.imgur.com/5G7qDQL.png)
+![Arena Helper](images/arena-helper-4.png?raw=true)
 
 All cards are picked. The deck can be saved to Hearthstone Deck Tracker, without needing to use the Import function. The Arena Helper window can be closed. Make sure to check the deck for errors, because sometimes detection is not flawless.
 
-![Arena Helper](http://i.imgur.com/AnPaN4L.png)
+![Arena Helper](images/arena-helper-5.png?raw=true)
 
 All arena decks are saved in the AppData directory: HearthstoneDeckTracker\ArenaHelper\Decks
 If the plugin made a mistake, you can override or reset the cards and card picks manually by editing the .json files in the decks directory.
