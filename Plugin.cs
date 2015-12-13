@@ -309,7 +309,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.3"); }
+            get { return new Version("0.6.4"); }
         }
 
         public MenuItem MenuItem
@@ -1069,7 +1069,7 @@ namespace ArenaHelper
 
             if (haspluginupdates)
             {
-                if (!Hearthstone_Deck_Tracker.API.Core.Game.IsRunning && arenawindow != null && !showingupdatemessage)
+                if (arenawindow != null && !showingupdatemessage)
                 {
                     showingupdatemessage = true;
 
@@ -1103,7 +1103,7 @@ namespace ArenaHelper
 
         private async Task CheckDataUpdate()
         {
-            if (!hasdataupdates && !Hearthstone_Deck_Tracker.API.Core.Game.IsRunning && arenawindow != null && !showingupdatemessage)
+            if (!hasdataupdates && arenawindow != null && !showingupdatemessage)
             {
                 if ((DateTime.Now - lastdataupdatecheck) > dataupdatecheckinterval)
                 {
