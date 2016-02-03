@@ -110,6 +110,13 @@ namespace ArenaHelper
             get { return "https://github.com/rembound/Arena-Helper"; }
         }
 
+        private string stringversion;
+        public string StringVersion
+        {
+            get { return this.stringversion; }
+            set { this.stringversion = value; }
+        }
+
 
         public void Update()
         {

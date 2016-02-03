@@ -282,6 +282,11 @@ namespace ArenaHelper
             get { return Path.Combine(Config.Instance.DataDir, "ArenaHelper"); }
         }
 
+        private string DataDataDir
+        {
+            get { return Path.Combine(Config.Instance.DataDir, "ArenaHelper", "Data"); }
+        }
+
         private string DeckDataDir
         {
             get { return Path.Combine(Config.Instance.DataDir, "ArenaHelper", "Decks"); }
@@ -309,7 +314,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.4"); }
+            get { return new Version("0.6.5"); }
         }
 
         public MenuItem MenuItem
@@ -319,39 +324,47 @@ namespace ArenaHelper
 
         public void OnLoad()
         {
-            plugins.LoadPlugins();
-
-            state = PluginState.Idle;
-
-            // Set hashes
-            herohashlist.Clear();
-            herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 14776501596708557433, 13071189497635732127, 12080542990295427731)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
-            herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451));
-            herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096827)); // Valeera, Valeera golden small, Valeera golden big
-            herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139));
-            herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590197, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
-            herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433851923975358071));
-            herohashlist.Add(new HeroHashData(6, "Warlock", "warlock_small.png", 10186248321710093033));
-            herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373)); // Jaina, Medivh small, Medivh big
-            herohashlist.Add(new HeroHashData(8, "Priest", "priest_small.png", 15052908377040876499));
-
-            AddMenuItem();
-
-            stopwatch = Stopwatch.StartNew();
-
-            // Init card list
-            List<Card> cards = Database.GetActualCards();
-            foreach (var card in cards)
+            try
             {
-                // Add to the list
-                cardlist.Add((Card)card.Clone());
+                plugins.LoadPlugins();
+
+                state = PluginState.Idle;
+
+                // Set hashes
+                herohashlist.Clear();
+                herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 14776501596708557433, 13071189497635732127, 12085046589922798227)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
+                herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451));
+                herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096827)); // Valeera, Valeera golden small, Valeera golden big
+                herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139));
+                herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590197, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
+                herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433711186487002743));
+                herohashlist.Add(new HeroHashData(6, "Warlock", "warlock_small.png", 10186248321718481641));
+                herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373)); // Jaina, Medivh small, Medivh big
+                herohashlist.Add(new HeroHashData(8, "Priest", "priest_small.png", 15052908377040876499));
+
+                AddMenuItem();
+
+                stopwatch = Stopwatch.StartNew();
+
+                // Init card list
+                List<Card> cards = Database.GetActualCards();
+                foreach (var card in cards)
+                {
+                    // Add to the list
+                    cardlist.Add((Card)card.Clone());
+                }
+
+                // Load data
+                LoadData();
+
+                // Add log events
+                Hearthstone_Deck_Tracker.API.LogEvents.OnArenaLogLine.Add(OnArenaLogLine);
             }
-
-            // Load data
-            LoadData();
-
-            // Add log events
-            Hearthstone_Deck_Tracker.API.LogEvents.OnArenaLogLine.Add(OnArenaLogLine);
+            catch (Exception e)
+            {
+                string errormsg = "OnLoad Error: " + e.Message + "\n" + e.ToString();
+                Logger.WriteLine(errormsg);
+            }
         }
 
         private void AddMenuItem()
@@ -369,19 +382,28 @@ namespace ArenaHelper
 
         private void ActivateArenaWindow()
         {
-            if (arenawindow == null)
+            try
             {
-                InitializeMainWindow();
-                arenawindow.Show();
+                if (arenawindow == null)
+                {
+                    InitializeMainWindow();
+                    arenawindow.Show();
+                }
+                else
+                {
+                    // Reset window position when reactivating
+                    arenawindow.Left = 100;
+                    arenawindow.Top = 100;
+                    arenawindow.WindowState = System.Windows.WindowState.Normal;
+                    arenawindow.Activate();
+                }
             }
-            else
+            catch (Exception e)
             {
-                // Reset window position when reactivating
-                arenawindow.Left = 100;
-                arenawindow.Top = 100;
-                arenawindow.WindowState = System.Windows.WindowState.Normal;
-                arenawindow.Activate();
+                string errormsg = "ActivateArenaWindow: " + e.Message + "\n" + e.ToString();
+                Logger.WriteLine(errormsg);
             }
+
         }
 
         protected void InitializeMainWindow()
@@ -389,6 +411,7 @@ namespace ArenaHelper
             if (arenawindow == null)
             {
                 arenawindow = new ArenaWindow();
+                arenawindow.StringVersion = "v" + Version.ToString();
 
                 // Load config
                 LoadConfig();
@@ -884,8 +907,16 @@ namespace ArenaHelper
 
         public async void OnUpdate()
         {
-            // Check for plugin updates
-            CheckUpdate();
+            try
+            {
+                // Check for plugin updates
+                CheckUpdate();
+            }
+            catch (Exception e)
+            {
+                string errormsg = "CheckUpdate: " + e.Message + "\n" + e.ToString();
+                Logger.WriteLine(errormsg);
+            }
             
             await mutex.WaitAsync();
             try
@@ -930,6 +961,11 @@ namespace ArenaHelper
                     testtext.Text += "\nElapsed: " + stopwatch.ElapsedMilliseconds;
                 }
             }
+            catch (Exception e)
+            {
+                string errormsg = "OnUpdate Error: " + e.Message + "\n" + e.ToString();
+                Logger.WriteLine(errormsg);
+            }
             finally
             {
                 mutex.Release();
@@ -941,82 +977,90 @@ namespace ArenaHelper
             if (arenawindow == null)
                 return;
 
-            //Logger.WriteLine("AH LogLine: " + logline);
-
-            // Only process new lines
-            DateTime loglinetime;
-            if (logline.Length > 20 && DateTime.TryParse(logline.Substring(2, 16), out loglinetime))
+            try
             {
-                if (loglinetime > DateTime.Now)
-                {
-                    loglinetime = loglinetime.AddDays(-1);
-                }
+                //Logger.WriteLine("AH LogLine: " + logline);
 
-                if (loglinetime < loglasttime || (loglinetime == loglasttime && logline == loglastline))
+                // Only process new lines
+                DateTime loglinetime;
+                if (logline.Length > 20 && DateTime.TryParse(logline.Substring(2, 16), out loglinetime))
                 {
-                    // Skip old lines and the previous line
-                    // Lines with the same timestamp could be needed, if it is not the same as the previous
-                    return;
-                }
-
-                //Logger.WriteLine("AH LogLine process");
-                // Set new time
-                loglasttime = loglinetime;
-                loglastline = logline;
-            }
-            else
-            {
-                return;
-            }
-
-            // Modified from ArenaHandler.cs
-            var heromatch = HeroChosenRegex.Match(logline);
-            var match = Hearthstone_Deck_Tracker.LogReader.HsLogReaderConstants.NewChoiceRegex.Match(logline);
-            if (heromatch.Success)
-            {
-                // Hero chosen
-                string heroname = Database.GetHeroNameFromId(heromatch.Groups["id"].Value, false);
-                if (heroname != null)
-                {
-                    HeroHashData hero = GetHero(heroname);
-                    if (hero != null)
+                    if (loglinetime > DateTime.Now)
                     {
-                        // Hero choice detection, final
-                        Logger.WriteLine("AH Hero chosen: " + heroname);
-                        PickHero(hero.index);
+                        loglinetime = loglinetime.AddDays(-1);
                     }
-                }
-            }
-            else if (match.Success)
-            {
-                string heroname = Database.GetHeroNameFromId(match.Groups["id"].Value, false);
-                if (heroname != null)
-                {
-                    if (GetHero(heroname) != null)
-                    {
-                        // Hero choice detection, not final
-                        Logger.WriteLine("AH Hero choice: " + heroname);
-                        loglastheroname = heroname;
-                    }
-                }
-                else
-                {
-                    // Card choice detection
-                    var cardid = match.Groups["id"].Value;
-                    var dtime = DateTime.Now.Subtract(loglastchoice).Milliseconds;
 
-                    // This should not be necessary, but HDT does it
-                    if (loglastcardid == cardid && dtime < 1000)
+                    if (loglinetime < loglasttime || (loglinetime == loglasttime && logline == loglastline))
                     {
-                        Logger.WriteLine(string.Format("AH Card with the same ID ({0}) was chosen less {1} ms ago. Ignoring.", cardid, dtime));
+                        // Skip old lines and the previous line
+                        // Lines with the same timestamp could be needed, if it is not the same as the previous
                         return;
                     }
 
-                    Logger.WriteLine("AH Card choice: " + cardid);
-
-                    loglastchoice = DateTime.Now;
-                    loglastcardid = cardid;
+                    //Logger.WriteLine("AH LogLine process");
+                    // Set new time
+                    loglasttime = loglinetime;
+                    loglastline = logline;
                 }
+                else
+                {
+                    return;
+                }
+
+                // Modified from ArenaHandler.cs
+                var heromatch = HeroChosenRegex.Match(logline);
+                var match = Hearthstone_Deck_Tracker.LogReader.HsLogReaderConstants.NewChoiceRegex.Match(logline);
+                if (heromatch.Success)
+                {
+                    // Hero chosen
+                    string heroname = Database.GetHeroNameFromId(heromatch.Groups["id"].Value, false);
+                    if (heroname != null)
+                    {
+                        HeroHashData hero = GetHero(heroname);
+                        if (hero != null)
+                        {
+                            // Hero choice detection, final
+                            Logger.WriteLine("AH Hero chosen: " + heroname);
+                            PickHero(hero.index);
+                        }
+                    }
+                }
+                else if (match.Success)
+                {
+                    string heroname = Database.GetHeroNameFromId(match.Groups["id"].Value, false);
+                    if (heroname != null)
+                    {
+                        if (GetHero(heroname) != null)
+                        {
+                            // Hero choice detection, not final
+                            Logger.WriteLine("AH Hero choice: " + heroname);
+                            loglastheroname = heroname;
+                        }
+                    }
+                    else
+                    {
+                        // Card choice detection
+                        var cardid = match.Groups["id"].Value;
+                        var dtime = DateTime.Now.Subtract(loglastchoice).Milliseconds;
+
+                        // This should not be necessary, but HDT does it
+                        if (loglastcardid == cardid && dtime < 1000)
+                        {
+                            Logger.WriteLine(string.Format("AH Card with the same ID ({0}) was chosen less {1} ms ago. Ignoring.", cardid, dtime));
+                            return;
+                        }
+
+                        Logger.WriteLine("AH Card choice: " + cardid);
+
+                        loglastchoice = DateTime.Now;
+                        loglastcardid = cardid;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                string errormsg = "OnArenaLogLine: " + e.Message + "\n" + e.ToString();
+                Logger.WriteLine(errormsg);
             }
         }
 
@@ -1090,8 +1134,10 @@ namespace ArenaHelper
                             lastpluginupdatecheck = DateTime.Now.AddDays(1);
                         }
                     }
-                    catch
+                    catch(Exception e)
                     {
+                        string errormsg = "CheckPluginUpdate: " + e.Message + "\n" + e.ToString();
+                        Logger.WriteLine(errormsg);
                     }
                     finally
                     {
@@ -1119,7 +1165,7 @@ namespace ArenaHelper
                             string hashliststr = await Update.DownloadString(Update.HashListUrl);
                             if (hashliststr != null)
                             {
-                                string hashlistfile = Path.Combine(assemblylocation, "data", HashListFile);
+                                string hashlistfile = Path.Combine(DataDataDir, HashListFile);
                                 File.WriteAllText(hashlistfile, hashliststr);
                             }
 
@@ -1132,7 +1178,7 @@ namespace ArenaHelper
                             string tierliststr = await Update.DownloadString(Update.TierListUrl);
                             if (tierliststr != null)
                             {
-                                string tierlistfile = Path.Combine(assemblylocation, "data", TierListFile);
+                                string tierlistfile = Path.Combine(DataDataDir, TierListFile);
                                 File.WriteAllText(tierlistfile, tierliststr);
                             }
                             hasdataupdates = true;
@@ -1144,7 +1190,7 @@ namespace ArenaHelper
                             dataversion = latestdataversion;
 
                             // Write the new version file
-                            string dataversionfile = Path.Combine(assemblylocation, "data", DataVersionFile);
+                            string dataversionfile = Path.Combine(DataDataDir, DataVersionFile);
                             string json = JsonConvert.SerializeObject(dataversion, Newtonsoft.Json.Formatting.Indented, new VersionConverter());
                             File.WriteAllText(dataversionfile, json);
 
@@ -2188,10 +2234,12 @@ namespace ArenaHelper
                 }
                 catch (Exception e)
                 {
+                    string errormsg = "Error2: " + e.Message + "\n" + e.ToString();
                     if (testtext != null)
                     {
-                        testtext.Text = "Error2: " + e.Message + "\n" + e.ToString();
+                        testtext.Text = errormsg;
                     }
+                    Logger.WriteLine(errormsg);
                 }
             }
 
@@ -2223,10 +2271,12 @@ namespace ArenaHelper
                 }
                 catch (Exception e)
                 {
+                    string errormsg = "Error3: " + e.Message + "\n" + e.ToString();
                     if (testtext != null)
                     {
-                        testtext.Text = "Error3: " + e.Message + "\n" + e.ToString();
+                        testtext.Text = errormsg;
                     }
+                    Logger.WriteLine(errormsg);
                 }
             }
 
@@ -2254,10 +2304,12 @@ namespace ArenaHelper
                 }
                 catch (Exception e)
                 {
+                    string errormsg = "Error4: " + e.Message + "\n" + e.ToString();
                     if (testtext != null)
                     {
-                        testtext.Text = "Error4: " + e.Message + "\n" + e.ToString();
+                        testtext.Text = errormsg;
                     }
+                    Logger.WriteLine(errormsg);
                 }
             }
 
@@ -2381,6 +2433,25 @@ namespace ArenaHelper
             return indices;
         }
 
+        private List<Tuple<int, int>> FindAllHashIndex(ulong hash, IList<CardHashData> hashlist, int maxdistance)
+        {
+            List<Tuple<int, int>> indices = new List<Tuple<int, int>>();
+            for (var i = 0; i < hashlist.Count; i++)
+            {
+                // Check all item hashes
+                foreach (var itemhash in hashlist[i].hashes)
+                {
+                    int distance = GetHashDistance(hash, itemhash);
+                    if (distance < maxdistance)
+                    {
+                        indices.Add(new Tuple<int, int>(i, distance));
+                    }
+                }
+            }
+
+            return indices;
+        }
+
         private void CropBitmapRelative(ref Bitmap bm, Rectangle fullrect, Rectangle croprect)
         {
             double cropx = (double)(croprect.X - fullrect.X) / fullrect.Width;
@@ -2413,17 +2484,57 @@ namespace ArenaHelper
         {
             string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            // Load data version
+            if (!Directory.Exists(DataDataDir))
+                Directory.CreateDirectory(DataDataDir);
+
+            // Data files
             string dataversionfile = Path.Combine(assemblylocation, "data", DataVersionFile);
-            dataversion = JsonConvert.DeserializeObject<Update.AHDataVersion>(File.ReadAllText(dataversionfile), new VersionConverter());
+            string userdataversionfile = Path.Combine(DataDataDir, DataVersionFile);
+            string cardhashesfile = Path.Combine(assemblylocation, "data", HashListFile);
+            string usercardhashesfile = Path.Combine(DataDataDir, HashListFile);
+            string cardtierfile = Path.Combine(assemblylocation, "data", TierListFile);
+            string usercardtierfile = Path.Combine(DataDataDir, TierListFile);
+
+            // Get default data version
+            dataversion = LoadDataVersion(dataversionfile);
+
+            // Check user data version
+            if (File.Exists(userdataversionfile))
+            {
+                Update.AHDataVersion userdataversion = LoadDataVersion(userdataversionfile);
+                if (userdataversion.hashlist > dataversion.hashlist)
+                {
+                    if (File.Exists(usercardhashesfile))
+                    {
+                         // Use userdata version
+                        Logger.WriteLine("Arena Helper: Using userdata version of hashlist");
+                         dataversion.hashlist = userdataversion.hashlist;
+                         cardhashesfile = usercardhashesfile;
+                     }
+                 }
+
+                if (userdataversion.tierlist > dataversion.tierlist)
+                {
+                    if (File.Exists(usercardtierfile))
+                    {
+                        // Use userdata version
+                        Logger.WriteLine("Arena Helper: Using userdata version of tierlist");
+                        dataversion.tierlist = userdataversion.tierlist;
+                        cardtierfile = usercardtierfile;
+                    }
+                }
+            }
 
             // Load card hashes
-            string cardhashesfile = Path.Combine(assemblylocation, "data", HashListFile);
             cardhashlist = JsonConvert.DeserializeObject<List<CardHashData>>(File.ReadAllText(cardhashesfile));
 
             // Load card tier info
-            string cardtierfile = Path.Combine(assemblylocation, "data", TierListFile);
             cardtierlist = JsonConvert.DeserializeObject<List<CardTierInfo>>(File.ReadAllText(cardtierfile));
+        }
+
+        private Update.AHDataVersion LoadDataVersion(string filename)
+        {
+            return JsonConvert.DeserializeObject<Update.AHDataVersion>(File.ReadAllText(filename), new VersionConverter());
         }
 
         private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)

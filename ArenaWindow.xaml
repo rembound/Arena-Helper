@@ -54,12 +54,12 @@
             <controls:Flyout x:Name="FlyoutAbout" Header="About" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
                 <StackPanel Margin="5">
                     <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" TextWrapping="Wrap">
-                        <Run Text="Thank you for using my plugin! Arena Helper was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
-                        <Run Text="with support from the community at " /><Hyperlink NavigateUri="{Binding StringGitHub}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">GitHub</Hyperlink><Run Text="." />
+                        <Run Text="Thank you for using my plugin! Arena Helper " /><Run Text="{Binding StringVersion, Mode=OneWay}" /><Run Text=" was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
+                        <Run Text="with support from the community at GitHub." />
                         <Run Text="Thanks go out to Grinning Goat for providing " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">ADWCTA's Arena Tier List</Hyperlink><Run Text="!" />
                         <LineBreak /><LineBreak />
-                        <Run Text="Any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donations</Hyperlink>
-                        <Run Text="are greatly appreciated. Thanks for your support! :)" />
+                        <Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Donations</Hyperlink>
+                        <Run Text="are greatly appreciated. Thanks for your support!" />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Name="AboutDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>
