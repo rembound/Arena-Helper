@@ -314,7 +314,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.5"); }
+            get { return new Version("0.6.6"); }
         }
 
         public MenuItem MenuItem
@@ -481,25 +481,42 @@ namespace ArenaHelper
             string filename = Path.Combine(DataDir, ConfigFile);
             if (File.Exists(filename))
             {
-                // Load the data
-                configdata = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(filename));
-
-                // Fix window position for legacy configs
-                if (!(configdata.windowx > -32000 && configdata.windowy > -32000))
+                try
                 {
-                    configdata.ResetWindow();
+                    // Load the data
+                    ConfigData loadedconfigdata = JsonConvert.DeserializeObject<ConfigData>(File.ReadAllText(filename));
+
+                    if (loadedconfigdata != null)
+                    {
+                        // Set data
+                        configdata = loadedconfigdata;
+
+                        // Fix window position for legacy configs
+                        if (!(configdata.windowx > -32000 && configdata.windowy > -32000))
+                        {
+                            configdata.ResetWindow();
+                        }
+
+                        // Set window position
+                        arenawindow.Left = configdata.windowx;
+                        arenawindow.Top = configdata.windowy;
+                    }
+                    else
+                    {
+                        Logger.WriteLine("Arena Helper: Error loading config, null");
+                    }
                 }
-
-                // Set window position
-                arenawindow.Left = configdata.windowx;
-                arenawindow.Top = configdata.windowy;
-
-                // Set options
-                arenawindow.CheckBoxOverlay.IsChecked = configdata.overlay;
-                arenawindow.CheckBoxManual.IsChecked = configdata.manualclicks;
-                arenawindow.CheckBoxAutoSave.IsChecked = configdata.autosave;
-                arenawindow.CheckBoxDebug.IsChecked = configdata.debug;
+                catch (Exception e)
+                {
+                    Logger.WriteLine("Arena Helper: Error loading config");
+                }
             }
+
+            // Set options
+            arenawindow.CheckBoxOverlay.IsChecked = configdata.overlay;
+            arenawindow.CheckBoxManual.IsChecked = configdata.manualclicks;
+            arenawindow.CheckBoxAutoSave.IsChecked = configdata.autosave;
+            arenawindow.CheckBoxDebug.IsChecked = configdata.debug;
 
             configinit = true;
         }
@@ -759,13 +776,36 @@ namespace ArenaHelper
 
             NewArena();
 
+            bool validarenadata = false;
+            ArenaData loadedarenadata = null;
             if (File.Exists(filename))
+            {
+                try
+                {
+                    Logger.WriteLine("Arena Helper: loading data");
+                    // Load the data
+                    loadedarenadata = JsonConvert.DeserializeObject<ArenaData>(File.ReadAllText(filename));
+                    if (loadedarenadata != null)
+                    {
+                        // Set the data
+                        arenadata = loadedarenadata;
+                        validarenadata = true;
+                    }
+                    else
+                    {
+                        Logger.WriteLine("Arena Helper: Error loading arena data, null");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.WriteLine("Arena Helper: Error loading arena data");
+                }
+            }
+
+            if (validarenadata)
             {
                 // Set current filename
                 currentfilename = filename;
-
-                // Load the data
-                arenadata = JsonConvert.DeserializeObject<ArenaData>(File.ReadAllText(filename));
 
                 // Make sure there is a guid for legacy arena runs
                 if (arenadata.deckguid == "")

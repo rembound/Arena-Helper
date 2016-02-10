@@ -5,7 +5,7 @@
                       xmlns:local="clr-namespace:ArenaHelper"
                       xmlns:localcontrols="clr-namespace:ArenaHelper.Controls"
                       Title="Arena Helper" Height="255" MinHeight="255" MaxHeight="255" Width="400" MinWidth="400" MaxWidth="400"
-                      Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Topmost="True" LocationChanged="MetroWindow_LocationChanged">
+                      Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Topmost="True" LocationChanged="MetroWindow_LocationChanged" ShowMaxRestoreButton="False">
     <controls:MetroWindow.Resources>
         <Style TargetType="{x:Type Hyperlink}" BasedOn="{StaticResource {x:Type Hyperlink}}" x:Key="HyperlinkAboutStyle">
             <Setter Property="Foreground" Value="#0088ff" />
