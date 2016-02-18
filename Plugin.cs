@@ -314,7 +314,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.6"); }
+            get { return new Version("0.6.7"); }
         }
 
         public MenuItem MenuItem
@@ -689,7 +689,6 @@ namespace ArenaHelper
         {
             // Save deck
             Deck deck = new Deck();
-            deck.Name = arenadata.deckname;
             deck.IsArenaDeck = true;
 
             if (autosave)
@@ -727,6 +726,9 @@ namespace ArenaHelper
 
             // Add tag
             deck.Tags.Add("Arena");
+
+            // Deck name based on class
+            deck.Name = Helper.ParseDeckNameTemplate(Config.Instance.ArenaDeckNameTemplate, deck);
 
             if (!autosave)
             {
@@ -979,7 +981,16 @@ namespace ArenaHelper
                             // With manual clicks or logreader, we don't need the focus
                             needsfocus = false;
                         }
-                        fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
+                        //fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
+                        //fullcapture = await Helper.CaptureHearthstoneAsync(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
+                        if (needsfocus && !User32.IsHearthstoneInForeground())
+                        {
+                            fullcapture = null;
+                        }
+                        else
+                        {
+                            fullcapture = Helper.CaptureScreen(User32.GetHearthstoneWindow(), new Point(0, 0), hsrect.Width, hsrect.Height);
+                        }
                     }
                     else
                     {

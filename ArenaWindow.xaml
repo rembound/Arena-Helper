@@ -30,7 +30,7 @@
                             <VisualBrush Visual="{StaticResource appbar_heart}" />
                         </Rectangle.Fill>
                     </Rectangle>
-                    <TextBlock Margin="4" VerticalAlignment="Center" Text="About" />
+                    <TextBlock Margin="4" VerticalAlignment="Center" Text="Support" />
                 </StackPanel>
             </Button>
         </controls:WindowCommands>
