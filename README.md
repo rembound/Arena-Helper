@@ -1,6 +1,6 @@
 # Arena Helper
 
-Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist). The created deck can be saved to Hearthstone Deck Tracker.
+Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist). The created deck can be saved to Hearthstone Deck Tracker. Check out the [How To Install](https://github.com/rembound/Arena-Helper#how-to-install) guide below to download and install the plugin.
 
 ![Arena Helper](images/arena-helper.png?raw=true)
 
@@ -18,7 +18,7 @@ Arena Helper has support for plugins within the plugin. Plugins allow you to use
 Available plugins:
 * [Hearth Arena Plugin (Unofficial)](https://github.com/corlettb/HDTAHPluginHAPlugin) by [@corlettb](https://github.com/corlettb)
 
-## How to Install
+## How To Install
 
 1. [Click here](https://github.com/rembound/Arena-Helper/releases) to download the latest ArenaHelper.vX.Y.Z.zip from the [releases page](https://github.com/rembound/Arena-Helper/releases).  
 2. Unblock the zip file before unzipping, by [right-clicking it and choosing properties](http://blogs.msdn.com/b/delay/p/unblockingdownloadedfile.aspx):
@@ -32,7 +32,7 @@ Available plugins:
 8. If it is not working you can enable a debug mode in the options window  
 9. If all else fails, copy the dlls from the x86 directory to the C:/windows/SysWOW64 directory.
 
-## How to use
+## How To Use
 
 When you start a new arena run, open up the Arena Helper window from the plugins menu. Arena Helper will try to detect the arena window and the heroes that can be chosen. Keep in mind that the plugin uses visual information. The plugin window can't overlap the heroes or cards that are in the center of the screen. Make your selection slowly and with a single click to allow the plugin to detect the cards. Hovering over the cards while the plugin is still detecting them, will interfere with the detection process.
 
