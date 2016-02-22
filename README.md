@@ -13,14 +13,14 @@ If you like to support me and the continued development of this plugin, any dona
 
 ## Plugins For Arena Helper
 
-Arena Helper now has support for plugins within the plugin. If you are a site owner that has an API or if you want to create a website that integrates with Hearthstone to automatically detect the Arena cards and present a value and possible advice to the player, you can create your own plugin. Check out my article [How To Write Plugins For Arena Helper](http://rembound.com/articles/how-to-write-plugins-for-arena-helper) to read a tutorial on how to create such a plugin. If you want to see how it works immediately, you can find a TestPlugin project in the latest source code.
+Arena Helper has support for plugins within the plugin. Plugins allow you to use the card detection system while drafting a Hearthstone arena deck for your own purposes. It also allows you to override the tier list values and can present an advice to the player. Check out my article [How To Write Plugins For Arena Helper](http://rembound.com/articles/how-to-write-plugins-for-arena-helper) to read a tutorial on how to create such a plugin. If you want to see how it works immediately, you can find a TestPlugin project in the latest source code. If you have made a plugin and want to be featured on this page, contact me.
 
 Available plugins:
 * [Hearth Arena Plugin (Unofficial)](https://github.com/corlettb/HDTAHPluginHAPlugin) by [@corlettb](https://github.com/corlettb)
 
 ## How to Install
 
-1. Download the latest ArenaHelper.zip from the [releases page](https://github.com/rembound/Arena-Helper/releases)  
+1. [Click here](https://github.com/rembound/Arena-Helper/releases) to download the latest ArenaHelper.vX.Y.Z.zip from the [releases page](https://github.com/rembound/Arena-Helper/releases).  
 2. Unblock the zip file before unzipping, by [right-clicking it and choosing properties](http://blogs.msdn.com/b/delay/p/unblockingdownloadedfile.aspx):
 ![Unblock](images/unblock.png?raw=true)  
 3. Make sure you remove any old versions of the ArenaHelper directory in the plugins directory of Hearthstone Deck Tracker completely, before upgrading versions.  
