@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Hearthstone_Deck_Tracker.Utility.Logging;
 
 // Ignore the warning, not every function needs an 'await'
 #pragma warning disable 1998
@@ -38,7 +39,7 @@ namespace TestPlugin
         {
             // Plugin constructor
             // Setup stuff
-            Logger.WriteLine("TestPlugin constructor");
+            Log.WriteLine("TestPlugin constructor", LogType.Debug);
         }
 
         // Called when three new cards are detected
@@ -71,7 +72,7 @@ namespace TestPlugin
         public override async void NewArena(ArenaHelper.Plugin.ArenaData arenadata)
         {
             // Do something with the information
-            Logger.WriteLine("New Arena: " + arenadata.deckname);
+            Log.WriteLine("New Arena: " + arenadata.deckname, LogType.Debug);
         }
 
         // Called when the heroes are detected
@@ -82,7 +83,7 @@ namespace TestPlugin
         public override async void HeroesDetected(ArenaHelper.Plugin.ArenaData arenadata, string heroname0, string heroname1, string heroname2)
         {
             // Do something with the information
-            Logger.WriteLine("Heroes Detected: " + heroname0 + ", " + heroname1 + ", " + heroname2);
+            Log.WriteLine("Heroes Detected: " + heroname0 + ", " + heroname1 + ", " + heroname2, LogType.Debug);
         }
 
         // Called when a hero is picked
@@ -91,7 +92,7 @@ namespace TestPlugin
         public override async void HeroPicked(ArenaHelper.Plugin.ArenaData arenadata, string heroname)
         {
             // Do something with the information
-            Logger.WriteLine("Hero Picked: " + heroname);
+            Log.WriteLine("Hero Picked: " + heroname, LogType.Debug);
         }
 
         // Called when the cards are detected
@@ -102,7 +103,7 @@ namespace TestPlugin
         public override async void CardsDetected(ArenaHelper.Plugin.ArenaData arenadata, Card card0, Card card1, Card card2)
         {
             // Do something with the information
-            Logger.WriteLine("Cards Detected: " + card0.Name + ", " + card1.Name + ", " + card2.Name);
+            Log.WriteLine("Cards Detected: " + card0.Name + ", " + card1.Name + ", " + card2.Name, LogType.Debug);
         }
 
         // Called when a card is picked
@@ -128,7 +129,7 @@ namespace TestPlugin
                 // Be careful when manipulating values on the ArenaData as they might have changed while making your API calls
                 bool changed = cardcount != arenadata.pickedcards.Count;
 
-                Logger.WriteLine("Card Picked: " + cardname);
+                Log.WriteLine("Card Picked: " + cardname, LogType.Debug);
             }
             finally
             {
@@ -141,7 +142,7 @@ namespace TestPlugin
         public override async void Done(ArenaHelper.Plugin.ArenaData arenadata)
         {
             // Do something with the information
-            Logger.WriteLine("Done");
+            Log.WriteLine("Done", LogType.Debug);
         }
 
         // Called when Arena Helper window is opened
@@ -149,7 +150,7 @@ namespace TestPlugin
         // state: the current state of Arena Helper
         public override async void ResumeArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
         {
-            Logger.WriteLine("Resuming Arena");
+            Log.WriteLine("Resuming Arena", LogType.Debug);
             foreach (var cardid in arenadata.pickedcards)
             {
                 Card card = ArenaHelper.Plugin.GetCard(cardid);
@@ -158,22 +159,22 @@ namespace TestPlugin
                 {
                     cardname = card.Name;
                 }
-                Logger.WriteLine(cardname);
+                Log.WriteLine(cardname, LogType.Debug);
             }
 
             foreach (var heroname in arenadata.detectedheroes)
             {
                 ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(heroname);
-                Logger.WriteLine("Detected hero: " + hero.name);
+                Log.WriteLine("Detected hero: " + hero.name, LogType.Debug);
             }
 
             if (arenadata.pickedhero != "")
             {
                 ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(arenadata.pickedhero);
-                Logger.WriteLine("Picked hero: " + hero.name);
+                Log.WriteLine("Picked hero: " + hero.name, LogType.Debug);
             }
 
-            Logger.WriteLine("State: " + ArenaHelper.Plugin.GetState().ToString());
+            Log.WriteLine("State: " + ArenaHelper.Plugin.GetState().ToString(), LogType.Debug);
         }
 
         // Called when Arena Helper window is closed
@@ -181,7 +182,7 @@ namespace TestPlugin
         public override async void CloseArena(ArenaHelper.Plugin.ArenaData arenadata, ArenaHelper.Plugin.PluginState state)
         {
             // Closing the window, to maybe resume at a later time
-            Logger.WriteLine("Closing");
+            Log.WriteLine("Closing", LogType.Debug);
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Hearthstone;
+using Hearthstone_Deck_Tracker.Utility.Logging;
 
 // Ignore the warning, not every function needs an 'await'
 #pragma warning disable 1998
@@ -147,7 +148,7 @@ namespace ArenaHelper
             {
                 AHPlugin plugin = (AHPlugin)Activator.CreateInstance(type);
                 plugins.Add(plugin);
-                Logger.WriteLine("Found: " + plugin.Name);
+                Log.WriteLine("Found: " + plugin.Name, LogType.Debug);
             }
         }
 

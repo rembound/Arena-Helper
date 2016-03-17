@@ -20,6 +20,9 @@ using System.Runtime.InteropServices;
 using MahApps.Metro.Controls.Dialogs;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Converters;
+using Hearthstone_Deck_Tracker.Utility;
+using Hearthstone_Deck_Tracker.Utility.Logging;
+
 
 namespace ArenaHelper
 {
@@ -314,7 +317,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.7"); }
+            get { return new Version("0.6.8"); }
         }
 
         public MenuItem MenuItem
@@ -363,7 +366,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "OnLoad Error: " + e.Message + "\n" + e.ToString();
-                Logger.WriteLine(errormsg);
+                Log.WriteLine(errormsg, LogType.Debug);
             }
         }
 
@@ -401,7 +404,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "ActivateArenaWindow: " + e.Message + "\n" + e.ToString();
-                Logger.WriteLine(errormsg);
+                Log.WriteLine(errormsg, LogType.Debug);
             }
 
         }
@@ -503,12 +506,12 @@ namespace ArenaHelper
                     }
                     else
                     {
-                        Logger.WriteLine("Arena Helper: Error loading config, null");
+                        Log.WriteLine("Arena Helper: Error loading config, null", LogType.Debug);
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.WriteLine("Arena Helper: Error loading config");
+                    Log.WriteLine("Arena Helper: Error loading config", LogType.Debug);
                 }
             }
 
@@ -784,7 +787,7 @@ namespace ArenaHelper
             {
                 try
                 {
-                    Logger.WriteLine("Arena Helper: loading data");
+                    Log.WriteLine("Arena Helper: loading data", LogType.Debug);
                     // Load the data
                     loadedarenadata = JsonConvert.DeserializeObject<ArenaData>(File.ReadAllText(filename));
                     if (loadedarenadata != null)
@@ -795,12 +798,12 @@ namespace ArenaHelper
                     }
                     else
                     {
-                        Logger.WriteLine("Arena Helper: Error loading arena data, null");
+                        Log.WriteLine("Arena Helper: Error loading arena data, null", LogType.Debug);
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.WriteLine("Arena Helper: Error loading arena data");
+                    Log.WriteLine("Arena Helper: Error loading arena data", LogType.Debug);
                 }
             }
 
@@ -957,7 +960,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "CheckUpdate: " + e.Message + "\n" + e.ToString();
-                Logger.WriteLine(errormsg);
+                Log.WriteLine(errormsg, LogType.Debug);
             }
             
             await mutex.WaitAsync();
@@ -981,15 +984,14 @@ namespace ArenaHelper
                             // With manual clicks or logreader, we don't need the focus
                             needsfocus = false;
                         }
-                        //fullcapture = Helper.CaptureHearthstone(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
-                        //fullcapture = await Helper.CaptureHearthstoneAsync(new Point(0, 0), hsrect.Width, hsrect.Height, default(IntPtr), needsfocus);
+
                         if (needsfocus && !User32.IsHearthstoneInForeground())
                         {
                             fullcapture = null;
                         }
                         else
                         {
-                            fullcapture = Helper.CaptureScreen(User32.GetHearthstoneWindow(), new Point(0, 0), hsrect.Width, hsrect.Height);
+                            fullcapture = ScreenCapture.CaptureScreen(User32.GetHearthstoneWindow(), new Point(0, 0), hsrect.Width, hsrect.Height);
                         }
                     }
                     else
@@ -1015,7 +1017,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "OnUpdate Error: " + e.Message + "\n" + e.ToString();
-                Logger.WriteLine(errormsg);
+                Log.WriteLine(errormsg, LogType.Debug);
             }
             finally
             {
@@ -1030,7 +1032,7 @@ namespace ArenaHelper
 
             try
             {
-                //Logger.WriteLine("AH LogLine: " + logline);
+                //Log.WriteLine("AH LogLine: " + logline, LogType.Debug);
 
                 // Only process new lines
                 DateTime loglinetime;
@@ -1071,7 +1073,7 @@ namespace ArenaHelper
                         if (hero != null)
                         {
                             // Hero choice detection, final
-                            Logger.WriteLine("AH Hero chosen: " + heroname);
+                            Log.WriteLine("AH Hero chosen: " + heroname, LogType.Debug);
                             PickHero(hero.index);
                         }
                     }
@@ -1084,7 +1086,7 @@ namespace ArenaHelper
                         if (GetHero(heroname) != null)
                         {
                             // Hero choice detection, not final
-                            Logger.WriteLine("AH Hero choice: " + heroname);
+                            Log.WriteLine("AH Hero choice: " + heroname, LogType.Debug);
                             loglastheroname = heroname;
                         }
                     }
@@ -1097,11 +1099,11 @@ namespace ArenaHelper
                         // This should not be necessary, but HDT does it
                         if (loglastcardid == cardid && dtime < 1000)
                         {
-                            Logger.WriteLine(string.Format("AH Card with the same ID ({0}) was chosen less {1} ms ago. Ignoring.", cardid, dtime));
+                            Log.WriteLine(string.Format("AH Card with the same ID ({0}) was chosen less {1} ms ago. Ignoring.", cardid, dtime), LogType.Debug);
                             return;
                         }
 
-                        Logger.WriteLine("AH Card choice: " + cardid);
+                        Log.WriteLine("AH Card choice: " + cardid, LogType.Debug);
 
                         loglastchoice = DateTime.Now;
                         loglastcardid = cardid;
@@ -1111,7 +1113,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "OnArenaLogLine: " + e.Message + "\n" + e.ToString();
-                Logger.WriteLine(errormsg);
+                Log.WriteLine(errormsg, LogType.Debug);
             }
         }
 
@@ -1188,7 +1190,7 @@ namespace ArenaHelper
                     catch(Exception e)
                     {
                         string errormsg = "CheckPluginUpdate: " + e.Message + "\n" + e.ToString();
-                        Logger.WriteLine(errormsg);
+                        Log.WriteLine(errormsg, LogType.Debug);
                     }
                     finally
                     {
@@ -1831,7 +1833,7 @@ namespace ArenaHelper
                 // Logreader
                 if (loglastcardid != "")
                 {
-                    Logger.WriteLine("AH Card choice pick: " + loglastcardid);
+                    Log.WriteLine("AH Card choice pick: " + loglastcardid, LogType.Debug);
                     PickCard(loglastcardid);
                     loglastcardid = "";
                 }
@@ -1949,7 +1951,7 @@ namespace ArenaHelper
 
             if (pickindex == -1)
             {
-                Logger.WriteLine("AH: Missed a pick");
+                Log.WriteLine("AH: Missed a pick", LogType.Debug);
             }
 
             arenadata.pickedcards.Add(cardid);
@@ -2290,7 +2292,7 @@ namespace ArenaHelper
                     {
                         testtext.Text = errormsg;
                     }
-                    Logger.WriteLine(errormsg);
+                    Log.WriteLine(errormsg, LogType.Debug);
                 }
             }
 
@@ -2327,7 +2329,7 @@ namespace ArenaHelper
                     {
                         testtext.Text = errormsg;
                     }
-                    Logger.WriteLine(errormsg);
+                    Log.WriteLine(errormsg, LogType.Debug);
                 }
             }
 
@@ -2360,7 +2362,7 @@ namespace ArenaHelper
                     {
                         testtext.Text = errormsg;
                     }
-                    Logger.WriteLine(errormsg);
+                    Log.WriteLine(errormsg, LogType.Debug);
                 }
             }
 
@@ -2558,7 +2560,7 @@ namespace ArenaHelper
                     if (File.Exists(usercardhashesfile))
                     {
                          // Use userdata version
-                        Logger.WriteLine("Arena Helper: Using userdata version of hashlist");
+                        Log.WriteLine("Arena Helper: Using userdata version of hashlist", LogType.Debug);
                          dataversion.hashlist = userdataversion.hashlist;
                          cardhashesfile = usercardhashesfile;
                      }
@@ -2569,7 +2571,7 @@ namespace ArenaHelper
                     if (File.Exists(usercardtierfile))
                     {
                         // Use userdata version
-                        Logger.WriteLine("Arena Helper: Using userdata version of tierlist");
+                        Log.WriteLine("Arena Helper: Using userdata version of tierlist", LogType.Debug);
                         dataversion.tierlist = userdataversion.tierlist;
                         cardtierfile = usercardtierfile;
                     }
