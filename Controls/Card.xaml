@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:ArenaHelper"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <Rectangle Fill="{Binding Background}" Height="34" Width="217"/>
+    <!--
     <Grid Height="34" Width="217">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="38" />
@@ -14,13 +16,14 @@
         <Rectangle Fill="{Binding Background}" Height="34" Width="217" Grid.ColumnSpan="2"/>
         <local:OutlinedTextBlock Width="32" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center"
                                  Text="{Binding Cost}"
-                                 FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT"
+                                 FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT"
                                  TextAlignment="Center" FontSize="20" Grid.Column="0" />
+
         <Viewbox Height="16" HorizontalAlignment="Left" Grid.Column="1">
             <local:OutlinedTextBlock VerticalAlignment="Center" Text="{Binding LocalizedName}"
                                  Fill="{Binding ColorPlayer}" 
                                  FontFamily="{Binding Font}" 
                                  TextAlignment="Left" FontSize="13" />
         </Viewbox>
-    </Grid>
+    </Grid>-->
 </UserControl>

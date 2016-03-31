@@ -51,7 +51,7 @@
             </controls:Flyout>
 
             <!-- About -->
-            <controls:Flyout x:Name="FlyoutAbout" Header="About" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+            <controls:Flyout x:Name="FlyoutAbout" Header="Support" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
                 <StackPanel Margin="5">
                     <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" TextWrapping="Wrap">
                         <Run Text="Thank you for using my plugin! Arena Helper " /><Run Text="{Binding StringVersion, Mode=OneWay}" /><Run Text=" was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
@@ -109,14 +109,14 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <local:OutlinedTextBlock Grid.Row="0" x:Name="DetectingHeader" HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="Title" Margin="0,4,0,0" />
+            <local:OutlinedTextBlock Grid.Row="0" x:Name="DetectingHeader" HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Title" Margin="0,4,0,0" />
             <TextBlock Grid.Row="1" x:Name="DetectingText" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Margin="0,12,0,0">text</TextBlock>
             <TextBlock Grid.Row="2" x:Name="DetectingText2" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Margin="0,20,0,0">text</TextBlock>
         </Grid>
 
         <!-- HeroPanel -->
         <StackPanel x:Name="HeroPanel" Grid.Row="1" Width="200" Visibility="Hidden">
-            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="Detected Heroes" Margin="0,4,0,0" />
+            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Detected Heroes" Margin="0,4,0,0" />
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -134,7 +134,7 @@
         </StackPanel>
 
         <StackPanel x:Name="ConfigureHeroPanel" Grid.Row="1" Width="300" Visibility="Hidden">
-            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="Select Hero" Margin="0,4,0,0" />
+            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Select Hero" Margin="0,4,0,0" />
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -169,13 +169,13 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0">
-                <local:OutlinedTextBlock x:Name="Header" HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="header" Margin="0,4,0,0" />
+                <local:OutlinedTextBlock x:Name="Header" HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="header" Margin="0,4,0,0" />
                 <localcontrols:Card x:Name="CardControl0" DataContext="{Binding Card0}" HorizontalAlignment="Center" Margin="0,12,0,0" MouseUp="CardControl0_MouseUp" />
                 <localcontrols:Card x:Name="CardControl1" DataContext="{Binding Card1}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl1_MouseUp" />
                 <localcontrols:Card x:Name="CardControl2" DataContext="{Binding Card2}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl2_MouseUp" />
             </StackPanel>
             <StackPanel Grid.Column="1" Visibility="Visible" HorizontalAlignment="Center" Margin="32,0,0,0">
-                <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT" FontSize="20" Text="Value" Margin="0,4,0,0" />
+                <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Value" Margin="0,4,0,0" />
                 <Label x:Name="Value0" Height="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center"  Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Content="80" FontSize="14" Margin="0,12,0,0" />
                 <Label x:Name="Value1" Height="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Content="80" FontSize="14" Margin="0,4,0,0" />
                 <Label x:Name="Value2" Height="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Content="80" FontSize="14" Margin="0,4,0,0" />

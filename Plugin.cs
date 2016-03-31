@@ -195,7 +195,7 @@ namespace ArenaHelper
 
         private List<ArenaHelper.Controls.ValueOverlay> valueoverlays = new List<ArenaHelper.Controls.ValueOverlay>();
         private ArenaHelper.Controls.AdviceOverlay adviceoverlay = null;
-        private HearthstoneTextBlock testtext = null;
+        private ArenaHelper.Controls.DebugTextBlock testtext = null;
         private List<System.Windows.Controls.Image> testimages = new List<System.Windows.Controls.Image>();
 
         private Update.AHDataVersion dataversion;
@@ -317,7 +317,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.8"); }
+            get { return new Version("0.6.9"); }
         }
 
         public MenuItem MenuItem
@@ -2657,7 +2657,7 @@ namespace ArenaHelper
             // Test text
             if (testtext == null)
             {
-                testtext = new HearthstoneTextBlock();
+                testtext = new Controls.DebugTextBlock();
                 testtext.FontSize = 12;
                 testtext.Text = "Arena Helper";
                 Canvas.SetLeft(testtext, 5);

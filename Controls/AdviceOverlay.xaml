@@ -16,7 +16,7 @@
             </Border.Background>
             <local:OutlinedTextBlock x:Name="AdviceText" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="8,8,8,8"
                                  Text="text"
-                                 FontFamily="/HearthstoneDeckTracker;component/Resources/#Belwe Bd BT"
+                                 FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT"
                                  TextAlignment="Left" FontSize="18" />
         </Border>
     </Grid>
