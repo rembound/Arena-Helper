@@ -317,7 +317,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.6.9"); }
+            get { return new Version("0.7.0"); }
         }
 
         public MenuItem MenuItem
@@ -335,11 +335,11 @@ namespace ArenaHelper
 
                 // Set hashes
                 herohashlist.Clear();
-                herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 14776501596708557433, 13071189497635732127, 12085046589922798227)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
+                herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 15929423101315404409, 13071189497635732127, 13237968094529645459)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
                 herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451));
-                herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096827)); // Valeera, Valeera golden small, Valeera golden big
-                herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139));
-                herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590197, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
+                herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096795)); // Valeera, Valeera golden small, Valeera golden big
+                herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139, 11848119152778072427, 11846995451926976873)); // Uther Lightbringer, Lady Liadrin small, Lady Liadrin big
+                herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590069, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
                 herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433711186487002743));
                 herohashlist.Add(new HeroHashData(6, "Warlock", "warlock_small.png", 10186248321718481641));
                 herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373)); // Jaina, Medivh small, Medivh big
