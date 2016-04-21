@@ -1,6 +1,6 @@
 # Arena Helper
 
-Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist). The created deck can be saved to Hearthstone Deck Tracker. Check out the [How To Install](https://github.com/rembound/Arena-Helper#how-to-install) guide below to download and install the plugin.
+Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/Epix37/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to visually detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [The Lightforge: Hearthstone Arena Tier List](http://thelightforge.com/TierList). The created deck can be saved to Hearthstone Deck Tracker. Check out the [How To Install](https://github.com/rembound/Arena-Helper#how-to-install) guide below to download and install the plugin.
 
 ![Arena Helper](images/arena-helper.png?raw=true)
 
@@ -52,7 +52,7 @@ Wait for the plugin to finish detecting the cards.
 
 ![Arena Helper](images/arena-helper-3.png?raw=true)
 
-Arena Helper has detected the cards and displays the value from [ADWCTA's Arena Tier List](http://ggoatgaming.com/tierlist) in the window and the overlay.
+Arena Helper has detected the cards and displays the value from [The Lightforge: Hearthstone Arena Tier List](http://thelightforge.com/TierList) in the window and the overlay.
 
 ![Arena Helper](images/arena-helper-4.png?raw=true)
 
