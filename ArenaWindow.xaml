@@ -30,7 +30,7 @@
                             <VisualBrush Visual="{StaticResource appbar_heart}" />
                         </Rectangle.Fill>
                     </Rectangle>
-                    <TextBlock Margin="4" VerticalAlignment="Center" Text="Support" />
+                    <TextBlock Margin="4" VerticalAlignment="Center" Text="About" />
                 </StackPanel>
             </Button>
         </controls:WindowCommands>
@@ -51,12 +51,12 @@
             </controls:Flyout>
 
             <!-- About -->
-            <controls:Flyout x:Name="FlyoutAbout" Header="Support" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+            <controls:Flyout x:Name="FlyoutAbout" Header="About" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
                 <StackPanel Margin="5">
                     <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" TextWrapping="Wrap">
                         <Run Text="Thank you for using my plugin! Arena Helper " /><Run Text="{Binding StringVersion, Mode=OneWay}" /><Run Text=" was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
                         <Run Text="with support from the community at GitHub." />
-                        <Run Text="Thanks go out to Grinning Goat for providing " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">ADWCTA's Arena Tier List</Hyperlink><Run Text="!" />
+                        <Run Text="Thanks go out to Grinning Goat for providing " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Hearthstone Arena Tier List</Hyperlink><Run Text="!" />
                         <LineBreak /><LineBreak />
                         <Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Donations</Hyperlink>
                         <Run Text="are greatly appreciated. Thanks for your support!" />

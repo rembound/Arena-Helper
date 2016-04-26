@@ -102,7 +102,7 @@ namespace ArenaHelper
 
         public string StringTierList
         {
-            get { return "http://ggoatgaming.com/tierlist"; }
+            get { return "http://thelightforge.com/TierList"; }
         }
 
         public string StringGitHub

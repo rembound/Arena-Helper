@@ -317,7 +317,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.7.0"); }
+            get { return new Version("0.7.1"); }
         }
 
         public MenuItem MenuItem
@@ -2658,6 +2658,7 @@ namespace ArenaHelper
             if (testtext == null)
             {
                 testtext = new Controls.DebugTextBlock();
+                testtext.TextWrapping = System.Windows.TextWrapping.Wrap;
                 testtext.FontSize = 12;
                 testtext.Text = "Arena Helper";
                 Canvas.SetLeft(testtext, 5);
