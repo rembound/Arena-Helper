@@ -53,19 +53,50 @@
             <!-- About -->
             <controls:Flyout x:Name="FlyoutAbout" Header="About" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
                 <StackPanel Margin="5">
-                    <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" TextWrapping="Wrap">
-                        <Run Text="Thank you for using my plugin! Arena Helper " /><Run Text="{Binding StringVersion, Mode=OneWay}" /><Run Text=" was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
+                    <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
+                        <Run Text="Arena Helper " /><Run Text="{Binding StringVersion, Mode=OneWay}" /><Run Text=" was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
                         <Run Text="with support from the community at GitHub." />
                         <Run Text="Thanks go out to Grinning Goat for providing " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Hearthstone Arena Tier List</Hyperlink><Run Text="!" />
                         <LineBreak /><LineBreak />
-                        <Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Donations</Hyperlink>
-                        <Run Text="are greatly appreciated. Thanks for your support!" />
+                        <Run Text="Thanks for your support! Any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donation</Hyperlink><Run Text=" is greatly appreciated." />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Name="AboutDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>
-                        <Button Name="AboutVisitWebsite" Content="rembound.com" Margin="10,0,0,0" Width="100" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutVisitWebsite_Click"/>
-                        <Button Name="AboutVisitGitHub" Content="github" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutVisitGitHub_Click"/>
+                        <Button Name="AboutVisitWebsite" Content="rembound.com" Margin="10,0,0,0" Width="100" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitWebsite_Click"/>
+                        <Button Name="AboutVisitGitHub" Content="github" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitGitHub_Click"/>
                         <Button Name="AboutButtonClose" Content="close" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutButtonClose_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:Flyout>
+
+            <!-- Update -->
+            <controls:Flyout x:Name="FlyoutUpdate" Header="Update available!" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+                <StackPanel Margin="5">
+                    <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
+                        <Run Text="Press &quot;download&quot; to automatically download and install the new update. This will restart Hearthstone Deck Tracker." />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Name="UpdateDownload" Content="download" Width="70" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="UpdateDownload_Click"/>
+                        <Button Name="UpdateWebsite" Content="website" Margin="10,0,0,0" Width="70" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="UpdateWebsite_Click"/>
+                        <Button Name="UpdateClose" Content="close" Width="70" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="UpdateClose_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </controls:Flyout>
+
+            <!-- Data Update -->
+            <controls:Flyout x:Name="FlyoutDataUpdate" Header="Data update applied!" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+                <StackPanel Margin="5">
+                    <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
+                        <Run Text="The tier list and card data was updated to the latest version." />
+                        <Run Text="More info about the tier list can be found at: " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Hearthstone Arena Tier List</Hyperlink>
+                        <LineBreak /><LineBreak />
+                        <Run Text="Thanks for your support! Any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donation</Hyperlink><Run Text=" is greatly appreciated." />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Name="DataUpdateDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>
+                        <Button Name="DataUpdateWebsite" Content="rembound.com" Margin="10,0,0,0" Width="100" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitWebsite_Click"/>
+                        <Button Name="DataUpdateGitHub" Content="github" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitGitHub_Click"/>
+                        <Button Name="DataUpdateClose" Content="close" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="DataUpdateClose_Click"/>
                     </StackPanel>
                 </StackPanel>
             </controls:Flyout>

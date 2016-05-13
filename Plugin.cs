@@ -37,6 +37,7 @@ namespace ArenaHelper
             public bool overlay;
             public bool debug;
             public bool autosave;
+            public bool updated;
 
             public ConfigData()
             {
@@ -45,6 +46,7 @@ namespace ArenaHelper
                 overlay = true;
                 debug = false;
                 autosave = false;
+                updated = false;
             }
 
             public void ResetWindow()
@@ -247,6 +249,7 @@ namespace ArenaHelper
 
         // Updates
         private DateTime lastpluginupdatecheck = DateTime.MinValue;
+        private Update.GithubRelease latestrelease = null;
         private bool haspluginupdates = false;
         private TimeSpan pluginupdatecheckinterval = TimeSpan.FromHours(1);
         private bool showingupdatemessage = false;
@@ -317,7 +320,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.7.1"); }
+            get { return new Version("0.8.0"); }
         }
 
         public MenuItem MenuItem
@@ -329,6 +332,10 @@ namespace ArenaHelper
         {
             try
             {
+                // Clean auto updater
+                Update.CleanAutoUpdate();
+
+                // Load plugins
                 plugins.LoadPlugins();
 
                 state = PluginState.Idle;
@@ -342,7 +349,7 @@ namespace ArenaHelper
                 herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590069, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
                 herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433711186487002743));
                 herohashlist.Add(new HeroHashData(6, "Warlock", "warlock_small.png", 10186248321718481641));
-                herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373)); // Jaina, Medivh small, Medivh big
+                herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373, 4200442357624021949, 6507833410481791487)); // Jaina, Medivh small, Medivh big, Khadgar small, Khadgar big
                 herohashlist.Add(new HeroHashData(8, "Priest", "priest_small.png", 15052908377040876499));
 
                 AddMenuItem();
@@ -366,7 +373,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "OnLoad Error: " + e.Message + "\n" + e.ToString();
-                Log.WriteLine(errormsg, LogType.Debug);
+                Log.Info(errormsg);
             }
         }
 
@@ -390,6 +397,14 @@ namespace ArenaHelper
                 if (arenawindow == null)
                 {
                     InitializeMainWindow();
+
+                    // Show about page when auto updated
+                    if (configdata.updated)
+                    {
+                        arenawindow.FlyoutAbout.IsOpen = true;
+                        configdata.updated = false;
+                        SaveConfig();
+                    }
                     arenawindow.Show();
                 }
                 else
@@ -404,7 +419,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "ActivateArenaWindow: " + e.Message + "\n" + e.ToString();
-                Log.WriteLine(errormsg, LogType.Debug);
+                Log.Info(errormsg);
             }
 
         }
@@ -446,6 +461,8 @@ namespace ArenaHelper
                 arenawindow.oncheckboxmanual = new ArenaWindow.OnCheckbox(OnCheckboxManual);
                 arenawindow.oncheckboxautosave = new ArenaWindow.OnCheckbox(OnCheckboxAutoSave);
                 arenawindow.oncheckboxdebug = new ArenaWindow.OnCheckbox(OnCheckboxDebug);
+
+                arenawindow.onupdatedownloadclick = new ArenaWindow.OnEvent(OnUpdateDownloadClick);
 
                 // Get the latest arena data
                 string newestfilename = "";
@@ -506,12 +523,12 @@ namespace ArenaHelper
                     }
                     else
                     {
-                        Log.WriteLine("Arena Helper: Error loading config, null", LogType.Debug);
+                        Log.Info("Arena Helper: Error loading config, null");
                     }
                 }
                 catch (Exception e)
                 {
-                    Log.WriteLine("Arena Helper: Error loading config", LogType.Debug);
+                    Log.Info("Arena Helper: Error loading config");
                 }
             }
 
@@ -688,6 +705,18 @@ namespace ArenaHelper
             }
         }
 
+        // Auto update
+        public void OnUpdateDownloadClick()
+        {
+            Log.Info("Auto Updating Arena Helper");
+            if (latestrelease != null)
+            {
+                configdata.updated = true;
+                SaveConfig();
+                Update.AutoUpdate(latestrelease);
+            }
+        }
+
         private void SaveDeck(bool autosave)
         {
             // Save deck
@@ -787,7 +816,7 @@ namespace ArenaHelper
             {
                 try
                 {
-                    Log.WriteLine("Arena Helper: loading data", LogType.Debug);
+                    Log.Info("Arena Helper: loading data");
                     // Load the data
                     loadedarenadata = JsonConvert.DeserializeObject<ArenaData>(File.ReadAllText(filename));
                     if (loadedarenadata != null)
@@ -798,12 +827,12 @@ namespace ArenaHelper
                     }
                     else
                     {
-                        Log.WriteLine("Arena Helper: Error loading arena data, null", LogType.Debug);
+                        Log.Info("Arena Helper: Error loading arena data, null");
                     }
                 }
                 catch (Exception e)
                 {
-                    Log.WriteLine("Arena Helper: Error loading arena data", LogType.Debug);
+                    Log.Info("Arena Helper: Error loading arena data");
                 }
             }
 
@@ -960,7 +989,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "CheckUpdate: " + e.Message + "\n" + e.ToString();
-                Log.WriteLine(errormsg, LogType.Debug);
+                Log.Info(errormsg);
             }
             
             await mutex.WaitAsync();
@@ -1017,7 +1046,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "OnUpdate Error: " + e.Message + "\n" + e.ToString();
-                Log.WriteLine(errormsg, LogType.Debug);
+                Log.Info(errormsg);
             }
             finally
             {
@@ -1032,7 +1061,7 @@ namespace ArenaHelper
 
             try
             {
-                //Log.WriteLine("AH LogLine: " + logline, LogType.Debug);
+                //Log.Info("AH LogLine: " + logline);
 
                 // Only process new lines
                 DateTime loglinetime;
@@ -1073,7 +1102,7 @@ namespace ArenaHelper
                         if (hero != null)
                         {
                             // Hero choice detection, final
-                            Log.WriteLine("AH Hero chosen: " + heroname, LogType.Debug);
+                            Log.Info("AH Hero chosen: " + heroname);
                             PickHero(hero.index);
                         }
                     }
@@ -1086,7 +1115,7 @@ namespace ArenaHelper
                         if (GetHero(heroname) != null)
                         {
                             // Hero choice detection, not final
-                            Log.WriteLine("AH Hero choice: " + heroname, LogType.Debug);
+                            Log.Info("AH Hero choice: " + heroname);
                             loglastheroname = heroname;
                         }
                     }
@@ -1099,11 +1128,11 @@ namespace ArenaHelper
                         // This should not be necessary, but HDT does it
                         if (loglastcardid == cardid && dtime < 1000)
                         {
-                            Log.WriteLine(string.Format("AH Card with the same ID ({0}) was chosen less {1} ms ago. Ignoring.", cardid, dtime), LogType.Debug);
+                            Log.Info(string.Format("AH Card with the same ID ({0}) was chosen less {1} ms ago. Ignoring.", cardid, dtime));
                             return;
                         }
 
-                        Log.WriteLine("AH Card choice: " + cardid, LogType.Debug);
+                        Log.Info("AH Card choice: " + cardid);
 
                         loglastchoice = DateTime.Now;
                         loglastcardid = cardid;
@@ -1113,7 +1142,7 @@ namespace ArenaHelper
             catch (Exception e)
             {
                 string errormsg = "OnArenaLogLine: " + e.Message + "\n" + e.ToString();
-                Log.WriteLine(errormsg, LogType.Debug);
+                Log.Info(errormsg);
             }
         }
 
@@ -1156,10 +1185,15 @@ namespace ArenaHelper
                 if ((DateTime.Now - lastpluginupdatecheck) > pluginupdatecheckinterval)
                 {
                     lastpluginupdatecheck = DateTime.Now;
-                    var latestversion = await Update.GetLatestVersion();
-                    if (latestversion != null)
+                    latestrelease = await Update.GetLatestRelease();
+                    if (latestrelease != null)
                     {
-                        haspluginupdates = latestversion > Version;
+                        Version latestversion = latestrelease.GetVersion();
+                        if (latestversion != null)
+                        {
+                            haspluginupdates = latestversion > Version;
+                            Log.Info(latestrelease.Assets[0].Url);
+                        }
                     }
                 }
             }
@@ -1169,20 +1203,11 @@ namespace ArenaHelper
                 if (arenawindow != null && !showingupdatemessage)
                 {
                     showingupdatemessage = true;
-
-                    var settings = new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "Not now" };
                     try
                     {
                         if (arenawindow != null)
                         {
-                            var result = await arenawindow.ShowMessageAsync("New update available!",
-                                "Do you want to download it?",
-                                MessageDialogStyle.AffirmativeAndNegative, settings);
-
-                            if (result == MessageDialogResult.Affirmative)
-                            {
-                                Process.Start(Update.releaseDownloadUrl);
-                            }
+                            arenawindow.FlyoutUpdate.IsOpen = true;
                             haspluginupdates = false;
                             lastpluginupdatecheck = DateTime.Now.AddDays(1);
                         }
@@ -1190,7 +1215,7 @@ namespace ArenaHelper
                     catch(Exception e)
                     {
                         string errormsg = "CheckPluginUpdate: " + e.Message + "\n" + e.ToString();
-                        Log.WriteLine(errormsg, LogType.Debug);
+                        Log.Info(errormsg);
                     }
                     finally
                     {
@@ -1252,10 +1277,8 @@ namespace ArenaHelper
 
                             if (arenawindow != null)
                             {
-                                var settings = new MetroDialogSettings { AffirmativeButtonText = "OK"};
-                                var result = await arenawindow.ShowMessageAsync("Data update applied!",
-                                    "The tier list and card data was updated to the latest version.",
-                                    MessageDialogStyle.Affirmative, settings);
+                                // Show update message
+                                arenawindow.FlyoutDataUpdate.IsOpen = true;
                                 haspluginupdates = false;
                                 lastpluginupdatecheck = DateTime.Now.AddDays(1);
                             }
@@ -1833,7 +1856,7 @@ namespace ArenaHelper
                 // Logreader
                 if (loglastcardid != "")
                 {
-                    Log.WriteLine("AH Card choice pick: " + loglastcardid, LogType.Debug);
+                    Log.Info("AH Card choice pick: " + loglastcardid);
                     PickCard(loglastcardid);
                     loglastcardid = "";
                 }
@@ -1951,7 +1974,7 @@ namespace ArenaHelper
 
             if (pickindex == -1)
             {
-                Log.WriteLine("AH: Missed a pick", LogType.Debug);
+                Log.Info("AH: Missed a pick");
             }
 
             arenadata.pickedcards.Add(cardid);
@@ -2292,7 +2315,7 @@ namespace ArenaHelper
                     {
                         testtext.Text = errormsg;
                     }
-                    Log.WriteLine(errormsg, LogType.Debug);
+                    Log.Info(errormsg);
                 }
             }
 
@@ -2329,7 +2352,7 @@ namespace ArenaHelper
                     {
                         testtext.Text = errormsg;
                     }
-                    Log.WriteLine(errormsg, LogType.Debug);
+                    Log.Info(errormsg);
                 }
             }
 
@@ -2362,7 +2385,7 @@ namespace ArenaHelper
                     {
                         testtext.Text = errormsg;
                     }
-                    Log.WriteLine(errormsg, LogType.Debug);
+                    Log.Info(errormsg);
                 }
             }
 
@@ -2380,13 +2403,13 @@ namespace ArenaHelper
             CvInvoke.Blur(sourceimage, sourceimage, new Size(4, 4), new Point(-1, -1));
 
             // Show image for debugging
-            Image<Bgra, Byte> convimage = Image<Bgra, Byte>.FromIplImagePtr(sourceimage);
-            ShowBitmap(convimage.ToBitmap(), ref imagecontrol);
+            //Image<Bgra, Byte> convimage = Image<Bgra, Byte>.FromIplImagePtr(sourceimage);
+            //ShowBitmap(convimage.ToBitmap(), ref imagecontrol);
 
             // Resize to 64x64 pixels
             Image<Gray, float> resimage = new Image<Gray, float>(new Size(64, 64));
             CvInvoke.Resize(sourceimage, resimage, new Size(64, 64));
-            ShowBitmap(resimage.ToBitmap(), ref imagecontrol);
+            //ShowBitmap(resimage.ToBitmap(), ref imagecontrol);
 
             // DCT
             IntPtr compleximage = CvInvoke.cvCreateImage(resimage.Size, Emgu.CV.CvEnum.IplDepth.IplDepth32F, 1);
@@ -2560,7 +2583,7 @@ namespace ArenaHelper
                     if (File.Exists(usercardhashesfile))
                     {
                          // Use userdata version
-                        Log.WriteLine("Arena Helper: Using userdata version of hashlist", LogType.Debug);
+                        Log.Info("Arena Helper: Using userdata version of hashlist");
                          dataversion.hashlist = userdataversion.hashlist;
                          cardhashesfile = usercardhashesfile;
                      }
@@ -2571,7 +2594,7 @@ namespace ArenaHelper
                     if (File.Exists(usercardtierfile))
                     {
                         // Use userdata version
-                        Log.WriteLine("Arena Helper: Using userdata version of tierlist", LogType.Debug);
+                        Log.Info("Arena Helper: Using userdata version of tierlist");
                         dataversion.tierlist = userdataversion.tierlist;
                         cardtierfile = usercardtierfile;
                     }

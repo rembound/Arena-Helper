@@ -6,6 +6,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using Hearthstone_Deck_Tracker.Utility.Logging;
+using System.IO;
+using System.Reflection;
 
 namespace ArenaHelper
 {
@@ -22,21 +26,25 @@ namespace ArenaHelper
         public const string HashListUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/cardhashes.json";
         public const string TierListUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/cardtier.json";
 
+        // Updater
+        public const string UpdaterFileName = "Updater.exe";
+        public const string UpdaterFileNameNew = "Updater_new.exe";
+
 
         public const string userAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
 
-        public static async Task<Version> GetLatestVersion()
+        public static async Task<GithubRelease> GetLatestRelease()
         {
             try
             {
-                string versionStr;
+                string releaseStr;
                 using (var wc = new WebClient())
                 {
                     wc.Headers.Add("user-agent", userAgent);
-                    versionStr = await wc.DownloadStringTaskAsync(latestReleaseRequestUrl);
+                    releaseStr = await wc.DownloadStringTaskAsync(latestReleaseRequestUrl);
                 }
-                var versionObj = JsonConvert.DeserializeObject<GithubRelease>(versionStr);
-                return versionObj == null ? null : new Version(versionObj.TagName);
+                var releaseObj = JsonConvert.DeserializeObject<GithubRelease>(releaseStr);
+                return (releaseObj == null ? null : releaseObj);
             }
             catch (Exception)
             {
@@ -44,10 +52,28 @@ namespace ArenaHelper
             return null;
         }
 
-        private class GithubRelease
+        public class GithubRelease
         {
             [JsonProperty("tag_name")]
             public string TagName { get; set; }
+
+            [JsonProperty("assets")]
+            public List<Asset> Assets { get; set; }
+
+            public class Asset
+            {
+                [JsonProperty("browser_download_url")]
+                public string Url { get; set; }
+
+                [JsonProperty("name")]
+                public string Name { get; set; }
+            }
+
+            public Version GetVersion()
+            {
+                Version v;
+                return (Version.TryParse(TagName, out v) ? v : null);
+            }
         }
 
 
@@ -99,6 +125,51 @@ namespace ArenaHelper
             {
             }
             return null;
+        }
+
+        // Start auto updater
+        public static async void AutoUpdate(GithubRelease release)
+        {
+            try
+            {
+                if (release.Assets.Count > 0)
+                {
+                    string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string updater = Path.Combine(assemblylocation, UpdaterFileName);
+                    Process.Start(updater, string.Format("{0} {1}", Process.GetCurrentProcess().Id, release.Assets[0].Url));
+                    Hearthstone_Deck_Tracker.API.Core.MainWindow.Close();
+                    System.Windows.Application.Current.Shutdown();
+                }
+            }
+            catch(Exception e)
+            {
+                // Manual update
+                Log.Info("AutoUpdate error: " + e.Message);
+                Process.Start(releaseDownloadUrl);
+            }
+        }
+
+        // Clean up auto updater
+        public static void CleanAutoUpdate()
+        {
+            try
+            {
+                string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string updater = Path.Combine(assemblylocation, UpdaterFileName);
+                string updaternew = Path.Combine(assemblylocation, UpdaterFileNameNew);
+
+
+                if (File.Exists(updaternew))
+                {
+                    if (File.Exists(updater))
+                        File.Delete(updater);
+                    File.Move(updaternew, updater);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Info("Error updating Arena Helper updater");
+            }
         }
     }
 }

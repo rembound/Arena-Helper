@@ -42,6 +42,8 @@ namespace ArenaHelper
         public OnCheckbox oncheckboxautosave = null;
         public OnCheckbox oncheckboxdebug = null;
 
+        public OnEvent onupdatedownloadclick = null;
+
         public bool initconfig = false;
 
         public ArenaWindow()
@@ -152,6 +154,7 @@ namespace ArenaHelper
             Process.Start(e.Uri.AbsoluteUri);
         }
 
+        // About
         private void AboutDonate_Click(object sender, RoutedEventArgs e)
         {
             Process.Start(StringDonate);
@@ -171,6 +174,32 @@ namespace ArenaHelper
         {
             FlyoutAbout.IsOpen = false;
         }
+
+        // Update
+        private void UpdateDownload_Click(object sender, RoutedEventArgs e)
+        {
+            if (onupdatedownloadclick != null)
+            {
+                onupdatedownloadclick();
+            }
+        }
+
+        private void UpdateWebsite_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(StringGitHub);
+        }
+
+        private void UpdateClose_Click(object sender, RoutedEventArgs e)
+        {
+            FlyoutUpdate.IsOpen = false;
+        }
+
+        // Data update
+        private void DataUpdateClose_Click(object sender, RoutedEventArgs e)
+        {
+            FlyoutDataUpdate.IsOpen = false;
+        }
+
 
         private void ButtonNewArena_Click(object sender, RoutedEventArgs e)
         {

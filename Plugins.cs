@@ -148,7 +148,7 @@ namespace ArenaHelper
             {
                 AHPlugin plugin = (AHPlugin)Activator.CreateInstance(type);
                 plugins.Add(plugin);
-                Log.WriteLine("Found: " + plugin.Name, LogType.Debug);
+                Log.Info("Found: " + plugin.Name);
             }
         }
 

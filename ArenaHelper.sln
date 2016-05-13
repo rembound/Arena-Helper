@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArenaHelper", "ArenaHelper.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPlugin", "TestPlugin\TestPlugin.csproj", "{9DBE89DA-8673-4657-A0DC-EC1F26C70B8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Updater", "Updater\Updater.csproj", "{BA9680FE-9A15-4AC1-B218-511D1EA691FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9DBE89DA-8673-4657-A0DC-EC1F26C70B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DBE89DA-8673-4657-A0DC-EC1F26C70B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DBE89DA-8673-4657-A0DC-EC1F26C70B8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA9680FE-9A15-4AC1-B218-511D1EA691FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA9680FE-9A15-4AC1-B218-511D1EA691FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA9680FE-9A15-4AC1-B218-511D1EA691FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA9680FE-9A15-4AC1-B218-511D1EA691FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
