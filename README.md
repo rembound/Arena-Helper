@@ -25,7 +25,7 @@ Available plugins:
 2. Unblock the zip file before unzipping, by [right-clicking it and choosing properties](http://blogs.msdn.com/b/delay/p/unblockingdownloadedfile.aspx):
 ![Unblock](images/unblock.png?raw=true)  
 3. Make sure you remove any old versions of the ArenaHelper directory in the plugins directory of Hearthstone Deck Tracker completely, before upgrading versions.  
-4. Unzip the archive to `Hearthstone Deck Tracker/Plugins`  
+4. Unzip the archive to `%AppData%/HearthstoneDeckTracker/Plugins` To find this directory, you can click the following button in the Hearthstone Deck Tracker options menu: `Options -> Tracker -> Plugins -> Plugins Folder`
 5. If you've done it correctly, the ArenaHelper directory should be inside the Plugins directory. Inside the ArenaHelper directory, there should be a bunch of files, including a file called ArenaHelper.dll.  
 6. If the plugin is missing MSVCP120.dll, install the following Redistributable Package (Select vcredist_x86.exe):  
 [Visual C++ Redistributable Packages for Visual Studio 2013](http://www.microsoft.com/en-us/download/details.aspx?id=40784)  
