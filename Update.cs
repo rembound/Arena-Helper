@@ -128,48 +128,32 @@ namespace ArenaHelper
         }
 
         // Start auto updater
-        public static async void AutoUpdate(GithubRelease release)
+        public static async Task<bool> AutoUpdate(GithubRelease release)
         {
+            bool status = true;
             try
             {
                 if (release.Assets.Count > 0)
                 {
-                    string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    string updater = Path.Combine(assemblylocation, UpdaterFileName);
-                    Process.Start(updater, string.Format("{0} {1}", Process.GetCurrentProcess().Id, release.Assets[0].Url));
-                    Hearthstone_Deck_Tracker.API.Core.MainWindow.Close();
-                    System.Windows.Application.Current.Shutdown();
+                    // Update and install
+                    status = await AutoUpdater.Update(release.Assets[0].Url);
                 }
             }
             catch(Exception e)
             {
-                // Manual update
+                status = false;
+
                 Log.Info("AutoUpdate error: " + e.Message);
-                Process.Start(releaseDownloadUrl);
             }
+
+            return status;
         }
 
         // Clean up auto updater
+        // TODO: When coming from 0.8 and skipping a version, how to add new files (they are removed if not synced)
         public static void CleanAutoUpdate()
         {
-            try
-            {
-                string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                string updater = Path.Combine(assemblylocation, UpdaterFileName);
-                string updaternew = Path.Combine(assemblylocation, UpdaterFileNameNew);
 
-
-                if (File.Exists(updaternew))
-                {
-                    if (File.Exists(updater))
-                        File.Delete(updater);
-                    File.Move(updaternew, updater);
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Info("Error updating Arena Helper updater");
-            }
         }
     }
 }

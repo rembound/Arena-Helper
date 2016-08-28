@@ -36,6 +36,10 @@
     <Reference Include="Emgu.Util">
       <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2157\bin\Emgu.Util.dll</HintPath>
     </Reference>
+    <Reference Include="HearthMirror">
+      <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\HearthMirror.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Hearthstone Deck Tracker">
       <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
       <Private>False</Private>
@@ -52,6 +56,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity">
       <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -69,6 +74,7 @@
     <Compile Include="ArenaWindow.xaml.cs">
       <DependentUpon>ArenaWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AutoUpdater.cs" />
     <Compile Include="Controls\AdviceOverlay.xaml.cs">
       <DependentUpon>AdviceOverlay.xaml</DependentUpon>
     </Compile>
@@ -85,6 +91,8 @@
     <Compile Include="Controls\ValueOverlay.xaml.cs">
       <DependentUpon>ValueOverlay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Debug.cs" />
+    <Compile Include="Detection.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Plugins.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

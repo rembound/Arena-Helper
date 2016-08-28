@@ -72,10 +72,10 @@
             <!-- Update -->
             <controls:Flyout x:Name="FlyoutUpdate" Header="Update available!" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
                 <StackPanel Margin="5">
-                    <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
+                    <TextBlock x:Name="UpdateText" Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
                         <Run Text="Press &quot;download&quot; to automatically download and install the new update. This will restart Hearthstone Deck Tracker." />
                     </TextBlock>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <StackPanel x:Name="UpdateButtons" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Name="UpdateDownload" Content="download" Width="70" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="UpdateDownload_Click"/>
                         <Button Name="UpdateWebsite" Content="website" Margin="10,0,0,0" Width="70" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="UpdateWebsite_Click"/>
                         <Button Name="UpdateClose" Content="close" Width="70" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="UpdateClose_Click"/>

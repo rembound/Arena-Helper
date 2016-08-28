@@ -10,8 +10,6 @@ using System.Windows.Media.Imaging;
 using System.Reflection;
 using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Plugins;
-using Emgu.CV;
-using Emgu.CV.Structure;
 using Hearthstone_Deck_Tracker.Hearthstone;
 using System.Diagnostics;
 using System.Threading;
@@ -22,7 +20,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Converters;
 using Hearthstone_Deck_Tracker.Utility;
 using Hearthstone_Deck_Tracker.Utility.Logging;
-
+using HearthMirror;
 
 namespace ArenaHelper
 {
@@ -112,33 +110,6 @@ namespace ArenaHelper
             }
         }
 
-        public class DetectedInfo
-        {
-            public int index;
-            public int confirmations;
-
-            public DetectedInfo(int index)
-            {
-                this.index = index;
-                confirmations = 0;
-            }
-
-            public void Confirm(int cindex)
-            {
-                if (index != cindex)
-                {
-                    // Different index
-                    index = cindex;
-                    confirmations = 0;
-                }
-                else
-                {
-                    // Same index, increase confirmations
-                    confirmations++;
-                }
-            }
-        }
-
         public class ArenaData
         {
             public string deckname;
@@ -159,35 +130,11 @@ namespace ArenaHelper
             }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        private struct MousePoint
-        {
-            public readonly int X;
-            public readonly int Y;
-        }
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetCursorPos(out MousePoint lpPoint);
-
-        public static Point GetMousePos()
-        {
-            MousePoint p;
-            GetCursorPos(out p);
-            return new Point(p.X, p.Y);
-        }
-
-        [DllImport("user32.dll")]
-        static extern short GetAsyncKeyState(UInt16 virtualKeyCode);
-        private const UInt16 VK_MBUTTON = 0x04; // middle mouse button
-        private const UInt16 VK_LBUTTON = 0x01; // left mouse button
-        private const UInt16 VK_RBUTTON = 0x02; // right mouse button
-
         public enum PluginState { Idle, SearchHeroes, SearchBigHero, DetectedHeroes, SearchCards, SearchCardValues, DetectedCards, Done };
 
-        private List<DetectedInfo> detectedcards = new List<DetectedInfo>();
-        private List<DetectedInfo> detectedheroes = new List<DetectedInfo>();
-        private List<DetectedInfo> detectedbighero = new List<DetectedInfo>();
+        private List<Detection.DetectedInfo> detectedcards = new List<Detection.DetectedInfo>();
+        private List<Detection.DetectedInfo> detectedheroes = new List<Detection.DetectedInfo>();
+        private List<Detection.DetectedInfo> detectedbighero = new List<Detection.DetectedInfo>();
         private static PluginState state;
         private List<int> mouseindex = new List<int>();
         private ArenaData arenadata = new ArenaData();
@@ -195,10 +142,10 @@ namespace ArenaHelper
         private ConfigData configdata = new ConfigData();
         private bool configinit = false;
 
-        private List<ArenaHelper.Controls.ValueOverlay> valueoverlays = new List<ArenaHelper.Controls.ValueOverlay>();
-        private ArenaHelper.Controls.AdviceOverlay adviceoverlay = null;
-        private ArenaHelper.Controls.DebugTextBlock testtext = null;
-        private List<System.Windows.Controls.Image> testimages = new List<System.Windows.Controls.Image>();
+        private List<Controls.ValueOverlay> valueoverlays = new List<Controls.ValueOverlay>();
+        private Controls.AdviceOverlay adviceoverlay = null;
+        private Controls.DebugTextBlock debugtext = null;
+        private List<System.Windows.Controls.Image> debugimages = new List<System.Windows.Controls.Image>();
 
         private Update.AHDataVersion dataversion;
         private const string DataVersionFile = "version.json";
@@ -209,19 +156,9 @@ namespace ArenaHelper
         public static List<HeroHashData> herohashlist = new List<HeroHashData>();
         public static List<CardTierInfo> cardtierlist = new List<CardTierInfo>();
 
-        private Bitmap fullcapture;
-
-        // Left card dimensions
-        private const int scalewidth = 1280;
-        private const int scaleheight = 960;
-        Rectangle cardrect = new Rectangle(100, 152, 260, 393);
-        Rectangle cardcroprect = new Rectangle(127, 226, 204, 157);
-        private const int cardwidth = 250;
+        private Detection detection = new Detection();
 
         // Arena detection
-        Rectangle arenarect = new Rectangle(305, 0, 349, 69);
-        ulong arenahash = 14739256890895383027;
-        ulong arenahash2 = 18342314164188135155; // Dark arena hash in PluginState.DetectedHeroes
         bool inarena = false;
         bool stablearena = false;
         Stopwatch arenastopwatch;
@@ -229,16 +166,7 @@ namespace ArenaHelper
         // Configure heroes
         bool configurehero = false;
 
-        // Portrait detection
-        Rectangle portraitcroprect = new Rectangle(143, 321, 173, 107);
-        private const int portraitwidth = 250;
-        ulong[] herohashes = new ulong[7];
-
-        // Big portrait detection
-        Rectangle portraitbigcroprect = new Rectangle(381, 376, 471, 291);
-
         // Log reader
-        private bool uselogreader = true;
         private DateTime loglasttime = DateTime.MinValue;
         private string loglastline = "";
         private DateTime loglastchoice = DateTime.MinValue;
@@ -246,6 +174,9 @@ namespace ArenaHelper
         private string loglastcardid = "";
         //"DraftManager.OnChosen(): hero=HERO_03 premium=STANDARD"
         public static readonly Regex HeroChosenRegex = new Regex(@"DraftManager\.OnChosen\(\): hero=(?<id>(.+)) .*");
+
+        // HearthMirror
+        private bool usehearthmirror = true;
 
         // Updates
         private DateTime lastpluginupdatecheck = DateTime.MinValue;
@@ -260,7 +191,7 @@ namespace ArenaHelper
         Stopwatch stopwatch;
 
         protected MenuItem MainMenuItem { get; set; }
-        protected static ArenaWindow arenawindow;
+        internal static ArenaWindow arenawindow = null;
         
         private SemaphoreSlim mutex = new SemaphoreSlim(1);
 
@@ -269,8 +200,6 @@ namespace ArenaHelper
         private const int HeroConfirmations = 3;
         private const int CardConfirmations = 3;
         private const int BigHeroConfirmations = 0; // Confirm immediately
-        private const int maxcarddistance = 10;
-        private const int maxherodistance = 14;
         private const string DetectingArena = "Detecting arena...";
         private const string DetectingHeroes = "Detecting heroes...";
         private const string DetectingCards = "Detecting cards...";
@@ -278,8 +207,6 @@ namespace ArenaHelper
         private const string DetectionWarning = "Please make sure nothing overlaps the arena heroes and cards and the Hearthstone window has the focus. Don't make a selection yet!";
         private const string DoneMessage = "All cards are picked. You can start a new arena run or save the deck.";
         private const string ConfigFile = "arenahelper.json";
-
-        // TODO: When AH window is open, and you start Hearthstone, sometimes the plugin takes too long and gets suspended.
 
         private Plugins plugins = new Plugins();
 
@@ -320,7 +247,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.8.0"); }
+            get { return new Version("0.8.1"); }
         }
 
         public MenuItem MenuItem
@@ -332,9 +259,6 @@ namespace ArenaHelper
         {
             try
             {
-                // Clean auto updater
-                Update.CleanAutoUpdate();
-
                 // Load plugins
                 plugins.LoadPlugins();
 
@@ -343,7 +267,7 @@ namespace ArenaHelper
                 // Set hashes
                 herohashlist.Clear();
                 herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 15929423101315404409, 13071189497635732127, 13237968094529645459)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
-                herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451));
+                herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451, 15841665550811421911, 15769608231248747991)); // Thrall, Morgl small, Morgl big
                 herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096795)); // Valeera, Valeera golden small, Valeera golden big
                 herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139, 11848119152778072427, 11846995451926976873)); // Uther Lightbringer, Lady Liadrin small, Lady Liadrin big
                 herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590069, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
@@ -401,6 +325,9 @@ namespace ArenaHelper
                     // Show about page when auto updated
                     if (configdata.updated)
                     {
+                        // Clean auto updater
+                        Update.CleanAutoUpdate();
+
                         arenawindow.FlyoutAbout.IsOpen = true;
                         configdata.updated = false;
                         SaveConfig();
@@ -546,11 +473,11 @@ namespace ArenaHelper
             // Debug
             if (configdata.debug)
             {
-                testtext.Visibility = System.Windows.Visibility.Visible;
+                debugtext.Visibility = System.Windows.Visibility.Visible;
             }
             else
             {
-                testtext.Visibility = System.Windows.Visibility.Hidden;
+                debugtext.Visibility = System.Windows.Visibility.Hidden;
             }
         }
 
@@ -706,14 +633,34 @@ namespace ArenaHelper
         }
 
         // Auto update
-        public void OnUpdateDownloadClick()
+        public async void OnUpdateDownloadClick()
         {
             Log.Info("Auto Updating Arena Helper");
             if (latestrelease != null)
             {
+                arenawindow.UpdateText.Text = "Updating Arena Helper, please wait...";
+                arenawindow.UpdateButtons.Visibility = System.Windows.Visibility.Hidden;
                 configdata.updated = true;
                 SaveConfig();
-                Update.AutoUpdate(latestrelease);
+
+                // Update
+                bool status = await Update.AutoUpdate(latestrelease);
+                if (status)
+                {
+                    // Start the new process
+                    Process.Start(System.Windows.Application.ResourceAssembly.Location);
+
+                    // Shutdown the old process
+                    Hearthstone_Deck_Tracker.API.Core.MainWindow.Close();
+                    System.Windows.Application.Current.Shutdown();
+                }
+                else
+                {
+                    arenawindow.UpdateText.Text = "There was a problem while auto-updating. Press \"website\" to visit the project page and update manually.";
+
+                    arenawindow.UpdateDownload.IsEnabled = false;
+                    arenawindow.UpdateButtons.Visibility = System.Windows.Visibility.Visible;
+                }
             }
         }
 
@@ -946,17 +893,17 @@ namespace ArenaHelper
         private void ClearDetected()
         {
             detectedcards.Clear();
-            detectedcards.Add(new DetectedInfo(-1));
-            detectedcards.Add(new DetectedInfo(-1));
-            detectedcards.Add(new DetectedInfo(-1));
+            detectedcards.Add(new Detection.DetectedInfo(-1));
+            detectedcards.Add(new Detection.DetectedInfo(-1));
+            detectedcards.Add(new Detection.DetectedInfo(-1));
 
             detectedheroes.Clear();
-            detectedheroes.Add(new DetectedInfo(-1));
-            detectedheroes.Add(new DetectedInfo(-1));
-            detectedheroes.Add(new DetectedInfo(-1));
+            detectedheroes.Add(new Detection.DetectedInfo(-1));
+            detectedheroes.Add(new Detection.DetectedInfo(-1));
+            detectedheroes.Add(new Detection.DetectedInfo(-1));
 
             detectedbighero.Clear();
-            detectedbighero.Add(new DetectedInfo(-1));
+            detectedbighero.Add(new Detection.DetectedInfo(-1));
         }
 
         public void OnUnload()
@@ -997,7 +944,7 @@ namespace ArenaHelper
             {
                 if (arenawindow != null && state != PluginState.Done)
                 {
-                    testtext.Text = "";
+                    Debug.Log("");
                     stopwatch.Restart();
 
                     // Size updates
@@ -1007,28 +954,21 @@ namespace ArenaHelper
                     var hsrect = Helper.GetHearthstoneRect(false);
                     if (hsrect.Width > 0 && hsrect.Height > 0)
                     {
-                        bool needsfocus = true;
-                        if (configdata.manualclicks || uselogreader)
+                        if (Config.Instance.AlternativeScreenCapture)
                         {
-                            // With manual clicks or logreader, we don't need the focus
-                            needsfocus = false;
-                        }
-
-                        if (needsfocus && !User32.IsHearthstoneInForeground())
-                        {
-                            fullcapture = null;
+                            detection.fullcapture = ScreenCapture.CaptureWindow(User32.GetHearthstoneWindow(), new Point(0, 0), hsrect.Width, hsrect.Height);
                         }
                         else
                         {
-                            fullcapture = ScreenCapture.CaptureScreen(User32.GetHearthstoneWindow(), new Point(0, 0), hsrect.Width, hsrect.Height);
+                            detection.fullcapture = ScreenCapture.CaptureScreen(User32.GetHearthstoneWindow(), new Point(0, 0), hsrect.Width, hsrect.Height);
                         }
                     }
                     else
                     {
-                        fullcapture = null;
+                        detection.fullcapture = null;
                     }
 
-                    if (fullcapture != null)
+                    if (detection.fullcapture != null)
                     {
                         await Detect();
                     }
@@ -1040,7 +980,7 @@ namespace ArenaHelper
                         SetState(state);
                     }
 
-                    testtext.Text += "\nElapsed: " + stopwatch.ElapsedMilliseconds;
+                    Debug.AppendLog("\nElapsed: " + stopwatch.ElapsedMilliseconds);
                 }
             }
             catch (Exception e)
@@ -1157,14 +1097,14 @@ namespace ArenaHelper
             // Position card values
             for (int i = 0; i < valueoverlays.Count; i++)
             {
-                Point cardpos = GetHSPos(hsrect, i * cardwidth + cardrect.X, cardrect.Y, scalewidth, scaleheight);
-                Point cardsize = GetHSSize(hsrect, cardrect.Width, cardrect.Height - 8, scalewidth, scaleheight);
+                Point cardpos = Detection.GetHSPos(hsrect, i * Detection.cardwidth + Detection.cardrect.X, Detection.cardrect.Y, Detection.scalewidth, Detection.scaleheight);
+                Point cardsize = Detection.GetHSSize(hsrect, Detection.cardrect.Width, Detection.cardrect.Height - 8, Detection.scalewidth, Detection.scaleheight);
 
                 Canvas.SetLeft(valueoverlays[i], cardpos.X + cardsize.X / 2 - valueoverlays[i].RenderSize.Width/2);
                 Canvas.SetTop(valueoverlays[i], cardpos.Y + cardsize.Y);
             }
 
-            Point advpos = GetHSPos(hsrect, cardrect.X, cardrect.Y + cardrect.Height - 8, scalewidth, scaleheight);
+            Point advpos = Detection.GetHSPos(hsrect, Detection.cardrect.X, Detection.cardrect.Y + Detection.cardrect.Height - 8, Detection.scalewidth, Detection.scaleheight);
             //Point advsize = GetHSSize(hsrect, cardrect.Width, cardrect.Height, scalewidth, scaleheight);
             Canvas.SetLeft(adviceoverlay, advpos.X);
             Canvas.SetTop(adviceoverlay, advpos.Y + 52);
@@ -1235,8 +1175,6 @@ namespace ArenaHelper
                     Update.AHDataVersion latestdataversion = await Update.GetDataVersion();
                     if (latestdataversion != null)
                     {
-                        string assemblylocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
                         if (latestdataversion.hashlist > dataversion.hashlist)
                         {
                             // Hash list updated, download the new hash list
@@ -1392,24 +1330,24 @@ namespace ArenaHelper
             try
             {
                 // Detect arena
-                ulong arenascreenhash = GetScreenHash(arenarect, scalewidth, scaleheight);
+                ulong arenascreenhash = detection.GetScreenHash(Detection.arenarect, Detection.scalewidth, Detection.scaleheight);
 
                 // Screen is darker when picking a hero
                 bool arenacheck2 = false;
 
                 if (state == PluginState.DetectedHeroes || state == PluginState.SearchBigHero)
                 {
-                    if (GetHashDistance(arenahash2, arenascreenhash) < 10)
+                    if (detection.GetHashDistance(Detection.arenahash2, arenascreenhash) < 10)
                     {
                         arenacheck2 = true;
-                        testtext.Text += "Arenacheck2 true\n";
+                        Debug.AppendLog("Arenacheck2 true\n");
                     }
                 }
-                testtext.Text += "Arenacheck1: " + GetHashDistance(arenahash, arenascreenhash) + "\n";
-                testtext.Text += "Arenacheck2: " + GetHashDistance(arenahash2, arenascreenhash) + "\n";
+                Debug.AppendLog("Arenacheck1: " + detection.GetHashDistance(Detection.arenahash, arenascreenhash) + "\n");
+                Debug.AppendLog("Arenacheck2: " + detection.GetHashDistance(Detection.arenahash2, arenascreenhash) + "\n");
 
 
-                if (GetHashDistance(arenahash, arenascreenhash) < 10 || arenacheck2)
+                if (detection.GetHashDistance(Detection.arenahash, arenascreenhash) < 10 || arenacheck2)
                 {
                     // In arena
                     // If previously not in arena, wait for stable arena screen
@@ -1447,24 +1385,55 @@ namespace ArenaHelper
 
                 // In arena
 
-                // Detect heroes and cards
-                List<int> heroindices = DetectHeroes();
-                List<int> cardindices = DetectCards();
+                // Detect heroes
+                Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> detectedheroes = detection.DetectHeroes(herohashlist);
+                List<int> heroindices = detectedheroes.Item1;
+
+                // Show debug info
+                for (int i = 0; i < detectedheroes.Item2.Count; i++)
+                {
+                    ulong herohash = detectedheroes.Item2[i].Item1;
+                    List<Tuple<int, int>> detectedindices = detectedheroes.Item2[i].Item2;
+
+                    Debug.AppendLog("\nHero Hash" + i + ": " + string.Format("0x{0:X}", herohash));
+                    foreach (Tuple<int, int> heroindex in detectedindices)
+                    {
+                        Debug.AppendLog(", " + herohashlist[heroindex.Item1].name + " (" + heroindex.Item2 + ")");
+                    }
+                }
+
+                // Detect cards
+                Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> detectedcards = detection.DetectCards(cardhashlist);
+                List<int> cardindices = detectedcards.Item1;
+
+                // Show debug info
+                for (int i = 0; i < detectedcards.Item2.Count; i++)
+                {
+                    ulong cardhash = detectedcards.Item2[i].Item1;
+                    List<Tuple<int, int>> detectedindices = detectedcards.Item2[i].Item2;
+
+                    Debug.AppendLog("\nHash" + i + ": " + string.Format("0x{0:X}", cardhash));
+                    foreach (Tuple<int, int> cardindex in detectedindices)
+                    {
+                        Debug.AppendLog(", " + cardlist[cardindex.Item1].Name + " (" + cardindex.Item2 + ")");
+                    }
+                }
+
 
                 if (state == PluginState.SearchHeroes)
                 {
                     // Searching for heroes
-                    SearchHeroes(heroindices, cardindices);
+                    SearchHeroes(heroindices);
                 }
                 else if (state == PluginState.SearchBigHero)
                 {
                     // Heroes detected, searching for big hero selection
-                    SearchBigHero(heroindices, cardindices);
+                    SearchBigHero(heroindices);
                 }
                 else if (state == PluginState.DetectedHeroes)
                 {
                     // Heroes detected, waiting
-                    WaitHeroPick(heroindices, cardindices);
+                    WaitHeroPick(heroindices);
                 }
                 else if (state == PluginState.SearchCards)
                 {
@@ -1474,27 +1443,25 @@ namespace ArenaHelper
                 else if (state == PluginState.SearchCardValues)
                 {
                     // Get card values
-                    await SearchCardValues(cardindices);
+                    await SearchCardValues();
                 }
                 else if (state == PluginState.DetectedCards)
                 {
                     // Cards detected, waiting
-                    WaitCardPick(cardindices);
+                    WaitCardPick();
                 }
             }
             catch (Exception e)
             {
-                if (testtext != null)
-                {
-                    testtext.Text = "Error: " + e.Message + "\n" + e.ToString();
-                }
+                Debug.Log("Error: " + e.Message + "\n" + e.ToString());
             }
-
         }
 
-        private void SearchHeroes(List<int> heroindices, List<int> cardindices)
+
+
+        private void SearchHeroes(List<int> heroindices)
         {
-            if (ConfirmDetected(detectedheroes, heroindices, HeroConfirmations) == 3)
+            if (detection.ConfirmDetected(detectedheroes, heroindices, HeroConfirmations) == 3)
             {
                 // All heroes detected
                 HeroHashData hero0 = herohashlist[detectedheroes[0].index];
@@ -1516,10 +1483,26 @@ namespace ArenaHelper
             }
         }
 
-        private void SearchBigHero(List<int> heroindices, List<int> cardindices)
+        private void SearchBigHero(List<int> heroindices)
         {
-            List<int> bigheroindices = DetectBigHero();
-            if (ConfirmDetected(detectedbighero, bigheroindices, BigHeroConfirmations) == 1)
+            Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> detectedbigheroes = detection.DetectBigHero(herohashlist);
+            List<int> bigheroindices = detectedbigheroes.Item1;
+
+            // Show debug info
+            for (int i = 0; i < detectedbigheroes.Item2.Count; i++)
+            {
+                ulong bigherohash = detectedbigheroes.Item2[i].Item1;
+                List<Tuple<int, int>> detectedindices = detectedbigheroes.Item2[i].Item2;
+
+                Debug.AppendLog("\nBig Hero Hash: " + string.Format("0x{0:X}", bigherohash));
+                foreach (Tuple<int, int> bigheroindex in detectedindices)
+                {
+                    Debug.AppendLog(", " + herohashlist[bigheroindex.Item1].name + " (" + bigheroindex.Item2 + ")");
+                }
+                Debug.AppendLog("\n");
+            }
+
+            if (detection.ConfirmDetected(detectedbighero, bigheroindices, BigHeroConfirmations) == 1)
             {
                 // Big hero detected
 
@@ -1539,7 +1522,7 @@ namespace ArenaHelper
                 SetState(PluginState.DetectedHeroes);
 
                 // Call it immediately
-                WaitHeroPick(heroindices, cardindices);
+                WaitHeroPick(heroindices);
             }
         }
 
@@ -1585,12 +1568,12 @@ namespace ArenaHelper
             arenawindow.Update();
         }
 
-        private void WaitHeroPick(List<int> heroindices, List<int> cardindices)
+        private void WaitHeroPick(List<int> heroindices)
         {
-            testtext.Text += "\nChoosing: " + herohashlist[detectedbighero[0].index].name + "\n";
+            Debug.AppendLog("\nChoosing: " + herohashlist[detectedbighero[0].index].name + "\n");
 
             // All heroes detected, wait for pick
-            if (GetUndetectedCount(heroindices) == 0)
+            if (detection.GetUndetectedCount(heroindices) == 0)
             {
                 // Cancelled the choice
                 ClearDetected();
@@ -1598,12 +1581,6 @@ namespace ArenaHelper
 
                 // Restore gui
                 ResetHeroSize();
-            }
-            else if (!uselogreader && GetUndetectedCount(heroindices) == 3 && GetUndetectedCount(cardindices) < 3)
-            {
-                // No heroes detected, at least one card detected
-                // The player picked a hero
-                PickHero(detectedbighero[0].index);
             }
         }
 
@@ -1625,30 +1602,57 @@ namespace ArenaHelper
 
         private async Task SearchCards(List<int> cardindices)
         {
-            if (ConfirmDetected(detectedcards, cardindices, CardConfirmations) == 3)
+            // TODO: Using HearthMirror. Also has reference to HearthMirror.
+            Card[] cards = new Card[3];
+            bool valid = false;
+
+            if (usehearthmirror)
+            {
+                Log.Info("GetArenaDraftChoices");
+                List<HearthMirror.Objects.Card> choices = Reflection.GetArenaDraftChoices();
+                if (choices.Count == 3)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        cards[i] = GetCard(choices[i].Id);
+                        Log.Info("Choice: " + choices[i].Id);
+                    }
+                    valid = true;
+                }
+            }
+            else if (detection.ConfirmDetected(detectedcards, cardindices, CardConfirmations) == 3)
             {
                 // All cards detected
 
                 // Save detected cards
-                Card card0 = cardlist[detectedcards[0].index];
-                Card card1 = cardlist[detectedcards[1].index];
-                Card card2 = cardlist[detectedcards[2].index];
-                arenadata.detectedcards.Add(new Tuple<string, string, string>(card0.Id, card1.Id, card2.Id));
+                for (int i = 0; i < 3; i++)
+                {
+                    cards[i] = cardlist[detectedcards[i].index];
+                }
+                valid = true;
+            }
+
+            if (valid)
+            {
+                // All cards detected
+
+                // Save detected cards
+                arenadata.detectedcards.Add(new Tuple<string, string, string>(cards[0].Id, cards[1].Id, cards[2].Id));
                 SaveArenaData();
 
                 // Update the plugin
-                plugins.CardsDetected(arenadata, card0, card1, card2);
+                plugins.CardsDetected(arenadata, cards[0], cards[1], cards[2]);
 
                 UpdateDetectedCards();
 
                 SetState(PluginState.SearchCardValues);
 
                 // Call it immediately
-                await SearchCardValues(cardindices);
+                await SearchCardValues();
             }
         }
 
-        private async Task SearchCardValues(List<int> cardindices)
+        private async Task SearchCardValues()
         {
             int lastindex = arenadata.detectedcards.Count - 1;
             if (lastindex < 0)
@@ -1752,7 +1756,7 @@ namespace ArenaHelper
             loglastcardid = "";
 
             // Call it immediately
-            WaitCardPick(cardindices);
+            WaitCardPick();
         }
 
         private void SetValueText(int index, string value)
@@ -1809,7 +1813,7 @@ namespace ArenaHelper
             return value;
         }
 
-        private void WaitCardPick(List<int> cardindices)
+        private void WaitCardPick()
         {
             // All cards detected, wait for new pick
 
@@ -1818,7 +1822,7 @@ namespace ArenaHelper
                 return;
 
             // Display detected cards
-            testtext.Text += "\nPicking card " + (arenadata.pickedcards.Count + 1) + "/" + MaxCardCount;
+            Debug.AppendLog("\nPicking card " + (arenadata.pickedcards.Count + 1) + "/" + MaxCardCount);
 
             List<Card> dcards = new List<Card>();
             dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item1));
@@ -1831,7 +1835,7 @@ namespace ArenaHelper
                 {
                     cardname = dcards[i].Name;
                 }
-                testtext.Text += "\nDetected " + i + ": " + cardname;
+                Debug.AppendLog("\nDetected " + i + ": " + cardname);
             }
 
             // Display picked cards
@@ -1843,7 +1847,7 @@ namespace ArenaHelper
                 {
                     cardname = card.Name;
                 }
-                testtext.Text += "\nPicked " + i + ": " + cardname;
+                Debug.AppendLog("\nPicked " + i + ": " + cardname);
             }
 
             // Skip this if we only allow manual picking
@@ -1851,7 +1855,7 @@ namespace ArenaHelper
             {
                 return;
             }
-            else if (uselogreader)
+            else
             {
                 // Logreader
                 if (loglastcardid != "")
@@ -1859,57 +1863,6 @@ namespace ArenaHelper
                     Log.Info("AH Card choice pick: " + loglastcardid);
                     PickCard(loglastcardid);
                     loglastcardid = "";
-                }
-            }
-            else
-            {
-                CardClickDetection(cardindices, dcards);
-            }
-        }
-
-        private void CardClickDetection(List<int> cardindices, List<Card> dcards)
-        {
-            // Get the click position
-            CheckMouse();
-
-            testtext.Text += "\nMouse: ";
-            for (int i = 0; i < mouseindex.Count; i++)
-            {
-                testtext.Text += mouseindex[i] + " ";
-            }
-
-            // Check if a new card was detected
-            bool newcard = false;
-            for (int i = 0; i < 3; i++)
-            {
-                int cardindex = cardindices[i];
-                if (cardindex != -1)
-                {
-                    if (dcards[i] != null)
-                    {
-                        if (dcards[i].Id != cardlist[cardindex].Id)
-                        {
-                            newcard = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if ((newcard || GetUndetectedCount(cardindices) == 3))
-            {
-                if (mouseindex.Count >= 1)
-                {
-                    // New card or no cards detected, the player picked a card
-                    PickCard(mouseindex[mouseindex.Count - 1]);
-
-                    // Clear the mouse data to avoid double detection of clicks
-                    mouseindex.Clear();
-                }
-                else
-                {
-                    // No click detected, missed a pick
-                    PickCard(-1);
                 }
             }
         }
@@ -2059,110 +2012,6 @@ namespace ArenaHelper
             return state;
         }
 
-        private static int GetUndetectedCount(List<int> indices)
-        {
-            int undetected = 0;
-            for (int i = 0; i < indices.Count; i++)
-            {
-                if (indices[i] == -1)
-                {
-                    undetected++;
-                }
-            }
-            return undetected;
-        }
-
-        private int ConfirmDetected(List<DetectedInfo> detected, List<int> indices, int confirmations)
-        {
-            int confirmed = 0;
-            for (int i = 0; i < detected.Count; i++)
-            {
-                detected[i].Confirm(indices[i]);
-
-                if (detected[i].index != -1 && detected[i].confirmations >= confirmations)
-                {
-                    confirmed++;
-                }
-            }
-            return confirmed;
-        }
-
-        private List<int> DetectCards()
-        {
-            List<int> indices = new List<int>();
-            for (int i = 0; i < 3; i++)
-            {
-                ulong cardhash = GetScreenCardHash(i);
-                List<Tuple<int, int>> cardindices = FindHashIndex(cardhash, cardhashlist, maxcarddistance);
-
-                if (cardindices.Count == 1)
-                {
-                    indices.Add(cardindices[0].Item1);
-                }
-                else
-                {
-                    indices.Add(-1);
-                }
-
-                testtext.Text += "\nHash" + i + ": " + string.Format("0x{0:X}", cardhash);
-                foreach (Tuple<int, int> cardindex in cardindices)
-                {
-                    testtext.Text += ", " + cardlist[cardindex.Item1].Name + " (" + cardindex.Item2 + ")";
-                }
-            }
-            return indices;
-        }
-
-        private List<int> DetectHeroes()
-        {
-            List<int> indices = new List<int>();
-            for (int i = 0; i < 3; i++)
-            {
-                ulong herohash = GetScreenHeroHash(i);
-                List<Tuple<int, int>> heroindices = FindHashIndex(herohash, herohashlist, maxherodistance);
-                if (heroindices.Count == 1)
-                {
-                    indices.Add(heroindices[0].Item1);
-                }
-                else
-                {
-                    indices.Add(-1);
-                }
-                testtext.Text += "\nHero Hash" + i + ": " + string.Format("0x{0:X}", herohash);
-                foreach (Tuple<int, int> heroindex in heroindices)
-                {
-                    testtext.Text += ", " + herohashlist[heroindex.Item1].name + " (" + heroindex.Item2 + ")";
-                }
-            }
-            return indices;
-        }
-
-        private List<int> DetectBigHero()
-        {
-            List<int> indices = new List<int>();
-
-            ulong bigherohash = GetScreenHash(portraitbigcroprect, scalewidth, scaleheight);
-            List<Tuple<int, int>> bigheroindices = FindHashIndex(bigherohash, herohashlist, maxherodistance);
-            if (bigheroindices.Count == 1)
-            {
-                indices.Add(bigheroindices[0].Item1);
-            }
-            else
-            {
-                indices.Add(-1);
-            }
-
-            testtext.Text += "\nBig Hero Hash: " + string.Format("0x{0:X}", bigherohash);
-            foreach (Tuple<int, int> bigheroindex in bigheroindices)
-            {
-                testtext.Text += ", " + herohashlist[bigheroindex.Item1].name + " (" + bigheroindex.Item2 + ")";
-            }
-            testtext.Text += "\n";
-
-            return indices;
-        }
-        
-
         private void UpdateTitle()
         {
             arenawindow.Header.Text = "Picking card " + (arenadata.pickedcards.Count + 1) + "/" + MaxCardCount;
@@ -2227,333 +2076,6 @@ namespace ArenaHelper
 
             herocontrol.HeroImage.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero.image, UriKind.Relative));
             herocontrol.HeroName.Text = hero.name;
-        }
-
-        private void CheckMouse()
-        {
-            // Mouse events
-            Point mousepos = GetMousePos();
-            var hsrect = Helper.GetHearthstoneRect(false);
-            mousepos.X -= hsrect.X;
-            mousepos.Y -= hsrect.Y;
-
-            short mousedown = GetAsyncKeyState(VK_LBUTTON);
-
-            if (mousepos.X < 0 || mousepos.Y < 0 || mousepos.X >= hsrect.Width || mousepos.Y >= hsrect.Height)
-            {
-                return;
-            }
-            testtext.Text += "\nMousepos: " + mousepos.X + ", " + mousepos.Y;
-
-            // Testing rectangle intersection clicking
-            /*for (int i = 0; i < 3; i++)
-            {
-                Point testcardpos = GetHSPos(hsrect, i * cardwidth + cardrect.X, cardrect.Y, scalewidth, scaleheight);
-                Point testcardsize = GetHSSize(hsrect, cardrect.Width, cardrect.Height, scalewidth, scaleheight);
-                Rectangle cardclickrect = new Rectangle(testcardpos.X, testcardpos.Y, testcardsize.X, testcardsize.Y);
-                if (cardclickrect.Contains(mousepos))
-                {
-                    testtext.Text += "\nButton " + i + " hover";
-                }
-            }*/
-
-            if (mousedown != 0)
-            {
-                double mindist = 0;
-                int closestmouseindex = 0;
-                for (int i = 0; i < 3; i++)
-                {
-                    Point cardpos = GetHSPos(hsrect, i * cardwidth + cardrect.X, cardrect.Y, scalewidth, scaleheight);
-                    Point cardsize = GetHSSize(hsrect, cardrect.Width, cardrect.Height, scalewidth, scaleheight);
-                    int centerx = cardpos.X + cardsize.X / 2;
-                    int centery = cardpos.Y + cardsize.Y / 2;
-                    double dist = Math.Sqrt((centerx - mousepos.X) * (centerx - mousepos.X) + (centery - mousepos.Y) * (centery - mousepos.Y));
-                    if (dist < mindist || i == 0)
-                    {
-                        closestmouseindex = i;
-                        mindist = dist;
-                    }
-                }
-
-                mouseindex.Add(closestmouseindex);
-                if (mouseindex.Count > 5)
-                {
-                    mouseindex.RemoveAt(0);
-                }
-            }
-        }
-
-        private ulong GetScreenCardHash(int index)
-        {
-            // Check for a valid index
-            if (index < 0 || index >= 3)
-                return 0;
-
-            var hsrect = Helper.GetHearthstoneRect(false);
-
-            // Get the position and size of the card
-            Point cardpos = GetHSPos(hsrect, index * cardwidth + cardrect.X, cardrect.Y, scalewidth, scaleheight);
-            Point cardsize = GetHSSize(hsrect, cardrect.Width, cardrect.Height, scalewidth, scaleheight);
-
-            // Copy a part of the screen
-            Bitmap capture = fullcapture.Clone(new Rectangle(cardpos.X, cardpos.Y, cardsize.X, cardsize.Y), fullcapture.PixelFormat);
-
-            ulong hash = 0;
-            if (capture != null)
-            {
-                try
-                {
-                    CropBitmapRelative(ref capture, cardrect, cardcroprect);
-
-                    System.Windows.Controls.Image imagecontrol = testimages[index];
-                    hash = GetImageHash(capture, ref imagecontrol);
-                }
-                catch (Exception e)
-                {
-                    string errormsg = "Error2: " + e.Message + "\n" + e.ToString();
-                    if (testtext != null)
-                    {
-                        testtext.Text = errormsg;
-                    }
-                    Log.Info(errormsg);
-                }
-            }
-
-            return hash;
-        }
-
-        private ulong GetScreenHeroHash(int index)
-        {
-            // Check for a valid index
-            if (index < 0 || index >= 3)
-                return 0;
-
-            var hsrect = Helper.GetHearthstoneRect(false);
-
-            // Get the position and size
-            Point pos = GetHSPos(hsrect, index * portraitwidth + portraitcroprect.X, portraitcroprect.Y, scalewidth, scaleheight);
-            Point size = GetHSSize(hsrect, portraitcroprect.Width, portraitcroprect.Height, scalewidth, scaleheight);
-
-            // Copy a part of the screen
-            Bitmap capture = fullcapture.Clone(new Rectangle(pos.X, pos.Y, size.X, size.Y), fullcapture.PixelFormat);
-
-            ulong hash = 0;
-            if (capture != null)
-            {
-                try
-                {
-                    System.Windows.Controls.Image imagecontrol = testimages[index];
-                    hash = GetImageHash(capture, ref imagecontrol);
-                }
-                catch (Exception e)
-                {
-                    string errormsg = "Error3: " + e.Message + "\n" + e.ToString();
-                    if (testtext != null)
-                    {
-                        testtext.Text = errormsg;
-                    }
-                    Log.Info(errormsg);
-                }
-            }
-
-            return hash;
-        }
-
-        private ulong GetScreenHash(Rectangle rect, int scalewidth, int scaleheight)
-        {
-            ulong hash = 0;
-            var hsrect = Helper.GetHearthstoneRect(false);
-
-            // Get the position and size of the card
-            Point pos = GetHSPos(hsrect, rect.X, rect.Y, scalewidth, scaleheight);
-            Point size = GetHSSize(hsrect, rect.Width, rect.Height, scalewidth, scaleheight);
-
-            // Copy a part of the screen
-            Bitmap capture = fullcapture.Clone(new Rectangle(pos.X, pos.Y, size.X, size.Y), fullcapture.PixelFormat);
-
-            if (capture != null)
-            {
-                try
-                {
-                    System.Windows.Controls.Image imagecontrol = testimages[0];
-                    hash = GetImageHash(capture, ref imagecontrol);
-                }
-                catch (Exception e)
-                {
-                    string errormsg = "Error4: " + e.Message + "\n" + e.ToString();
-                    if (testtext != null)
-                    {
-                        testtext.Text = errormsg;
-                    }
-                    Log.Info(errormsg);
-                }
-            }
-
-            return hash;
-        }
-
-        // Perceptual hash using the techniques from: http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html
-        private ulong GetImageHash(Bitmap bitmap, ref System.Windows.Controls.Image imagecontrol)
-        {
-            // Copy the image and convert to grayscale
-            Bitmap sourcebm = new Bitmap(bitmap);
-            Image<Gray, float> sourceimage = new Image<Gray, float>(sourcebm);
-
-            // Apply a convolution filter of 4x4
-            CvInvoke.Blur(sourceimage, sourceimage, new Size(4, 4), new Point(-1, -1));
-
-            // Show image for debugging
-            //Image<Bgra, Byte> convimage = Image<Bgra, Byte>.FromIplImagePtr(sourceimage);
-            //ShowBitmap(convimage.ToBitmap(), ref imagecontrol);
-
-            // Resize to 64x64 pixels
-            Image<Gray, float> resimage = new Image<Gray, float>(new Size(64, 64));
-            CvInvoke.Resize(sourceimage, resimage, new Size(64, 64));
-            //ShowBitmap(resimage.ToBitmap(), ref imagecontrol);
-
-            // DCT
-            IntPtr compleximage = CvInvoke.cvCreateImage(resimage.Size, Emgu.CV.CvEnum.IplDepth.IplDepth32F, 1);
-            CvInvoke.Dct(resimage, resimage, Emgu.CV.CvEnum.DctType.Forward);
-
-            Image<Gray, float> dctimage = Image<Gray, float>.FromIplImagePtr(resimage);
-
-            // Calculate the mean
-            double mean = 0;
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    mean += dctimage[y, x].Intensity;
-                }
-            }
-            mean -= dctimage[0, 0].Intensity;
-            mean /= 63;
-
-            // Calculate the hash
-            ulong hash = 0;
-            ulong index = 1;
-            for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    Gray color = dctimage[y, x];
-                    if (color.Intensity > mean)
-                    {
-                        hash |= index;
-                        // For debugging
-                        //bitmap.SetPixel(x, y, Color.FromArgb(255, 0, 0));
-                    }
-                    else
-                    {
-                        // For debugging
-                        //bitmap.SetPixel(x, y, Color.FromArgb(0, 255, 0));
-                    }
-
-                    index <<= 1;
-                }
-            }
-
-            return hash;
-        }
-
-        private int GetHashDistance(ulong hash1, ulong hash2)
-        {
-            ulong index = 1;
-            int distance = 0;
-            for (int i = 0; i < 64; i++)
-            {
-                if ((hash1 & index) != (hash2 & index))
-                {
-                    distance++;
-                }
-
-                index <<= 1;
-            }
-
-            return distance;
-        }
-
-        private List<Tuple<int, int>> FindHashIndex(ulong hash, IEnumerable<HashData> hashlist, int maxdistance)
-        {
-            int bestindex = -1;
-            int bestdistance = 100;
-
-            List<Tuple<int, int>> indices = new List<Tuple<int, int>>();
-            int i = 0;
-            foreach (var item in hashlist)
-            {
-                // Check all item hashes
-                foreach (var itemhash in item.hashes)
-                {
-                    int distance = GetHashDistance(hash, itemhash);
-                    if (distance < maxdistance)
-                    {
-                        if (distance < bestdistance)
-                        {
-                            bestindex = i;
-                            bestdistance = distance;
-
-                            indices.Clear();
-                            indices.Add(new Tuple<int, int>(i, distance));
-                        }
-                        else if (bestindex != i && distance == bestdistance)
-                        {
-                            // Collision
-                            indices.Add(new Tuple<int, int>(i, distance));
-                        }
-                    }
-                }
-                i++;
-            }
-
-            return indices;
-        }
-
-        private List<Tuple<int, int>> FindAllHashIndex(ulong hash, IList<CardHashData> hashlist, int maxdistance)
-        {
-            List<Tuple<int, int>> indices = new List<Tuple<int, int>>();
-            for (var i = 0; i < hashlist.Count; i++)
-            {
-                // Check all item hashes
-                foreach (var itemhash in hashlist[i].hashes)
-                {
-                    int distance = GetHashDistance(hash, itemhash);
-                    if (distance < maxdistance)
-                    {
-                        indices.Add(new Tuple<int, int>(i, distance));
-                    }
-                }
-            }
-
-            return indices;
-        }
-
-        private void CropBitmapRelative(ref Bitmap bm, Rectangle fullrect, Rectangle croprect)
-        {
-            double cropx = (double)(croprect.X - fullrect.X) / fullrect.Width;
-            double cropy = (double)(croprect.Y - fullrect.Y) / fullrect.Height;
-            double cropwidth = (double)croprect.Width / fullrect.Width;
-            double cropheight = (double)croprect.Height / fullrect.Height;
-
-            bm = bm.Clone(new Rectangle((int)(cropx * bm.Width), (int)(cropy * bm.Height), (int)(cropwidth * bm.Width), (int)(cropheight * bm.Height)), bm.PixelFormat);
-        }
-
-
-        private void ShowBitmap(Bitmap bm, ref System.Windows.Controls.Image imagecontrol)
-        {
-            if (imagecontrol != null)
-            {
-
-                MemoryStream ms = new MemoryStream();
-                bm.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                ms.Position = 0;
-                BitmapImage bi = new BitmapImage();
-                bi.BeginInit();
-                bi.StreamSource = ms;
-                bi.EndInit();
-
-                imagecontrol.Source = bi;
-            }
         }
 
         private void LoadData()
@@ -2626,28 +2148,6 @@ namespace ArenaHelper
             }
         }
 
-        // Reference resolution: 1280 x 960 (4:3)
-        private Point GetHSPos(Rectangle hsrect, int x, int y, int width, int height)
-        {
-            // Get normalized position
-            double nx = x / (double)width;
-            double ny = y / (double)height;
-
-            // Convert to actual position
-            double ratio = ((double)width / (double)height) / ((double)hsrect.Width / hsrect.Height);
-            int px = (int)((hsrect.Width * ratio * nx) + (hsrect.Width * (1 - ratio) / 2));
-            int py = (int)(ny * hsrect.Height);
-            return new Point(px, py);
-        }
-
-        // Doesn't work for too wide aspect ratios
-        private Point GetHSSize(Rectangle hsrect, int x, int y, int width, int height)
-        {
-            double scalefactor = (double)hsrect.Height / height;
-
-            return new Point((int)(scalefactor * x), (int)(scalefactor * y));
-        }
-
         // Add overlay elements for debugging
         private void AddElements()
         {
@@ -2656,7 +2156,7 @@ namespace ArenaHelper
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    ArenaHelper.Controls.ValueOverlay valuetext = new ArenaHelper.Controls.ValueOverlay();
+                    Controls.ValueOverlay valuetext = new Controls.ValueOverlay();
                     valuetext.ValueText.Text = "Value";
                     Canvas.SetLeft(valuetext, 5);
                     Canvas.SetTop(valuetext, 5);
@@ -2669,7 +2169,7 @@ namespace ArenaHelper
             // Advice overlay
             if (adviceoverlay == null)
             {
-                adviceoverlay = new ArenaHelper.Controls.AdviceOverlay();
+                adviceoverlay = new Controls.AdviceOverlay();
                 adviceoverlay.AdviceText.Text = "";
                 Canvas.SetLeft(adviceoverlay, 5);
                 Canvas.SetTop(adviceoverlay, 5);
@@ -2678,35 +2178,39 @@ namespace ArenaHelper
             }
 
             // Test text
-            if (testtext == null)
+            if (debugtext == null)
             {
-                testtext = new Controls.DebugTextBlock();
-                testtext.TextWrapping = System.Windows.TextWrapping.Wrap;
-                testtext.FontSize = 12;
-                testtext.Text = "Arena Helper";
-                Canvas.SetLeft(testtext, 5);
-                Canvas.SetTop(testtext, 5);
+                debugtext = new Controls.DebugTextBlock();
+                debugtext.TextWrapping = System.Windows.TextWrapping.Wrap;
+                debugtext.FontSize = 12;
+                debugtext.Text = "Arena Helper";
+                Canvas.SetLeft(debugtext, 5);
+                Canvas.SetTop(debugtext, 5);
 
-                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(testtext);
+                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(debugtext);
 
-                testtext.Visibility = System.Windows.Visibility.Hidden;
+                debugtext.Visibility = System.Windows.Visibility.Hidden;
+
+                Debug.SetTextControl(debugtext);
             }
 
             // Test images
-            if (testimages.Count == 0)
+            if (debugimages.Count == 0)
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    System.Windows.Controls.Image testimage = new System.Windows.Controls.Image();
+                    System.Windows.Controls.Image debugimage = new System.Windows.Controls.Image();
 
-                    Canvas.SetLeft(testimage, 5 + i * 210);
-                    Canvas.SetTop(testimage, 550);
+                    Canvas.SetLeft(debugimage, 5 + i * 210);
+                    Canvas.SetTop(debugimage, 550);
 
-                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(testimage);
+                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(debugimage);
 
-                    testimage.Visibility = System.Windows.Visibility.Hidden;
-                    testimages.Add(testimage);
+                    debugimage.Visibility = System.Windows.Visibility.Hidden;
+                    debugimages.Add(debugimage);
                 }
+
+                Debug.SetImageControls(debugimages);
             }
         }
 
@@ -2726,17 +2230,19 @@ namespace ArenaHelper
                 adviceoverlay = null;
             }
 
-            if (testtext != null)
+            if (debugtext != null)
             {
-                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(testtext);
-                testtext = null;
+                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(debugtext);
+                Debug.SetTextControl(null);
+                debugtext = null;
             }
 
-            for (int i = 0; i < testimages.Count; i++)
+            for (int i = 0; i < debugimages.Count; i++)
             {
-                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(testimages[i]);
+                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(debugimages[i]);
             }
-            testimages.Clear();
+            Debug.SetImageControls(null);
+            debugimages.Clear();
         }
 
     }
