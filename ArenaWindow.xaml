@@ -58,7 +58,7 @@
                         <Run Text="with support from the community at GitHub." />
                         <Run Text="Thanks go out to Grinning Goat for providing " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Hearthstone Arena Tier List</Hyperlink><Run Text="!" />
                         <LineBreak /><LineBreak />
-                        <Run Text="Thanks for your support! Any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donation</Hyperlink><Run Text=" is greatly appreciated." />
+                        <Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Donate</Hyperlink><Run Text=" to help support development. Thank you!" />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Name="AboutDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>
@@ -90,7 +90,7 @@
                         <Run Text="The tier list and card data was updated to the latest version." />
                         <Run Text="More info about the tier list can be found at: " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Hearthstone Arena Tier List</Hyperlink>
                         <LineBreak /><LineBreak />
-                        <Run Text="Thanks for your support! Any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donation</Hyperlink><Run Text=" is greatly appreciated." />
+                        <Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Donate</Hyperlink><Run Text=" to help support development. Thank you!" />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Name="DataUpdateDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>

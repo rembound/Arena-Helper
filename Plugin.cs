@@ -177,6 +177,8 @@ namespace ArenaHelper
 
         // HearthMirror
         private bool usehearthmirror = true;
+        List<Card> previouscards = new List<Card>();
+        int samecardconfirmations;
 
         // Updates
         private DateTime lastpluginupdatecheck = DateTime.MinValue;
@@ -247,7 +249,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.8.1"); }
+            get { return new Version("0.8.2"); }
         }
 
         public MenuItem MenuItem
@@ -859,6 +861,9 @@ namespace ArenaHelper
             loglastheroname = "";
             loglastcardid = "";
 
+            previouscards.Clear();
+            samecardconfirmations = 0;
+
             ClearDetected();
 
             arenawindow.Hero0.HeroImage.Source = null;
@@ -1343,11 +1348,12 @@ namespace ArenaHelper
                         Debug.AppendLog("Arenacheck2 true\n");
                     }
                 }
-                Debug.AppendLog("Arenacheck1: " + detection.GetHashDistance(Detection.arenahash, arenascreenhash) + "\n");
+                //Debug.AppendLog("Arenacheck1: " + detection.GetHashDistance(Detection.arenahash, arenascreenhash) + "\n");
                 Debug.AppendLog("Arenacheck2: " + detection.GetHashDistance(Detection.arenahash2, arenascreenhash) + "\n");
 
-
-                if (detection.GetHashDistance(Detection.arenahash, arenascreenhash) < 10 || arenacheck2)
+                
+                //if (detection.GetHashDistance(Detection.arenahash, arenascreenhash) < 10 || arenacheck2)
+                if (Hearthstone_Deck_Tracker.API.Core.Game.CurrentMode == Hearthstone_Deck_Tracker.Enums.Hearthstone.Mode.DRAFT)
                 {
                     // In arena
                     // If previously not in arena, wait for stable arena screen
@@ -1461,7 +1467,47 @@ namespace ArenaHelper
 
         private void SearchHeroes(List<int> heroindices)
         {
-            if (detection.ConfirmDetected(detectedheroes, heroindices, HeroConfirmations) == 3)
+            if (usehearthmirror)
+            {
+
+                HearthMirror.Objects.ArenaInfo arenainfo = Reflection.GetArenaDeck();
+                Log.Info("SH Cards");
+                if (arenainfo.Deck.Cards.Count == 0)
+                {
+                    Log.Info("GetArenaDraftChoices");
+                    List<HearthMirror.Objects.Card> choices = Reflection.GetArenaDraftChoices();
+                    if (choices.Count == 3)
+                    {
+                        List<string> heronames = new List<string>();
+                        for (int i = 0; i < 3; i++)
+                        {
+                            Log.Info("Hero Choice: " + choices[i].Id);
+                            string heroname = Database.GetHeroNameFromId(choices[i].Id, false);
+                            if (heroname != null)
+                            {
+                                heronames.Add(heroname);
+                            }
+                        }
+
+                        if (heronames.Count == 3)
+                        {
+                            arenadata.detectedheroes.Clear();
+                            arenadata.detectedheroes.Add(heronames[0]);
+                            arenadata.detectedheroes.Add(heronames[1]);
+                            arenadata.detectedheroes.Add(heronames[2]);
+                            SaveArenaData();
+
+                            plugins.HeroesDetected(arenadata, heronames[0], heronames[1], heronames[2]);
+
+                            // Show the heroes
+                            UpdateDetectedHeroes();
+
+                            SetState(PluginState.SearchBigHero);
+                        }
+                    }
+                }
+            }
+            else if (detection.ConfirmDetected(detectedheroes, heroindices, HeroConfirmations) == 3)
             {
                 // All heroes detected
                 HeroHashData hero0 = herohashlist[detectedheroes[0].index];
@@ -1485,29 +1531,12 @@ namespace ArenaHelper
 
         private void SearchBigHero(List<int> heroindices)
         {
-            Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> detectedbigheroes = detection.DetectBigHero(herohashlist);
-            List<int> bigheroindices = detectedbigheroes.Item1;
-
-            // Show debug info
-            for (int i = 0; i < detectedbigheroes.Item2.Count; i++)
-            {
-                ulong bigherohash = detectedbigheroes.Item2[i].Item1;
-                List<Tuple<int, int>> detectedindices = detectedbigheroes.Item2[i].Item2;
-
-                Debug.AppendLog("\nBig Hero Hash: " + string.Format("0x{0:X}", bigherohash));
-                foreach (Tuple<int, int> bigheroindex in detectedindices)
-                {
-                    Debug.AppendLog(", " + herohashlist[bigheroindex.Item1].name + " (" + bigheroindex.Item2 + ")");
-                }
-                Debug.AppendLog("\n");
-            }
-
-            if (detection.ConfirmDetected(detectedbighero, bigheroindices, BigHeroConfirmations) == 1)
+            if (usehearthmirror)
             {
                 // Big hero detected
 
                 // Update gui
-                string bigheroname = herohashlist[detectedbighero[0].index].name;
+                string bigheroname = loglastheroname;
                 int bigheroindex = -1;
                 for (int i = 0; i < arenadata.detectedheroes.Count; i++)
                 {
@@ -1517,12 +1546,56 @@ namespace ArenaHelper
                         break;
                     }
                 }
-                ChangeHeroSize(bigheroindex, 56, 56, 4);
 
-                SetState(PluginState.DetectedHeroes);
+                if (bigheroindex != -1)
+                {
+                    ResetHeroSize();
+                    ChangeHeroSize(bigheroindex, 56, 56, 4);
 
-                // Call it immediately
-                WaitHeroPick(heroindices);
+                    //SetState(PluginState.DetectedHeroes);
+                }
+            }
+            else
+            {
+                Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> detectedbigheroes = detection.DetectBigHero(herohashlist);
+                List<int> bigheroindices = detectedbigheroes.Item1;
+
+                // Show debug info
+                for (int i = 0; i < detectedbigheroes.Item2.Count; i++)
+                {
+                    ulong bigherohash = detectedbigheroes.Item2[i].Item1;
+                    List<Tuple<int, int>> detectedindices = detectedbigheroes.Item2[i].Item2;
+
+                    Debug.AppendLog("\nBig Hero Hash: " + string.Format("0x{0:X}", bigherohash));
+                    foreach (Tuple<int, int> bigheroindex in detectedindices)
+                    {
+                        Debug.AppendLog(", " + herohashlist[bigheroindex.Item1].name + " (" + bigheroindex.Item2 + ")");
+                    }
+                    Debug.AppendLog("\n");
+                }
+
+                if (detection.ConfirmDetected(detectedbighero, bigheroindices, BigHeroConfirmations) == 1)
+                {
+                    // Big hero detected
+
+                    // Update gui
+                    string bigheroname = herohashlist[detectedbighero[0].index].name;
+                    int bigheroindex = -1;
+                    for (int i = 0; i < arenadata.detectedheroes.Count; i++)
+                    {
+                        if (arenadata.detectedheroes[i] == bigheroname)
+                        {
+                            bigheroindex = i;
+                            break;
+                        }
+                    }
+                    ChangeHeroSize(bigheroindex, 56, 56, 4);
+
+                    SetState(PluginState.DetectedHeroes);
+
+                    // Call it immediately
+                    WaitHeroPick(heroindices);
+                }
             }
         }
 
@@ -1570,17 +1643,20 @@ namespace ArenaHelper
 
         private void WaitHeroPick(List<int> heroindices)
         {
-            Debug.AppendLog("\nChoosing: " + herohashlist[detectedbighero[0].index].name + "\n");
-
-            // All heroes detected, wait for pick
-            if (detection.GetUndetectedCount(heroindices) == 0)
+            if (!usehearthmirror)
             {
-                // Cancelled the choice
-                ClearDetected();
-                SetState(PluginState.SearchBigHero);
+                Debug.AppendLog("\nChoosing: " + herohashlist[detectedbighero[0].index].name + "\n");
 
-                // Restore gui
-                ResetHeroSize();
+                // All heroes detected, wait for pick
+                if (detection.GetUndetectedCount(heroindices) == 0)
+                {
+                    // Cancelled the choice
+                    ClearDetected();
+                    SetState(PluginState.SearchBigHero);
+
+                    // Restore gui
+                    ResetHeroSize();
+                }
             }
         }
 
@@ -1617,7 +1693,45 @@ namespace ArenaHelper
                         cards[i] = GetCard(choices[i].Id);
                         Log.Info("Choice: " + choices[i].Id);
                     }
-                    valid = true;
+
+                    // Check for same cards
+                    bool samecardsdetected = false;
+                    if (previouscards.Count == 3)
+                    {
+                        int samecards = 0;
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (previouscards[i].Id == cards[i].Id)
+                            {
+                                samecards++;
+                            }
+                        }
+
+                        if (samecards == 3)
+                        {
+                            // All the same cards, can be valid but unlikely
+                            samecardsdetected = true;
+                        }
+                    }
+
+                    // Save card choices
+                    previouscards.Clear();
+                    for (int i = 0; i < 3; i++)
+                    {
+                        previouscards.Add(cards[i]);
+                    }
+
+                    // Wait for confirmations when same cards detected
+                    if (samecardsdetected && samecardconfirmations < 3)
+                    {
+                        Log.Info("Same cards detected: confirmation " + samecardconfirmations);
+                        samecardconfirmations++;
+                    }
+                    else
+                    {
+                        samecardconfirmations = 0;
+                        valid = true;
+                    }
                 }
             }
             else if (detection.ConfirmDetected(detectedcards, cardindices, CardConfirmations) == 3)
