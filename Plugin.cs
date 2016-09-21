@@ -177,8 +177,10 @@ namespace ArenaHelper
 
         // HearthMirror
         private bool usehearthmirror = true;
-        List<Card> previouscards = new List<Card>();
-        int samecardconfirmations;
+        private List<Card> previouscards = new List<Card>();
+        private bool samecarddelay;
+        private DateTime samecardtime = DateTime.MinValue;
+        private const int samecardmaxtime = 4000;
 
         // Updates
         private DateTime lastpluginupdatecheck = DateTime.MinValue;
@@ -249,7 +251,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.8.2"); }
+            get { return new Version("0.8.4"); }
         }
 
         public MenuItem MenuItem
@@ -862,7 +864,7 @@ namespace ArenaHelper
             loglastcardid = "";
 
             previouscards.Clear();
-            samecardconfirmations = 0;
+            samecarddelay = false;
 
             ClearDetected();
 
@@ -1068,7 +1070,7 @@ namespace ArenaHelper
                     {
                         // Card choice detection
                         var cardid = match.Groups["id"].Value;
-                        var dtime = DateTime.Now.Subtract(loglastchoice).Milliseconds;
+                        var dtime = DateTime.Now.Subtract(loglastchoice).TotalMilliseconds;
 
                         // This should not be necessary, but HDT does it
                         if (loglastcardid == cardid && dtime < 1000)
@@ -1469,13 +1471,10 @@ namespace ArenaHelper
         {
             if (usehearthmirror)
             {
-
-                HearthMirror.Objects.ArenaInfo arenainfo = Reflection.GetArenaDeck();
-                Log.Info("SH Cards");
-                if (arenainfo.Deck.Cards.Count == 0)
+                Log.Info("GetArenaDraftChoices");
+                List<HearthMirror.Objects.Card> choices = Reflection.GetArenaDraftChoices();
+                if (choices != null)
                 {
-                    Log.Info("GetArenaDraftChoices");
-                    List<HearthMirror.Objects.Card> choices = Reflection.GetArenaDraftChoices();
                     if (choices.Count == 3)
                     {
                         List<string> heronames = new List<string>();
@@ -1488,7 +1487,6 @@ namespace ArenaHelper
                                 heronames.Add(heroname);
                             }
                         }
-
                         if (heronames.Count == 3)
                         {
                             arenadata.detectedheroes.Clear();
@@ -1686,51 +1684,64 @@ namespace ArenaHelper
             {
                 Log.Info("GetArenaDraftChoices");
                 List<HearthMirror.Objects.Card> choices = Reflection.GetArenaDraftChoices();
-                if (choices.Count == 3)
+                if (choices != null)
                 {
-                    for (int i = 0; i < 3; i++)
+                    if (choices.Count == 3)
                     {
-                        cards[i] = GetCard(choices[i].Id);
-                        Log.Info("Choice: " + choices[i].Id);
-                    }
-
-                    // Check for same cards
-                    bool samecardsdetected = false;
-                    if (previouscards.Count == 3)
-                    {
-                        int samecards = 0;
                         for (int i = 0; i < 3; i++)
                         {
-                            if (previouscards[i].Id == cards[i].Id)
+                            cards[i] = GetCard(choices[i].Id);
+                            Log.Info("Choice: " + choices[i].Id);
+                        }
+
+                        // Check for same cards
+                        bool samecardsdetected = false;
+                        if (previouscards.Count == 3)
+                        {
+                            int samecards = 0;
+                            for (int i = 0; i < 3; i++)
                             {
-                                samecards++;
+                                if (previouscards[i].Id == cards[i].Id)
+                                {
+                                    samecards++;
+                                }
+                            }
+
+                            if (samecards == 3)
+                            {
+                                // All the same cards, can be valid but unlikely
+                                samecardsdetected = true;
                             }
                         }
 
-                        if (samecards == 3)
+                        // Save card choices
+                        previouscards.Clear();
+                        for (int i = 0; i < 3; i++)
                         {
-                            // All the same cards, can be valid but unlikely
-                            samecardsdetected = true;
+                            previouscards.Add(cards[i]);
                         }
-                    }
 
-                    // Save card choices
-                    previouscards.Clear();
-                    for (int i = 0; i < 3; i++)
-                    {
-                        previouscards.Add(cards[i]);
-                    }
+                        // Wait for confirmations when same cards detected
+                        if (samecardsdetected)
+                        {
+                            if (!samecarddelay)
+                            {
+                                Log.Info("Same cards detected: delaying");
+                                samecardtime = DateTime.Now;
+                                samecarddelay = true;
+                            }
+                            else if (DateTime.Now.Subtract(samecardtime).TotalMilliseconds >= samecardmaxtime)
+                            {
+                                samecarddelay = false;
+                                valid = true;
+                            }
 
-                    // Wait for confirmations when same cards detected
-                    if (samecardsdetected && samecardconfirmations < 3)
-                    {
-                        Log.Info("Same cards detected: confirmation " + samecardconfirmations);
-                        samecardconfirmations++;
-                    }
-                    else
-                    {
-                        samecardconfirmations = 0;
-                        valid = true;
+                        }
+                        else
+                        {
+                            samecarddelay = false;
+                            valid = true;
+                        }
                     }
                 }
             }
