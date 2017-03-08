@@ -6,8 +6,11 @@
              xmlns:local="clr-namespace:ArenaHelper"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="200">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="PortraitBackground" Color="#a0a0a0" />
+    </UserControl.Resources>
     <StackPanel VerticalAlignment="Center">
-        <Border x:Name="HeroBorder" Height="40" Width="40"  Grid.Row="0" Grid.Column="0" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="0,0,0,0" MouseUp="Hero_MouseUp">
+        <Border x:Name="HeroBorder" Height="40" Width="40"  Grid.Row="0" Grid.Column="0" Background="{StaticResource PortraitBackground}" Margin="0,0,0,0" MouseUp="Hero_MouseUp">
             <Image x:Name="HeroImage" Width="32" Height="32"  Margin="0,0,0,0" />
         </Border>
         <local:OutlinedTextBlock x:Name="HeroName" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Paladin" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" TextAlignment="Left" FontSize="13" Margin="0,4,0,0" />

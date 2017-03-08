@@ -117,6 +117,7 @@ namespace ArenaHelper
             public List<string> detectedheroes;
             public string pickedhero;
             public List<Tuple<string, string, string>> detectedcards;
+            public List<Tuple<double, double, double>> cardrating;
             public List<string> pickedcards;
 
             public ArenaData()
@@ -126,6 +127,7 @@ namespace ArenaHelper
                 detectedheroes = new List<string>();
                 pickedhero = "";
                 detectedcards = new List<Tuple<string, string, string>>();
+                cardrating = new List<Tuple<double, double, double>>();
                 pickedcards = new List<string>();
             }
         }
@@ -135,6 +137,7 @@ namespace ArenaHelper
         private List<Detection.DetectedInfo> detectedcards = new List<Detection.DetectedInfo>();
         private List<Detection.DetectedInfo> detectedheroes = new List<Detection.DetectedInfo>();
         private List<Detection.DetectedInfo> detectedbighero = new List<Detection.DetectedInfo>();
+        private List<double> currentcardvalues = new List<double>();
         private static PluginState state;
         private List<int> mouseindex = new List<int>();
         private ArenaData arenadata = new ArenaData();
@@ -251,7 +254,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.8.4"); }
+            get { return new Version("0.8.5"); }
         }
 
         public MenuItem MenuItem
@@ -775,6 +778,8 @@ namespace ArenaHelper
                         // Set the data
                         arenadata = loadedarenadata;
                         validarenadata = true;
+
+                        Log.Info("Arena Helper: Card Rating: " + arenadata.cardrating.Count);
                     }
                     else
                     {
@@ -883,6 +888,7 @@ namespace ArenaHelper
             arenadata.detectedheroes.Clear();
             arenadata.pickedhero = "";
             arenadata.detectedcards.Clear();
+            arenadata.cardrating.Clear();
             arenadata.pickedcards.Clear();
 
             // Invalidate arena
@@ -1248,6 +1254,7 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Visible;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             } else if (!stablearena && state != PluginState.Done)
             {
                 ShowOverlay(false);
@@ -1257,6 +1264,7 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.SearchHeroes)
             {
@@ -1269,6 +1277,7 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.SearchBigHero)
             {
@@ -1278,6 +1287,7 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Visible;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.DetectedHeroes)
             {
@@ -1287,6 +1297,7 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Visible;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.SearchCards)
             {
@@ -1300,6 +1311,7 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.SearchCardValues)
             {
@@ -1312,6 +1324,7 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.DetectedCards)
             {
@@ -1320,15 +1333,18 @@ namespace ArenaHelper
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Hidden;
             }
             else if (newstate == PluginState.Done)
             {
+                arenawindow.DeckRatingControl1.DeckRatingText.Text = GetDeckRating().ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
                 ShowOverlay(false);
-                SetDetectingText("Done", DoneMessage, "");
-                arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Visible;
+                arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.HeroPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.CardPanel.Visibility = System.Windows.Visibility.Hidden;
+                arenawindow.DonePanel.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
@@ -1838,11 +1854,11 @@ namespace ArenaHelper
 
             // Get the actual numerical value
             double maxvalue = 0;
-            List<double> cardvalues = new List<double>();
+            currentcardvalues.Clear();
             for (int i = 0; i < 3; i++)
             {
                 double dval = GetNumericalValue(values[i]);
-                cardvalues.Add(dval);
+                currentcardvalues.Add(dval);
 
                 if (i == 0 || dval > maxvalue)
                 {
@@ -1856,7 +1872,7 @@ namespace ArenaHelper
                 SetValueText(i, values[i]);
                 
                 // Highlight the card with the highest value, if no cards are missing
-                if (!missing && cardvalues[i] == maxvalue)
+                if (!missing && currentcardvalues[i] == maxvalue)
                 {
                     valueoverlays[i].GradientStop1.Color = System.Windows.Media.Color.FromArgb(0xFF, 0xf5, 0xdb, 0x4c);
                     valueoverlays[i].GradientStop2.Color = System.Windows.Media.Color.FromArgb(0xFF, 0x8b, 0x68, 0x11);
@@ -2055,7 +2071,22 @@ namespace ArenaHelper
                 Log.Info("AH: Missed a pick");
             }
 
+            // Add picked card
             arenadata.pickedcards.Add(cardid);
+
+            // Add card rating
+            double cardval0 = 0;
+            double cardval1 = 0;
+            double cardval2 = 0;
+            if (currentcardvalues.Count == 3)
+            {
+                cardval0 = currentcardvalues[0];
+                cardval1 = currentcardvalues[1];
+                cardval2 = currentcardvalues[2];
+            }
+            arenadata.cardrating.Add(new Tuple<double, double, double>(cardval0, cardval1, cardval2));
+
+            // Save
             SaveArenaData();
 
             plugins.CardPicked(arenadata, pickindex, pickedcard);
@@ -2141,6 +2172,47 @@ namespace ArenaHelper
         {
             arenawindow.Header.Text = "Picking card " + (arenadata.pickedcards.Count + 1) + "/" + MaxCardCount;
             arenawindow.DeckName.Content = arenadata.deckname;
+            arenawindow.DeckRatingControl0.DeckRatingText.Text = GetDeckRating().ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        private double GetDeckRating()
+        {
+            int pcount = arenadata.pickedcards.Count;
+            int dcount = arenadata.detectedcards.Count;
+            int ccount = arenadata.cardrating.Count;
+
+            // Check if valid counts
+            if (!(pcount > 0 && pcount <= dcount && pcount == ccount))
+            {
+                return 0;
+            }
+
+            // Calculate total rating
+            double totalrating = 0;
+            for (int i = 0; i < pcount; i++)
+            {
+                string curcard = arenadata.pickedcards[i];
+                double curcardval = 0;
+                if (curcard == arenadata.detectedcards[i].Item1)
+                {
+                    curcardval = arenadata.cardrating[i].Item1;
+                }
+                else if (curcard == arenadata.detectedcards[i].Item2)
+                {
+                    curcardval = arenadata.cardrating[i].Item2;
+                }
+                else if (curcard == arenadata.detectedcards[i].Item3)
+                {
+                    curcardval = arenadata.cardrating[i].Item3;
+                }
+
+                totalrating += curcardval;
+            }
+
+
+            // Return average
+            double deckrating = totalrating / (double)pcount;
+            return deckrating;
         }
 
         private void SetDetectingText(string title, string text, string text2)

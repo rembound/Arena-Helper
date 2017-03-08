@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="ArenaHelper.Controls.DeckRating"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArenaHelper"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <local:OutlinedTextBlock Grid.Row="0"  HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Deck Average" Margin="0,8,0,0" />
+        <Grid  Grid.Row="1" VerticalAlignment="Top" Margin="0,15,0,0">
+            <Ellipse Width="110" Height="110" Fill="#494949" Stroke="#2f2f2f" StrokeThickness="3"></Ellipse>
+            <TextBlock x:Name="DeckRatingText" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#f7f7f7" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="32" Text="65.3"/>
+        </Grid>
+    </Grid>
+</UserControl>

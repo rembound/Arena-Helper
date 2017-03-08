@@ -14,6 +14,7 @@ using Hearthstone_Deck_Tracker.Hearthstone;
 using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Navigation;
 using System.Diagnostics;
+using MahApps.Metro;
 
 #endregion
 

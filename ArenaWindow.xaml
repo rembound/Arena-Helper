@@ -4,12 +4,16 @@
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:ArenaHelper"
                       xmlns:localcontrols="clr-namespace:ArenaHelper.Controls"
-                      Title="Arena Helper" Height="255" MinHeight="255" MaxHeight="255" Width="400" MinWidth="400" MaxWidth="400"
-                      Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Topmost="True" LocationChanged="MetroWindow_LocationChanged" ShowMaxRestoreButton="False">
+                      Title="Arena Helper" Height="255" MinHeight="255" MaxHeight="255" Width="480" MinWidth="480" MaxWidth="480"
+                      Background="{DynamicResource WindowBackground}" Topmost="True" LocationChanged="MetroWindow_LocationChanged" ShowMaxRestoreButton="False">
     <controls:MetroWindow.Resources>
         <Style TargetType="{x:Type Hyperlink}" BasedOn="{StaticResource {x:Type Hyperlink}}" x:Key="HyperlinkAboutStyle">
             <Setter Property="Foreground" Value="#0088ff" />
         </Style>
+        <SolidColorBrush x:Key="WindowBackground" Color="#696969" />
+        <SolidColorBrush x:Key="SeparatorBackground" Color="#a0a0a0" />
+        <SolidColorBrush x:Key="PortraitBackground" Color="#a0a0a0" />
+        <SolidColorBrush x:Key="TextColor" Color="#ffffff" />
     </controls:MetroWindow.Resources>
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
@@ -39,7 +43,7 @@
     <controls:MetroWindow.Flyouts>
         <controls:FlyoutsControl Margin="{Binding TitleBarMargin, RelativeSource={RelativeSource AncestorType=local:ArenaWindow}}">
             <!-- Options -->
-            <controls:Flyout x:Name="FlyoutOptions" Header="Options" Position="Left" Width="400">
+            <controls:Flyout x:Name="FlyoutOptions" Header="Options" Position="Left" Width="480">
                 <StackPanel>
                     <CheckBox x:Name="CheckBoxOverlay" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" Checked="CheckBoxOverlay_Checked" Unchecked="CheckBoxOverlay_Unchecked" Content="Show values in overlay" />
                     <CheckBox x:Name="CheckBoxManual" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxManual_Checked" Unchecked="CheckBoxManual_Unchecked">
@@ -51,17 +55,17 @@
             </controls:Flyout>
 
             <!-- About -->
-            <controls:Flyout x:Name="FlyoutAbout" Header="About" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+            <controls:Flyout x:Name="FlyoutAbout" Header="About" CloseButtonVisibility="Collapsed" Position="Left" Width="480">
                 <StackPanel Margin="5">
                     <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
                         <Run Text="Arena Helper " /><Run Text="{Binding StringVersion, Mode=OneWay}" /><Run Text=" was made by " /><Hyperlink NavigateUri="{Binding StringWebsite}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Rembound</Hyperlink>
                         <Run Text="with support from the community at GitHub." />
                         <Run Text="Thanks go out to Grinning Goat for providing " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Hearthstone Arena Tier List</Hyperlink><Run Text="!" />
                         <LineBreak /><LineBreak />
-                        <Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Donate</Hyperlink><Run Text=" to help support development. Thank you!" />
+                        <Run Text="Thanks for your support! Any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donation</Hyperlink><Run Text=" is greatly appreciated." />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Name="AboutDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>
+                        <Button Name="AboutDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutDonate_Click"/>
                         <Button Name="AboutVisitWebsite" Content="rembound.com" Margin="10,0,0,0" Width="100" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitWebsite_Click"/>
                         <Button Name="AboutVisitGitHub" Content="github" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitGitHub_Click"/>
                         <Button Name="AboutButtonClose" Content="close" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutButtonClose_Click"/>
@@ -70,7 +74,7 @@
             </controls:Flyout>
 
             <!-- Update -->
-            <controls:Flyout x:Name="FlyoutUpdate" Header="Update available!" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+            <controls:Flyout x:Name="FlyoutUpdate" Header="Update available!" CloseButtonVisibility="Collapsed" Position="Left" Width="480">
                 <StackPanel Margin="5">
                     <TextBlock x:Name="UpdateText" Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
                         <Run Text="Press &quot;download&quot; to automatically download and install the new update. This will restart Hearthstone Deck Tracker." />
@@ -84,16 +88,16 @@
             </controls:Flyout>
 
             <!-- Data Update -->
-            <controls:Flyout x:Name="FlyoutDataUpdate" Header="Data update applied!" CloseButtonVisibility="Collapsed" Position="Left" Width="400">
+            <controls:Flyout x:Name="FlyoutDataUpdate" Header="Data update applied!" CloseButtonVisibility="Collapsed" Position="Left" Width="480">
                 <StackPanel Margin="5">
                     <TextBlock Margin="10,5,10,15" FontWeight="SemiBold" FontSize="13" TextWrapping="Wrap">
                         <Run Text="The tier list and card data was updated to the latest version." />
                         <Run Text="More info about the tier list can be found at: " /><Hyperlink NavigateUri="{Binding StringTierList}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Hearthstone Arena Tier List</Hyperlink>
                         <LineBreak /><LineBreak />
-                        <Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">Donate</Hyperlink><Run Text=" to help support development. Thank you!" />
+                        <Run Text="Thanks for your support! Any " /><Hyperlink NavigateUri="{Binding StringDonate}" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource HyperlinkAboutStyle}">donation</Hyperlink><Run Text=" is greatly appreciated." />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Name="DataUpdateDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource AccentedSquareButtonStyle}" Click="AboutDonate_Click"/>
+                        <Button Name="DataUpdateDonate" Content="donate" Width="60" Margin="0,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutDonate_Click"/>
                         <Button Name="DataUpdateWebsite" Content="rembound.com" Margin="10,0,0,0" Width="100" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitWebsite_Click"/>
                         <Button Name="DataUpdateGitHub" Content="github" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="AboutVisitGitHub_Click"/>
                         <Button Name="DataUpdateClose" Content="close" Width="60" Margin="10,0,0,0" Height="30" Style="{DynamicResource SquareButtonStyle}" Click="DataUpdateClose_Click"/>
@@ -108,6 +112,8 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
+        <!-- Top Panel -->
         <StackPanel Grid.Row="0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -115,12 +121,12 @@
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
                 <WrapPanel Grid.Column="0">
-                    <Border Height="40" Width="40" Background="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="4" MouseUp="ConfigureHero_MouseUp" >
+                    <Border Height="40" Width="40" Background="{DynamicResource PortraitBackground}" Margin="4" MouseUp="ConfigureHero_MouseUp" >
                         <Grid>
                             <Image x:Name="PickedHeroImage" Width="32" Height="32" />
                         </Grid>
                     </Border>
-                    <Label x:Name="DeckName" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Content="Deckname" FontSize="14" Margin="0" />
+                    <Label x:Name="DeckName" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextColor}" Content="Deckname" FontSize="14" Margin="0" />
                 </WrapPanel>
 
                 <WrapPanel Grid.Column="1" VerticalAlignment="Center">
@@ -128,7 +134,7 @@
                     <Button x:Name="Button2" Width="70" Content="Save Deck" Margin="0 0 8 0" Click="ButtonSave_Click" />
                 </WrapPanel>
             </Grid>
-            <Separator/>
+            <Separator Background="{DynamicResource SeparatorBackground}" />
         </StackPanel>
         
         <!-- DetectingPanel -->
@@ -140,14 +146,14 @@
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <local:OutlinedTextBlock Grid.Row="0" x:Name="DetectingHeader" HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Title" Margin="0,4,0,0" />
-            <TextBlock Grid.Row="1" x:Name="DetectingText" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Margin="0,12,0,0">text</TextBlock>
-            <TextBlock Grid.Row="2" x:Name="DetectingText2" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Margin="0,20,0,0">text</TextBlock>
+            <local:OutlinedTextBlock Grid.Row="0" x:Name="DetectingHeader" HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Title" Margin="0,8,0,0" />
+            <TextBlock Grid.Row="1" x:Name="DetectingText" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextColor}" Margin="0,12,0,0">text</TextBlock>
+            <TextBlock Grid.Row="2" x:Name="DetectingText2" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextColor}" Margin="0,20,0,0">text</TextBlock>
         </Grid>
 
         <!-- HeroPanel -->
         <StackPanel x:Name="HeroPanel" Grid.Row="1" Width="200" Visibility="Hidden">
-            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Detected Heroes" Margin="0,4,0,0" />
+            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Detected Heroes" Margin="0,8,0,0" />
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -161,9 +167,10 @@
                 <localcontrols:Hero Grid.Row="0" Grid.Column="1" Margin="0,16,0,0" x:Name="Hero1" />
                 <localcontrols:Hero Grid.Row="0" Grid.Column="2" Margin="0,16,0,0" x:Name="Hero2" />
             </Grid>
-            <TextBlock x:Name="DetectedHeroesWarning" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Margin="0,20,0,0">text</TextBlock>
+            <TextBlock x:Name="DetectedHeroesWarning" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextColor}" Margin="0,20,0,0">text</TextBlock>
         </StackPanel>
 
+        <!-- ConfigureHeroPanel -->
         <StackPanel x:Name="ConfigureHeroPanel" Grid.Row="1" Width="300" Visibility="Hidden">
             <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Select Hero" Margin="0,4,0,0" />
             <Grid>
@@ -194,23 +201,40 @@
         </StackPanel>
 
         <!-- CardPanel -->
-        <Grid x:Name="CardPanel" Grid.Row="1" HorizontalAlignment="Center" Visibility="Hidden">
+        <Grid x:Name="CardPanel" Grid.Row="1" HorizontalAlignment="Left" Visibility="Hidden">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <localcontrols:DeckRating x:Name="DeckRatingControl0" Grid.Column="0" Margin="16,0,0,0" />
+            <StackPanel Grid.Column="1" Margin="24,0,0,0">
+                <local:OutlinedTextBlock x:Name="Header" HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="header" Margin="0,8,0,0" />
+                <localcontrols:Card x:Name="CardControl0" DataContext="{Binding Card0}" HorizontalAlignment="Center" Margin="0,15,0,0" MouseUp="CardControl0_MouseUp" />
+                <localcontrols:Card x:Name="CardControl1" DataContext="{Binding Card1}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl1_MouseUp" />
+                <localcontrols:Card x:Name="CardControl2" DataContext="{Binding Card2}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl2_MouseUp" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" Visibility="Visible" HorizontalAlignment="Center" Margin="24,0,0,0">
+                <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Value" Margin="0,8,0,0" />
+                <Label x:Name="Value0" Height="34" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center"  Foreground="{DynamicResource TextColor}" Content="80" FontSize="14" Margin="0,14,0,0" />
+                <Label x:Name="Value1" Height="34" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextColor}" Content="80" FontSize="14" Margin="0,4,0,0" />
+                <Label x:Name="Value2" Height="34" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource TextColor}" Content="80" FontSize="14" Margin="0,4,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <!-- DonePanel -->
+        <Grid x:Name="DonePanel" Grid.Row="1" HorizontalAlignment="Left" Visibility="Hidden">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <local:OutlinedTextBlock x:Name="Header" HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="header" Margin="0,4,0,0" />
-                <localcontrols:Card x:Name="CardControl0" DataContext="{Binding Card0}" HorizontalAlignment="Center" Margin="0,12,0,0" MouseUp="CardControl0_MouseUp" />
-                <localcontrols:Card x:Name="CardControl1" DataContext="{Binding Card1}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl1_MouseUp" />
-                <localcontrols:Card x:Name="CardControl2" DataContext="{Binding Card2}" HorizontalAlignment="Center" Margin="0,4,0,0" MouseUp="CardControl2_MouseUp" />
-            </StackPanel>
-            <StackPanel Grid.Column="1" Visibility="Visible" HorizontalAlignment="Center" Margin="32,0,0,0">
-                <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Value" Margin="0,4,0,0" />
-                <Label x:Name="Value0" Height="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center"  Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Content="80" FontSize="14" Margin="0,12,0,0" />
-                <Label x:Name="Value1" Height="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Content="80" FontSize="14" Margin="0,4,0,0" />
-                <Label x:Name="Value2" Height="35" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" Content="80" FontSize="14" Margin="0,4,0,0" />
-            </StackPanel>
+            <localcontrols:DeckRating x:Name="DeckRatingControl1" Grid.Column="0" Margin="16,0,0,0" />
+            <Grid Grid.Column="1" HorizontalAlignment="Center" Margin="72,0,16,0">
+                <StackPanel Grid.Column="1" >
+                    <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Done" Margin="0,8,0,0" />
+                    <TextBlock TextWrapping="Wrap" Width="200" TextAlignment="Center" Foreground="{DynamicResource TextColor}" Margin="0,12,0,0">All cards are picked. You can start a new arena run or save the deck.</TextBlock>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </controls:MetroWindow>

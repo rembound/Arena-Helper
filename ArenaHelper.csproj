@@ -84,6 +84,9 @@
     <Compile Include="Controls\DebugTextBlock.xaml.cs">
       <DependentUpon>DebugTextBlock.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\DeckRating.xaml.cs">
+      <DependentUpon>DeckRating.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Hero.xaml.cs">
       <DependentUpon>Hero.xaml</DependentUpon>
     </Compile>
@@ -121,6 +124,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\DebugTextBlock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\DeckRating.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
