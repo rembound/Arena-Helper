@@ -16,10 +16,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\ArenaHelper\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,25 +32,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV">
-      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2157\bin\Emgu.CV.dll</HintPath>
+      <HintPath>lib\Emgu.CV.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.Util">
-      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2157\bin\Emgu.Util.dll</HintPath>
+      <HintPath>lib\Emgu.Util.dll</HintPath>
     </Reference>
     <Reference Include="HearthMirror">
-      <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\HearthMirror.dll</HintPath>
+      <HintPath>..\HearthMirror\HearthMirror\bin\x86\Release\HearthMirror.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Hearthstone Deck Tracker">
-      <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
+      <HintPath>..\Hearthstone-Deck-Tracker\Hearthstone Deck Tracker\bin\x86\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">
       <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -75,6 +77,11 @@
       <DependentUpon>ArenaWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AutoUpdater.cs" />
+    <Compile Include="CardInfo\CardData.cs" />
+    <Compile Include="CardInfo\CardTierInfo.cs" />
+    <Compile Include="CardInfo\HeroClass.cs" />
+    <Compile Include="CardInfo\Rarity.cs" />
+    <Compile Include="CardInfo\ClassTierScore.cs" />
     <Compile Include="Controls\AdviceOverlay.xaml.cs">
       <DependentUpon>AdviceOverlay.xaml</DependentUpon>
     </Compile>

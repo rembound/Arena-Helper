@@ -1,26 +1,29 @@
-﻿using System;
-using System.Drawing;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.IO;
-using System.Windows.Media.Imaging;
-using System.Reflection;
+﻿using HearthMirror;
 using Hearthstone_Deck_Tracker;
-using Hearthstone_Deck_Tracker.Plugins;
 using Hearthstone_Deck_Tracker.Hearthstone;
-using System.Diagnostics;
-using System.Threading;
-using Newtonsoft.Json;
-using System.Runtime.InteropServices;
-using MahApps.Metro.Controls.Dialogs;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json.Converters;
+using Hearthstone_Deck_Tracker.Plugins;
 using Hearthstone_Deck_Tracker.Utility;
 using Hearthstone_Deck_Tracker.Utility.Logging;
-using HearthMirror;
+
+using MahApps.Metro.Controls.Dialogs;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace ArenaHelper
 {
