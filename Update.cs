@@ -18,13 +18,13 @@ namespace ArenaHelper
         // Update code adapted from Hearthstone Collection Tracker Plugin
 
         // Plugin updates
-        public const string releaseDownloadUrl = @"https://github.com/rembound/Arena-Helper";
-        public const string latestReleaseRequestUrl = @"https://api.github.com/repos/rembound/Arena-Helper/releases/latest";
+        public const string releaseDownloadUrl = @"https://github.com/inkahootz/Arena-Helper";
+        public const string latestReleaseRequestUrl = @"https://api.github.com/repos/inkahootz/Arena-Helper/releases/latest";
 
         // Data updates
-        public const string DataVersionUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/version.json";
-        public const string HashListUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/cardhashes.json";
-        public const string TierListUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/cardtier.json";
+        public const string DataVersionUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/version.json";
+        public const string HashListUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/cardhashes.json";
+        public const string TierListUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/cardtier.json";
 
         // Updater
         public const string UpdaterFileName = "Updater.exe";
@@ -44,7 +44,7 @@ namespace ArenaHelper
                     releaseStr = await wc.DownloadStringTaskAsync(latestReleaseRequestUrl);
                 }
                 var releaseObj = JsonConvert.DeserializeObject<GithubRelease>(releaseStr);
-                return (releaseObj == null ? null : releaseObj);
+                return releaseObj;
             }
             catch (Exception)
             {
