@@ -1,4 +1,6 @@
-﻿namespace ArenaHelper.CardInfo
+﻿using ArenaHelper.Enums;
+
+namespace ArenaHelper.CardInfo
 {
     public class ClassTierScore
     {

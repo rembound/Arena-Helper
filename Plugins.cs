@@ -28,7 +28,7 @@ namespace AHPlugins
         // newcards: List of 3 detected cards
         // defaultvalues: List of 3 tier values for the detected cards
         // Return a list of 3 card values and an optional 4th advice value
-        public virtual async Task<List<string>> GetCardValues(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<string> defaultvalues) { return null; }
+        public virtual async Task<List<double>> GetCardValues(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<double> defaultvalues) { return null; }
 
         // Called when a new arena is started
         // arendata: As before
@@ -152,7 +152,7 @@ namespace ArenaHelper
             }
         }
 
-        public async Task<List<string>> GetCardValues(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<string> defaultvalues)
+        public async Task<List<double>> GetCardValues(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<double> defaultvalues)
         {
             foreach (var plugin in plugins)
             {

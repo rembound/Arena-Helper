@@ -1,15 +1,14 @@
-﻿using HearthMirror;
+﻿using ArenaHelper.CardInfo;
+using ArenaHelper.Enums;
+using HearthMirror;
 using Hearthstone_Deck_Tracker;
 using Hearthstone_Deck_Tracker.Hearthstone;
 using Hearthstone_Deck_Tracker.Plugins;
 using Hearthstone_Deck_Tracker.Utility;
 using Hearthstone_Deck_Tracker.Utility.Logging;
-
 using MahApps.Metro.Controls.Dialogs;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,13 +56,13 @@ namespace ArenaHelper
             }
         }
 
-        public class CardTierInfo
+        public class CardTierInfo2
         {
             public string id;
             public string name;
             public List<string> value;
 
-            public CardTierInfo(string id, string name, List<string> value)
+            public CardTierInfo2(string id, string name, List<string> value)
             {
                 this.id = id;
                 this.name = name;
@@ -118,7 +117,7 @@ namespace ArenaHelper
             public string deckname;
             public string deckguid;
             public List<string> detectedheroes;
-            public string pickedhero;
+            public HeroClass? pickedhero;
             public List<Tuple<string, string, string>> detectedcards;
             public List<Tuple<double, double, double>> cardrating;
             public List<string> pickedcards;
@@ -128,7 +127,7 @@ namespace ArenaHelper
                 deckname = "";
                 deckguid = "";
                 detectedheroes = new List<string>();
-                pickedhero = "";
+                pickedhero = null;
                 detectedcards = new List<Tuple<string, string, string>>();
                 cardrating = new List<Tuple<double, double, double>>();
                 pickedcards = new List<string>();
@@ -156,11 +155,11 @@ namespace ArenaHelper
         private Update.AHDataVersion dataversion;
         private const string DataVersionFile = "version.json";
         private const string HashListFile = "cardhashes.json";
-        private const string TierListFile = "cardtier.json";
+        private const string TierListFile = "tierlist.json";
         public static List<Card> cardlist = new List<Card>();
         private List<CardHashData> cardhashlist = new List<CardHashData>();
         public static List<HeroHashData> herohashlist = new List<HeroHashData>();
-        public static List<CardTierInfo> cardtierlist = new List<CardTierInfo>();
+        public static Dictionary<string,CardInfo.CardTierInfo> cardtierlist = new Dictionary<string, CardInfo.CardTierInfo>();
 
         private Detection detection = new Detection();
 
@@ -276,15 +275,15 @@ namespace ArenaHelper
 
                 // Set hashes
                 herohashlist.Clear();
-                herohashlist.Add(new HeroHashData(0, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 15929423101315404409, 13071189497635732127, 13237968094529645459)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
-                herohashlist.Add(new HeroHashData(1, "Shaman", "shaman_small.png", 18366959783178990451, 15841665550811421911, 15769608231248747991)); // Thrall, Morgl small, Morgl big
-                herohashlist.Add(new HeroHashData(2, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096795)); // Valeera, Valeera golden small, Valeera golden big
-                herohashlist.Add(new HeroHashData(3, "Paladin", "paladin_small.png", 11505795398351105139, 11848119152778072427, 11846995451926976873)); // Uther Lightbringer, Lady Liadrin small, Lady Liadrin big
-                herohashlist.Add(new HeroHashData(4, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590069, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
-                herohashlist.Add(new HeroHashData(5, "Druid", "druid_small.png", 5433711186487002743));
-                herohashlist.Add(new HeroHashData(6, "Warlock", "warlock_small.png", 10186248321718481641));
-                herohashlist.Add(new HeroHashData(7, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373, 4200442357624021949, 6507833410481791487)); // Jaina, Medivh small, Medivh big, Khadgar small, Khadgar big
-                herohashlist.Add(new HeroHashData(8, "Priest", "priest_small.png", 15052908377040876499));
+                herohashlist.Add(new HeroHashData(0, "Druid", "druid_small.png", 5433711186487002743));
+                herohashlist.Add(new HeroHashData(1, "Hunter", "hunter_small.png", 2294799430464257123, 1975465933826505957, 813537221374590069, 12942361696967163803, 17552924014479703963)); // Rexxar, Rexxar golden small, Rexxar golden big, Alleria small, Alleria big
+                herohashlist.Add(new HeroHashData(2, "Mage", "mage_small.png", 15770007155810004267, 8631746754340092973, 8343516378188643373, 4200442357624021949, 6507833410481791487)); // Jaina, Medivh small, Medivh big, Khadgar small, Khadgar big
+                herohashlist.Add(new HeroHashData(3, "Rogue", "rogue_small.png", 5643619427529904809, 11263619176753353643, 10111770795730096795)); // Valeera, Valeera golden small, Valeera golden big
+                herohashlist.Add(new HeroHashData(4, "Paladin", "paladin_small.png", 11505795398351105139, 11848119152778072427, 11846995451926976873)); // Uther Lightbringer, Lady Liadrin small, Lady Liadrin big
+                herohashlist.Add(new HeroHashData(5, "Priest", "priest_small.png", 15052908377040876499));
+                herohashlist.Add(new HeroHashData(6, "Shaman", "shaman_small.png", 18366959783178990451, 15841665550811421911, 15769608231248747991)); // Thrall, Morgl small, Morgl big
+                herohashlist.Add(new HeroHashData(7, "Warlock", "warlock_small.png", 10186248321718481641));
+                herohashlist.Add(new HeroHashData(8, "Warrior", "warrior_small.png", 13776678289873991291, 10236917153841177209, 15929423101315404409, 13071189497635732127, 13237968094529645459)); // Garrosh, Garrosh golden small, Garrosh golden big, Magni small, Magni big
 
                 AddMenuItem();
 
@@ -583,7 +582,7 @@ namespace ArenaHelper
 
             if (index >= 0 && index < herohashlist.Count)
             {
-                PickHero(index);
+                PickHero(herohashlist[index].name);
             }
             else
             {
@@ -807,7 +806,7 @@ namespace ArenaHelper
                     SaveArenaData();
                 }
 
-                if (arenadata.pickedhero != "")
+                if (arenadata.pickedhero != null)
                 {
                     // Hero is picked
                     if (arenadata.pickedcards.Count == MaxCardCount)
@@ -889,7 +888,7 @@ namespace ArenaHelper
             arenadata.deckname = Helper.ParseDeckNameTemplate(Config.Instance.ArenaDeckNameTemplate);
             arenadata.deckguid = Guid.NewGuid().ToString();
             arenadata.detectedheroes.Clear();
-            arenadata.pickedhero = "";
+            arenadata.pickedhero = null;
             arenadata.detectedcards.Clear();
             arenadata.cardrating.Clear();
             arenadata.pickedcards.Clear();
@@ -1059,7 +1058,7 @@ namespace ArenaHelper
                         {
                             // Hero choice detection, final
                             Log.Info("AH Hero chosen: " + heroname);
-                            PickHero(hero.index);
+                            PickHero(hero.name);
                         }
                     }
                 }
@@ -1677,17 +1676,17 @@ namespace ArenaHelper
             }
         }
 
-        private void PickHero(int heroindex)
+        private void PickHero(string heroname)
         {
             if (state == PluginState.Done)
                 return;
 
-            arenadata.pickedhero = herohashlist[heroindex].name;
+            arenadata.pickedhero = (HeroClass)Enum.Parse(typeof(HeroClass), heroname);
             SaveArenaData();
 
             UpdateHero();
 
-            plugins.HeroPicked(arenadata, arenadata.pickedhero);
+            plugins.HeroPicked(arenadata, arenadata.pickedhero.ToString());
 
             // Show the card panel
             SetState(PluginState.SearchCards);
@@ -1811,17 +1810,17 @@ namespace ArenaHelper
             newcards.Add(GetCard(arenadata.detectedcards[lastindex].Item3));
 
             // Add default values from the tierlist
-            List<string> values = new List<string>();
+            List<double> values = new List<double>();
             for (int i = 0; i < 3; i++)
             {
                 values.Add(GetCardValue(newcards[i].Id));
             }
 
             // Get the plugin result
-            List<string> pvalues = await plugins.GetCardValues(arenadata, newcards, values);
+            List<double> pvalues = await plugins.GetCardValues(arenadata, newcards, values);
 
             // Override the values if the plugin has a result
-            string advice = "";
+            double advice = Double.NaN;
             if (pvalues != null)
             {
                 if (pvalues.Count >= 3)
@@ -1843,9 +1842,9 @@ namespace ArenaHelper
             bool missing = false;
             for (int i = 0; i < values.Count; i++)
             {
-                if (values[i] == "")
+                if (values[i] == double.NaN)
                 {
-                    values[i] = "n/a";
+                    values[i] = double.NaN;
                     missing = true;
                 }
             }
@@ -1860,7 +1859,7 @@ namespace ArenaHelper
             currentcardvalues.Clear();
             for (int i = 0; i < 3; i++)
             {
-                double dval = GetNumericalValue(values[i]);
+                double dval = values[i];
                 currentcardvalues.Add(dval);
 
                 if (i == 0 || dval > maxvalue)
@@ -1872,7 +1871,7 @@ namespace ArenaHelper
             // Set value text
             for (int i = 0; i < valueoverlays.Count; i++)
             {
-                SetValueText(i, values[i]);
+                SetValueText(i, values[i].ToString());
                 
                 // Highlight the card with the highest value, if no cards are missing
                 if (!missing && currentcardvalues[i] == maxvalue)
@@ -1890,7 +1889,7 @@ namespace ArenaHelper
             }
             UpdateSize(); // Update size to center the labels
 
-            SetAdviceText(advice);
+            SetAdviceText(advice.ToString());
 
             arenawindow.Update();
 
@@ -1939,19 +1938,17 @@ namespace ArenaHelper
             return dvalue;
         }
 
-        public string GetCardValue(string id)
+        public double GetCardValue(string id)
         {
-            string value = "";
-            HeroHashData herodata = GetHero(arenadata.pickedhero);
+            double value = 0.0;
+            HeroHashData herodata = GetHero(arenadata.pickedhero.ToString());
             if (herodata != null)
             {
                 CardTierInfo cardtierinfo = GetCardTierInfo(id);
                 if (cardtierinfo != null)
                 {
-                    if (herodata.index >= 0 && herodata.index < cardtierinfo.value.Count)
-                    {
-                        value = cardtierinfo.value[herodata.index];
-                    }
+                    ClassTierScore tierScore = GetClassTierScore(cardtierinfo, arenadata.pickedhero);
+                    value = tierScore.Score;
                 }
             }
             return value;
@@ -2138,13 +2135,7 @@ namespace ArenaHelper
         {
             if (name != "")
             {
-                for (int i = 0; i < herohashlist.Count; i++)
-                {
-                    if (herohashlist[i].name == name)
-                    {
-                        return herohashlist[i];
-                    }
-                }
+                return herohashlist.First(hhd => hhd.name == name);
             }
 
             return null;
@@ -2154,16 +2145,18 @@ namespace ArenaHelper
         {
             if (id != "")
             {
-                for (int i = 0; i < cardtierlist.Count; i++)
-                {
-                    if (cardtierlist[i].id == id)
-                    {
-                        return cardtierlist[i];
-                    }
-                }
+                return cardtierlist[id];
             }
 
             return null;
+        }
+
+        public static ClassTierScore GetClassTierScore(CardTierInfo cardTierInfo, HeroClass? heroClass)
+        {
+            var heroScore = cardTierInfo.Scores.First(cts => cts.Hero == heroClass);
+            var generalScore = cardTierInfo.Scores.First(cts => cts.Hero == null);
+
+            return heroScore ?? generalScore;
         }
 
         public static PluginState GetState()
@@ -2227,7 +2220,7 @@ namespace ArenaHelper
 
         private void UpdateHero()
         {
-            HeroHashData hero = GetHero(arenadata.pickedhero);
+            HeroHashData hero = GetHero(arenadata.pickedhero.ToString());
             if (hero != null)
             {
                 arenawindow.PickedHeroImage.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero.image, UriKind.Relative));
@@ -2327,7 +2320,15 @@ namespace ArenaHelper
             cardhashlist = JsonConvert.DeserializeObject<List<CardHashData>>(File.ReadAllText(cardhashesfile));
 
             // Load card tier info
-            cardtierlist = JsonConvert.DeserializeObject<List<CardTierInfo>>(File.ReadAllText(cardtierfile));
+            cardtierlist = LoadCardTierList(cardtierfile);
+        }
+
+        private Dictionary<string, CardTierInfo> LoadCardTierList(string tierListFile)
+        {
+            var lightforgeData = JsonConvert.DeserializeObject<CardData>(File.ReadAllText(tierListFile));
+            // Remove duplicate keys due to tri-class cards
+            return lightforgeData.Cards.GroupBy(cti => cti.CardId).Select(cti => cti.First()).ToDictionary(cti => cti.CardId, cti => cti);
+
         }
 
         private Update.AHDataVersion LoadDataVersion(string filename)

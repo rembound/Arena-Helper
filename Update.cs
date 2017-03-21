@@ -80,10 +80,11 @@ namespace ArenaHelper
         // AHDataVersion
         public class AHDataVersion
         {
+            [JsonConverter(typeof(VersionConverter))]
             public Version hashlist;
-            public Version tierlist;
+            public DateTime tierlist;
 
-            public AHDataVersion(Version hashlist, Version tierlist)
+            public AHDataVersion(Version hashlist, DateTime tierlist)
             {
                 this.hashlist = hashlist;
                 this.tierlist = tierlist;

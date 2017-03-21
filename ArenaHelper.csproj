@@ -79,8 +79,8 @@
     <Compile Include="AutoUpdater.cs" />
     <Compile Include="CardInfo\CardData.cs" />
     <Compile Include="CardInfo\CardTierInfo.cs" />
-    <Compile Include="CardInfo\HeroClass.cs" />
-    <Compile Include="CardInfo\Rarity.cs" />
+    <Compile Include="Enums\HeroClass.cs" />
+    <Compile Include="Enums\CardRarity.cs" />
     <Compile Include="CardInfo\ClassTierScore.cs" />
     <Compile Include="Controls\AdviceOverlay.xaml.cs">
       <DependentUpon>AdviceOverlay.xaml</DependentUpon>

@@ -1,6 +1,6 @@
-﻿namespace ArenaHelper.CardInfo
+﻿namespace ArenaHelper.Enums
 {
-    public enum Rarity
+    public enum CardRarity
     {
         Common,
         Rare,
