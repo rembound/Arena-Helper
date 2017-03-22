@@ -56,20 +56,6 @@ namespace ArenaHelper
             }
         }
 
-        public class CardTierInfo2
-        {
-            public string id;
-            public string name;
-            public List<string> value;
-
-            public CardTierInfo2(string id, string name, List<string> value)
-            {
-                this.id = id;
-                this.name = name;
-                this.value = value;
-            }
-        }
-
         public class HashData
         {
             public List<ulong> hashes;
@@ -1189,9 +1175,9 @@ namespace ArenaHelper
                     lastdataupdatecheck = DateTime.Now;
                     Update.AHDataVersion latestdataversion = await Update.GetDataVersion();
                     Update.LightForgeTierVersion latesttierversion = await Update.GetLightForgeVersion();
-                    if (latesthashversion != null && latesttierversion != null)
+                    if (latestdataversion != null && latesttierversion != null)
                     {
-                        if (latesthashversion.hashlist > dataversion.hashlist)
+                        if (latestdataversion.hashlist > dataversion.hashlist)
                         {
                             // Hash list updated, download the new hash list
                             string hashliststr = await Update.DownloadString(Update.HashListUrl);
@@ -1206,7 +1192,7 @@ namespace ArenaHelper
 
                         if (latesttierversion.tierlist > dataversion.tierlist)
                         {
-                            latestdataversion
+                            latestdataversion.tierlist = latesttierversion.tierlist;
                             // Tier list updated, download the new tier list
                             string tierliststr = await Update.DownloadString(Update.TierListUrl);
                             if (tierliststr != null)
