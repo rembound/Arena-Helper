@@ -24,7 +24,7 @@ namespace ArenaHelper
         // Data updates
         public const string DataVersionUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/version.json";
         public const string HashListUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/cardhashes.json";
-        public const string TierListUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/cardtier.json";
+        public const string TierListUrl = @"http://thelightforge.com/api/tierlist/latest?locale=en";
 
         // Updater
         public const string UpdaterFileName = "Updater.exe";
@@ -101,7 +101,31 @@ namespace ArenaHelper
                     wc.Headers.Add("user-agent", userAgent);
                     versionStr = await wc.DownloadStringTaskAsync(DataVersionUrl);
                 }
-                return JsonConvert.DeserializeObject<AHDataVersion>(versionStr, new VersionConverter());
+                return JsonConvert.DeserializeObject<AHDataVersion>(versionStr);
+            }
+            catch (Exception)
+            {
+            }
+            return null;
+        }
+
+        public class LightForgeTierVersion
+        {
+            [JsonProperty("CreatedOn")]
+            public DateTime tierlist { get; set; }
+        }
+
+        public static async Task<LightForgeTierVersion> GetLightForgeVersion()
+        {
+            try
+            {
+                string versionStr;
+                using (var wc = new WebClient())
+                {
+                    wc.Headers.Add("user-agent", userAgent);
+                    versionStr = await wc.DownloadStringTaskAsync(TierListUrl);
+                }
+                return JsonConvert.DeserializeObject<LightForgeTierVersion>(versionStr);
             }
             catch (Exception)
             {

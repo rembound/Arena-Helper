@@ -1188,9 +1188,10 @@ namespace ArenaHelper
                 {
                     lastdataupdatecheck = DateTime.Now;
                     Update.AHDataVersion latestdataversion = await Update.GetDataVersion();
-                    if (latestdataversion != null)
+                    Update.LightForgeTierVersion latesttierversion = await Update.GetLightForgeVersion();
+                    if (latesthashversion != null && latesttierversion != null)
                     {
-                        if (latestdataversion.hashlist > dataversion.hashlist)
+                        if (latesthashversion.hashlist > dataversion.hashlist)
                         {
                             // Hash list updated, download the new hash list
                             string hashliststr = await Update.DownloadString(Update.HashListUrl);
@@ -1203,8 +1204,9 @@ namespace ArenaHelper
                             hasdataupdates = true;
                         }
 
-                        if (latestdataversion.tierlist > dataversion.tierlist)
+                        if (latesttierversion.tierlist > dataversion.tierlist)
                         {
+                            latestdataversion
                             // Tier list updated, download the new tier list
                             string tierliststr = await Update.DownloadString(Update.TierListUrl);
                             if (tierliststr != null)
