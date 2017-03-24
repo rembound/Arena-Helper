@@ -82,12 +82,14 @@ namespace ArenaHelper
         {
             [JsonConverter(typeof(VersionConverter))]
             public Version hashlist;
-            public DateTime tierlist;
 
-            public AHDataVersion(Version hashlist, DateTime tierlist)
+            [JsonProperty("lightforgedate")]
+            public DateTime lightforgedate { get; set; }
+
+            public AHDataVersion(Version hashlist, DateTime lightforgedate)
             {
                 this.hashlist = hashlist;
-                this.tierlist = tierlist;
+                this.lightforgedate = lightforgedate;
             }
         }
 
@@ -109,13 +111,13 @@ namespace ArenaHelper
             return null;
         }
 
-        public class LightForgeTierVersion
+        public class LightForgeTierDate
         {
             [JsonProperty("CreatedOn")]
-            public DateTime tierlist { get; set; }
+            public DateTime lightforgedate { get; set; }
         }
 
-        public static async Task<LightForgeTierVersion> GetLightForgeVersion()
+        public static async Task<LightForgeTierDate> GetLightForgeVersion()
         {
             try
             {
@@ -125,7 +127,7 @@ namespace ArenaHelper
                     wc.Headers.Add("user-agent", userAgent);
                     versionStr = await wc.DownloadStringTaskAsync(TierListUrl);
                 }
-                return JsonConvert.DeserializeObject<LightForgeTierVersion>(versionStr);
+                return JsonConvert.DeserializeObject<LightForgeTierDate>(versionStr);
             }
             catch (Exception)
             {

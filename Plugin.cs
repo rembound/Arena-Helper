@@ -1174,7 +1174,7 @@ namespace ArenaHelper
                 {
                     lastdataupdatecheck = DateTime.Now;
                     Update.AHDataVersion latestdataversion = await Update.GetDataVersion();
-                    Update.LightForgeTierVersion latesttierversion = await Update.GetLightForgeVersion();
+                    Update.LightForgeTierDate latesttierversion = await Update.GetLightForgeVersion();
                     if (latestdataversion != null && latesttierversion != null)
                     {
                         if (latestdataversion.hashlist > dataversion.hashlist)
@@ -1190,9 +1190,9 @@ namespace ArenaHelper
                             hasdataupdates = true;
                         }
 
-                        if (latesttierversion.tierlist > dataversion.tierlist)
+                        if (latesttierversion.lightforgedate > dataversion.lightforgedate)
                         {
-                            latestdataversion.tierlist = latesttierversion.tierlist;
+                            latestdataversion.lightforgedate = latesttierversion.lightforgedate;
                             // Tier list updated, download the new tier list
                             string tierliststr = await Update.DownloadString(Update.TierListUrl);
                             if (tierliststr != null)
@@ -2286,13 +2286,13 @@ namespace ArenaHelper
                      }
                  }
 
-                if (userdataversion.tierlist > dataversion.tierlist)
+                if (userdataversion.lightforgedate > dataversion.lightforgedate)
                 {
                     if (File.Exists(usercardtierfile))
                     {
                         // Use userdata version
                         Log.Info("Arena Helper: Using userdata version of tierlist");
-                        dataversion.tierlist = userdataversion.tierlist;
+                        dataversion.lightforgedate = userdataversion.lightforgedate;
                         cardtierfile = usercardtierfile;
                     }
                 }
@@ -2315,7 +2315,7 @@ namespace ArenaHelper
 
         private Update.AHDataVersion LoadDataVersion(string filename)
         {
-            return JsonConvert.DeserializeObject<Update.AHDataVersion>(File.ReadAllText(filename), new VersionConverter());
+            return JsonConvert.DeserializeObject<Update.AHDataVersion>(File.ReadAllText(filename));
         }
 
         private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
