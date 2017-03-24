@@ -47,9 +47,9 @@ namespace TestPlugin
         // newcards: List of 3 detected cards
         // defaultvalues: List of 3 tier values for the detected cards
         // Return a list of 3 card values and an optional 4th advice value
-        public override async Task<List<string>> GetCardValues(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<string> defaultvalues)
+        public override async Task<List<double>> GetCardValues(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<double> defaultvalues)
         {
-            List<string> values = new List<string>();
+            List<double> values = new List<double>();
 
             // Add a test delay to simulate an API call
             await Task.Delay(1000);
@@ -58,13 +58,28 @@ namespace TestPlugin
             for (int i = 0; i < 3; i++)
             {
                 // Add the prefix "p" to the default values as a test
-                values.Add("p" + defaultvalues[i]);
+                values.Add(defaultvalues[i]);
             }
 
-            // Optionally add an advice as a 4th list element
-            values.Add("I don't know, pick one!");
-
             return values;
+        }
+
+        // Called when three new cards are detected
+        // arenadata: The previously detected cards, picked cards and heroes
+        // newcards: List of 3 detected cards
+        // defaultvalues: List of 3 tier values for the detected cards
+        // Returns advice to diplay. Can be null.
+        public override async Task<string> GetCardAdvice(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<double> defaultvalues)
+        {
+            string advice;
+
+            // Add a test delay to simulate an API call
+            await Task.Delay(400);
+
+            // Set the advice
+            advice = "This is good advice.";
+
+            return advice;
         }
 
         // Called when a new arena is started
@@ -168,9 +183,9 @@ namespace TestPlugin
                 Log.Info("Detected hero: " + hero.name);
             }
 
-            if (arenadata.pickedhero != "")
+            if (arenadata.pickedhero != null)
             {
-                ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(arenadata.pickedhero);
+                ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(arenadata.pickedhero.ToString());
                 Log.Info("Picked hero: " + hero.name);
             }
 

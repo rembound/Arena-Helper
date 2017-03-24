@@ -1806,9 +1806,9 @@ namespace ArenaHelper
 
             // Get the plugin result
             List<double> pvalues = await plugins.GetCardValues(arenadata, newcards, values);
+            string advice = await plugins.GetCardAdvice(arenadata, newcards, values);
 
             // Override the values if the plugin has a result
-            double advice = Double.NaN;
             if (pvalues != null)
             {
                 if (pvalues.Count >= 3)
@@ -1817,12 +1817,6 @@ namespace ArenaHelper
                     {
                         values[i] = pvalues[i];
                     }
-                }
-
-                // Set advice text
-                if (pvalues.Count >= 4)
-                {
-                    advice = pvalues[3];
                 }
             }
 
@@ -1877,7 +1871,7 @@ namespace ArenaHelper
             }
             UpdateSize(); // Update size to center the labels
 
-            SetAdviceText(advice.ToString());
+            SetAdviceText(advice);
 
             arenawindow.Update();
 

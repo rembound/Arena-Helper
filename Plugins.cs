@@ -27,8 +27,15 @@ namespace AHPlugins
         // arenadata: The previously detected cards, picked cards and heroes
         // newcards: List of 3 detected cards
         // defaultvalues: List of 3 tier values for the detected cards
-        // Return a list of 3 card values and an optional 4th advice value
+        // Return a list of 3 card values
         public virtual async Task<List<double>> GetCardValues(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<double> defaultvalues) { return null; }
+
+        // Called when three new cards are detected
+        // arenadata: As before
+        // newcards: As before
+        // defaultvalues: As before
+        // Returns advice to diplay. Can be null.
+        public virtual async Task<string> GetCardAdvice(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<double> defaultvalues) { return null; }
 
         // Called when a new arena is started
         // arendata: As before
@@ -157,6 +164,15 @@ namespace ArenaHelper
             foreach (var plugin in plugins)
             {
                 return await plugin.GetCardValues(arenadata, newcards, defaultvalues);
+            }
+            return null;
+        }
+
+        public async Task<string> GetCardAdvice(ArenaHelper.Plugin.ArenaData arenadata, List<Card> newcards, List<double> defaultvalues)
+        {
+            foreach (var plugin in plugins)
+            {
+                return await plugin.GetCardAdvice(arenadata, newcards, defaultvalues);
             }
             return null;
         }
