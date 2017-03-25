@@ -18,12 +18,12 @@ namespace ArenaHelper
         // Update code adapted from Hearthstone Collection Tracker Plugin
 
         // Plugin updates
-        public const string releaseDownloadUrl = @"https://github.com/inkahootz/Arena-Helper";
-        public const string latestReleaseRequestUrl = @"https://api.github.com/repos/inkahootz/Arena-Helper/releases/latest";
+        public const string releaseDownloadUrl = @"https://github.com/rembound/Arena-Helper";
+        public const string latestReleaseRequestUrl = @"https://api.github.com/repos/rembound/Arena-Helper/releases/latest";
 
         // Data updates
-        public const string DataVersionUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/version.json";
-        public const string HashListUrl = @"https://raw.githubusercontent.com/inkahootz/Arena-Helper/master/data/cardhashes.json";
+        public const string DataVersionUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/version.json";
+        public const string HashListUrl = @"https://raw.githubusercontent.com/rembound/Arena-Helper/master/data/cardhashes.json";
         public const string TierListUrl = @"http://thelightforge.com/api/tierlist/latest?locale=en";
 
         // Updater
