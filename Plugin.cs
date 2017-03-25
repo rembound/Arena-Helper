@@ -2135,8 +2135,8 @@ namespace ArenaHelper
 
         public static ClassTierScore GetClassTierScore(CardTierInfo cardTierInfo, HeroClass? heroClass)
         {
-            var heroScore = cardTierInfo.Scores.First(cts => cts.Hero == heroClass);
-            var generalScore = cardTierInfo.Scores.First(cts => cts.Hero == null);
+            var heroScore = cardTierInfo.Scores.FirstOrDefault(cts => cts.Hero == heroClass);
+            var generalScore = cardTierInfo.Scores.FirstOrDefault(cts => cts.Hero == null);
 
             return heroScore ?? generalScore;
         }
