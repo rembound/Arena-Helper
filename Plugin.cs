@@ -254,7 +254,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.8.5"); }
+            get { return new Version("0.8.6"); }
         }
 
         public MenuItem MenuItem
@@ -1044,7 +1044,7 @@ namespace ArenaHelper
 
                 // Modified from ArenaHandler.cs
                 var heromatch = HeroChosenRegex.Match(logline);
-                var match = Hearthstone_Deck_Tracker.LogReader.HsLogReaderConstants.NewChoiceRegex.Match(logline);
+                var match = Hearthstone_Deck_Tracker.LogReader.LogConstants.NewChoiceRegex.Match(logline);
                 if (heromatch.Success)
                 {
                     // Hero chosen
