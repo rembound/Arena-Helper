@@ -7,9 +7,6 @@ Arena Helper uses [HearthMirror](https://github.com/HearthSim/HearthMirror) to e
 
 More technical information about how the plugin used image recognition and how it calculated the perceptual hashes can be found in my article [Arena Helper](http://rembound.com/projects/arena-helper).
 
-If you like to support me and the continued development of this plugin, any donations are greatly appreciated. Thank you for your support!  
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40rembound%2ecom&lc=NL&item_name=Rembound%2ecom&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
-
 ## Plugins For Arena Helper
 
 Arena Helper has support for plugins within the plugin. Plugins allow you to use the card detection system while drafting a Hearthstone arena deck for your own purposes. It also allows you to override the tier list values and can present an advice to the player. Check out my article [How To Write Plugins For Arena Helper](http://rembound.com/articles/how-to-write-plugins-for-arena-helper) to read a tutorial on how to create such a plugin. If you want to see how it works immediately, you can find a TestPlugin project in the latest source code. If you have made a plugin and want to be featured on this page, contact me.
