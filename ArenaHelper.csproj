@@ -45,8 +45,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">
-      <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Newtonsoft.Json.dll</HintPath>
@@ -58,10 +57,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity">
-      <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -107,7 +102,6 @@
     <Compile Include="Update.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <Resource Include="resources\font.ttf" />
   </ItemGroup>
   <ItemGroup>

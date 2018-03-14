@@ -164,13 +164,13 @@ namespace TestPlugin
 
             foreach (var heroname in arenadata.detectedheroes)
             {
-                ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(heroname);
+                ArenaHelper.Plugin.HeroData hero = ArenaHelper.Plugin.GetHero(heroname);
                 Log.Info("Detected hero: " + hero.name);
             }
 
             if (arenadata.pickedhero != "")
             {
-                ArenaHelper.Plugin.HeroHashData hero = ArenaHelper.Plugin.GetHero(arenadata.pickedhero);
+                ArenaHelper.Plugin.HeroData hero = ArenaHelper.Plugin.GetHero(arenadata.pickedhero);
                 Log.Info("Picked hero: " + hero.name);
             }
 

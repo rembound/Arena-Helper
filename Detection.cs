@@ -13,6 +13,48 @@ namespace ArenaHelper
 {
     public class Detection
     {
+        public class HashData
+        {
+            public List<ulong> hashes;
+
+            public HashData(params ulong[] hashes)
+            {
+                this.hashes = new List<ulong>();
+
+                // Store hashes
+                for (int i = 0; i < hashes.Length; i++)
+                {
+                    this.hashes.Add(hashes[i]);
+                }
+            }
+        }
+
+        public class CardHashData : HashData
+        {
+            public string id;
+
+            public CardHashData(string id, ulong hash)
+                : base(hash)
+            {
+                this.id = id;
+            }
+        }
+
+        public class HeroHashData : HashData
+        {
+            public int index;
+            public string name;
+            public string image;
+
+            public HeroHashData(int index, string name, string image, params ulong[] hashes)
+                : base(hashes)
+            {
+                this.index = index;
+                this.name = name;
+                this.image = image;
+            }
+        }
+
         private const int maxcarddistance = 10;
         private const int maxherodistance = 14;
 
@@ -92,7 +134,7 @@ namespace ArenaHelper
             return confirmed;
         }
 
-        public Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> DetectCards(IEnumerable<Plugin.HashData> cardhashlist)
+        public Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> DetectCards(IEnumerable<HashData> cardhashlist)
         {
             // [cardhash, [cardindex, hashdistance]]
             List<Tuple<ulong, List<Tuple<int, int>>>> detected = new List<Tuple<ulong, List<Tuple<int, int>>>>();
@@ -118,7 +160,7 @@ namespace ArenaHelper
             return new Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>>(indices, detected);
         }
 
-        public Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> DetectHeroes(IEnumerable<Plugin.HeroHashData> herohashlist)
+        public Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> DetectHeroes(IEnumerable<HeroHashData> herohashlist)
         {
             // [herohash, [heroindex, hashdistance]]
             List<Tuple<ulong, List<Tuple<int, int>>>> detected = new List<Tuple<ulong, List<Tuple<int, int>>>>();
@@ -144,7 +186,7 @@ namespace ArenaHelper
             return new Tuple<List<int>,List<Tuple<ulong,List<Tuple<int,int>>>>>(indices, detected);
         }
 
-        public Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> DetectBigHero(IEnumerable<Plugin.HeroHashData> herohashlist)
+        public Tuple<List<int>, List<Tuple<ulong, List<Tuple<int, int>>>>> DetectBigHero(IEnumerable<HeroHashData> herohashlist)
         {
             // [bigherohash, [heroindex, hashdistance]]
             List<Tuple<ulong, List<Tuple<int, int>>>> detected = new List<Tuple<ulong, List<Tuple<int, int>>>>();
@@ -347,7 +389,7 @@ namespace ArenaHelper
             return distance;
         }
 
-        public List<Tuple<int, int>> FindHashIndex(ulong hash, IEnumerable<Plugin.HashData> hashlist, int maxdistance)
+        public List<Tuple<int, int>> FindHashIndex(ulong hash, IEnumerable<HashData> hashlist, int maxdistance)
         {
             int bestindex = -1;
             int bestdistance = 100;
@@ -383,7 +425,7 @@ namespace ArenaHelper
             return indices;
         }
 
-        public List<Tuple<int, int>> FindAllHashIndex(ulong hash, IList<Plugin.CardHashData> hashlist, int maxdistance)
+        public List<Tuple<int, int>> FindAllHashIndex(ulong hash, IList<CardHashData> hashlist, int maxdistance)
         {
             List<Tuple<int, int>> indices = new List<Tuple<int, int>>();
             for (var i = 0; i < hashlist.Count; i++)
