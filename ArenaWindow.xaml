@@ -50,7 +50,6 @@
                         <TextBlock TextWrapping="Wrap" VerticalAlignment="Top">Manual card picking<LineBreak />Pick a card in Hearthstone, afterwards, click the card in the Arena Helper window. Don't detect picks automatically.</TextBlock>
                     </CheckBox>
                     <CheckBox x:Name="CheckBoxAutoSave" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxAutoSave_Checked" Unchecked="CheckBoxAutoSave_Unchecked" Content="Automatically save and use the deck" />
-                    <CheckBox x:Name="CheckBoxDebug" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,8,0,0" Checked="CheckBoxDebug_Checked" Unchecked="CheckBoxDebug_Unchecked" Content="Enable debug mode" />
                 </StackPanel>
             </controls:Flyout>
 
@@ -130,8 +129,8 @@
                 </WrapPanel>
 
                 <WrapPanel Grid.Column="1" VerticalAlignment="Center">
-                    <Button x:Name="Button1" Width="70" Content="New Arena" Margin="0 0 8 0" Click="ButtonNewArena_Click" />
-                    <Button x:Name="Button2" Width="70" Content="Save Deck" Margin="0 0 8 0" Click="ButtonSave_Click" />
+                    <Button x:Name="Button1" Width="74" Content="New Arena" Margin="0 0 8 0" Click="ButtonNewArena_Click" />
+                    <Button x:Name="Button2" Width="74" Content="Save Deck" Margin="0 0 8 0" Click="ButtonSave_Click" />
                 </WrapPanel>
             </Grid>
             <Separator Background="{DynamicResource SeparatorBackground}" />

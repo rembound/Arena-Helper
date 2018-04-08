@@ -117,8 +117,6 @@ namespace ArenaHelper
 
         private List<Controls.ValueOverlay> valueoverlays = new List<Controls.ValueOverlay>();
         private Controls.AdviceOverlay adviceoverlay = null;
-        private Controls.DebugTextBlock debugtext = null;
-        private List<System.Windows.Controls.Image> debugimages = new List<System.Windows.Controls.Image>();
 
         private Update.AHDataVersion dataversion;
         private const string DataVersionFile = "version.json";
@@ -216,7 +214,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.8.8"); }
+            get { return new Version("0.9.0"); }
         }
 
         public MenuItem MenuItem
@@ -348,7 +346,6 @@ namespace ArenaHelper
                 arenawindow.oncheckboxoverlay = new ArenaWindow.OnCheckbox(OnCheckboxOverlay);
                 arenawindow.oncheckboxmanual = new ArenaWindow.OnCheckbox(OnCheckboxManual);
                 arenawindow.oncheckboxautosave = new ArenaWindow.OnCheckbox(OnCheckboxAutoSave);
-                arenawindow.oncheckboxdebug = new ArenaWindow.OnCheckbox(OnCheckboxDebug);
 
                 arenawindow.onupdatedownloadclick = new ArenaWindow.OnEvent(OnUpdateDownloadClick);
 
@@ -424,22 +421,12 @@ namespace ArenaHelper
             arenawindow.CheckBoxOverlay.IsChecked = configdata.overlay;
             arenawindow.CheckBoxManual.IsChecked = configdata.manualclicks;
             arenawindow.CheckBoxAutoSave.IsChecked = configdata.autosave;
-            arenawindow.CheckBoxDebug.IsChecked = configdata.debug;
 
             configinit = true;
         }
 
         private void ApplyConfig()
         {
-            // Debug
-            if (configdata.debug)
-            {
-                debugtext.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                debugtext.Visibility = System.Windows.Visibility.Hidden;
-            }
         }
 
         private void ShowOverlay(bool show)
@@ -568,16 +555,6 @@ namespace ArenaHelper
             if (configinit)
             {
                 configdata.autosave = check;
-                SaveConfig();
-                ApplyConfig();
-            }
-        }
-
-        public void OnCheckboxDebug(bool check)
-        {
-            if (configinit)
-            {
-                configdata.debug = check;
                 SaveConfig();
                 ApplyConfig();
             }
@@ -1307,11 +1284,9 @@ namespace ArenaHelper
             }
             catch (Exception e)
             {
-                Debug.Log("Error: " + e.Message + "\n" + e.ToString());
+                Log.Error("Error: " + e.Message);
             }
         }
-
-
 
         private void SearchHeroes()
         {
@@ -1580,6 +1555,7 @@ namespace ArenaHelper
             arenawindow.Value1.Content = values[1];
             arenawindow.Value2.Content = values[2];
 
+
             // Get the actual numerical value
             double maxvalue = 0;
             currentcardvalues.Clear();
@@ -1689,35 +1665,6 @@ namespace ArenaHelper
             int lastindex = arenadata.detectedcards.Count - 1;
             if (lastindex < 0)
                 return;
-
-            // Display detected cards
-            Debug.AppendLog("\nPicking card " + (arenadata.pickedcards.Count + 1) + "/" + MaxCardCount);
-
-            List<Card> dcards = new List<Card>();
-            dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item1));
-            dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item2));
-            dcards.Add(GetCard(arenadata.detectedcards[lastindex].Item3));
-            for (int i = 0; i < dcards.Count; i++)
-            {
-                string cardname = "";
-                if (dcards[i] != null)
-                {
-                    cardname = dcards[i].Name;
-                }
-                Debug.AppendLog("\nDetected " + i + ": " + cardname);
-            }
-
-            // Display picked cards
-            for (int i = 0; i < arenadata.pickedcards.Count; i++)
-            {
-                Card card = GetCard(arenadata.pickedcards[i]);
-                string cardname = "";
-                if (card != null)
-                {
-                    cardname = card.Name;
-                }
-                Debug.AppendLog("\nPicked " + i + ": " + cardname);
-            }
 
             // Skip this if we only allow manual picking
             if (configdata.manualclicks)
@@ -2047,7 +1994,7 @@ namespace ArenaHelper
             }
         }
 
-        // Add overlay elements for debugging
+        // Add overlay elements
         private void AddElements()
         {
             // Value overlay
@@ -2075,42 +2022,6 @@ namespace ArenaHelper
                 Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(adviceoverlay);
                 adviceoverlay.Visibility = System.Windows.Visibility.Hidden;
             }
-
-            // Test text
-            if (debugtext == null)
-            {
-                debugtext = new Controls.DebugTextBlock();
-                debugtext.TextWrapping = System.Windows.TextWrapping.Wrap;
-                debugtext.FontSize = 12;
-                debugtext.Text = "Arena Helper";
-                Canvas.SetLeft(debugtext, 5);
-                Canvas.SetTop(debugtext, 5);
-
-                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(debugtext);
-
-                debugtext.Visibility = System.Windows.Visibility.Hidden;
-
-                Debug.SetTextControl(debugtext);
-            }
-
-            // Test images
-            if (debugimages.Count == 0)
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    System.Windows.Controls.Image debugimage = new System.Windows.Controls.Image();
-
-                    Canvas.SetLeft(debugimage, 5 + i * 210);
-                    Canvas.SetTop(debugimage, 550);
-
-                    Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Add(debugimage);
-
-                    debugimage.Visibility = System.Windows.Visibility.Hidden;
-                    debugimages.Add(debugimage);
-                }
-
-                Debug.SetImageControls(debugimages);
-            }
         }
 
         private void RemoveElements()
@@ -2128,21 +2039,6 @@ namespace ArenaHelper
                 Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(adviceoverlay);
                 adviceoverlay = null;
             }
-
-            if (debugtext != null)
-            {
-                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(debugtext);
-                Debug.SetTextControl(null);
-                debugtext = null;
-            }
-
-            for (int i = 0; i < debugimages.Count; i++)
-            {
-                Hearthstone_Deck_Tracker.API.Core.OverlayCanvas.Children.Remove(debugimages[i]);
-            }
-            Debug.SetImageControls(null);
-            debugimages.Clear();
         }
-
     }
 }

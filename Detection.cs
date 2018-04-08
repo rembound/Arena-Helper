@@ -230,14 +230,11 @@ namespace ArenaHelper
                 {
                     CropBitmapRelative(ref capture, cardrect, cardcroprect);
 
-                    System.Windows.Controls.Image imagecontrol = Debug.debugimages[index];
-                    hash = GetImageHash(capture, ref imagecontrol);
+                    hash = GetImageHash(capture);
                 }
                 catch (Exception e)
                 {
-                    string errormsg = "Error2: " + e.Message + "\n" + e.ToString();
-                    Debug.Log(errormsg);
-                    Log.Info(errormsg);
+                    Log.Error("Error2: " + e.Message);
                 }
             }
 
@@ -264,14 +261,11 @@ namespace ArenaHelper
             {
                 try
                 {
-                    System.Windows.Controls.Image imagecontrol = Debug.debugimages[index];
-                    hash = GetImageHash(capture, ref imagecontrol);
+                    hash = GetImageHash(capture);
                 }
                 catch (Exception e)
                 {
-                    string errormsg = "Error3: " + e.Message + "\n" + e.ToString();
-                    Debug.Log(errormsg);
-                    Log.Info(errormsg);
+                    Log.Error("Error3: " + e.Message);
                 }
             }
 
@@ -294,14 +288,11 @@ namespace ArenaHelper
             {
                 try
                 {
-                    System.Windows.Controls.Image imagecontrol = Debug.debugimages[0];
-                    hash = GetImageHash(capture, ref imagecontrol);
+                    hash = GetImageHash(capture);
                 }
                 catch (Exception e)
                 {
-                    string errormsg = "Error4: " + e.Message + "\n" + e.ToString();
-                    Debug.Log(errormsg);
-                    Log.Info(errormsg);
+                    Log.Error("Error4: " + e.Message);
                 }
             }
 
@@ -309,7 +300,7 @@ namespace ArenaHelper
         }
 
         // Perceptual hash using the techniques from: http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html
-        public ulong GetImageHash(Bitmap bitmap, ref System.Windows.Controls.Image imagecontrol)
+        public ulong GetImageHash(Bitmap bitmap)
         {
             // Copy the image and convert to grayscale
             Bitmap sourcebm = new Bitmap(bitmap);
@@ -317,10 +308,6 @@ namespace ArenaHelper
 
             // Apply a convolution filter of 4x4
             CvInvoke.Blur(sourceimage, sourceimage, new Size(4, 4), new Point(-1, -1));
-
-            // Show image for debugging
-            //Image<Bgra, Byte> convimage = Image<Bgra, Byte>.FromIplImagePtr(sourceimage);
-            //ShowBitmap(convimage.ToBitmap(), ref imagecontrol);
 
             // Resize to 64x64 pixels
             Image<Gray, float> resimage = new Image<Gray, float>(new Size(64, 64));

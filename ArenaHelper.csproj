@@ -76,9 +76,6 @@
     <Compile Include="Controls\Card.xaml.cs">
       <DependentUpon>Card.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\DebugTextBlock.xaml.cs">
-      <DependentUpon>DebugTextBlock.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\DeckRating.xaml.cs">
       <DependentUpon>DeckRating.xaml</DependentUpon>
     </Compile>
@@ -89,7 +86,6 @@
     <Compile Include="Controls\ValueOverlay.xaml.cs">
       <DependentUpon>ValueOverlay.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Debug.cs" />
     <Compile Include="Detection.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Plugins.cs" />
@@ -114,10 +110,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\Card.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\DebugTextBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -41,7 +41,6 @@ namespace ArenaHelper
         public OnCheckbox oncheckboxoverlay = null;
         public OnCheckbox oncheckboxmanual = null;
         public OnCheckbox oncheckboxautosave = null;
-        public OnCheckbox oncheckboxdebug = null;
 
         public OnEvent onupdatedownloadclick = null;
 
@@ -398,22 +397,6 @@ namespace ArenaHelper
             if (oncheckboxautosave != null)
             {
                 oncheckboxautosave(false);
-            }
-        }
-
-        private void CheckBoxDebug_Checked(object sender, RoutedEventArgs e)
-        {
-            if (oncheckboxdebug != null)
-            {
-                oncheckboxdebug(true);
-            }
-        }
-
-        private void CheckBoxDebug_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (oncheckboxdebug != null)
-            {
-                oncheckboxdebug(false);
             }
         }
 
