@@ -30,12 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Emgu.CV">
-      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2157\bin\Emgu.CV.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.Util">
-      <HintPath>..\..\..\..\CSharp\EmguCV3.0.0.2157\bin\Emgu.Util.dll</HintPath>
-    </Reference>
     <Reference Include="HearthMirror">
       <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\HearthMirror.dll</HintPath>
       <Private>False</Private>
