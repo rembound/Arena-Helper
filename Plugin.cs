@@ -214,7 +214,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.9.0"); }
+            get { return new Version("0.9.1"); }
         }
 
         public MenuItem MenuItem
@@ -1411,69 +1411,79 @@ namespace ArenaHelper
         private async Task SearchCards()
         {
             Card[] cards = new Card[3];
-            bool valid = false;
 
             Log.Info("GetArenaDraftChoices");
             List<HearthMirror.Objects.Card> choices = Reflection.GetArenaDraftChoices();
-            if (choices != null)
+
+            if (choices == null)
+                return;
+
+            if (choices.Count != 3)
+                return;
+
+            // Check if cards are valid and not hero cards
+            int validCards = 0;
+            for (int i = 0; i < 3; i++)
             {
-                if (choices.Count == 3)
+                cards[i] = GetCard(choices[i].Id);
+
+                if (cards[i].Type != "Hero") {
+                    validCards++;
+                    Log.Info("Choice: " + choices[i].Id);
+                }
+            }
+
+            if (validCards != 3)
+                return;
+
+            // Check for same cards
+            bool samecardsdetected = false;
+            if (previouscards.Count == 3)
+            {
+                int samecards = 0;
+                for (int i = 0; i < 3; i++)
                 {
-                    for (int i = 0; i < 3; i++)
+                    if (previouscards[i].Id == cards[i].Id)
                     {
-                        cards[i] = GetCard(choices[i].Id);
-                        Log.Info("Choice: " + choices[i].Id);
-                    }
-
-                    // Check for same cards
-                    bool samecardsdetected = false;
-                    if (previouscards.Count == 3)
-                    {
-                        int samecards = 0;
-                        for (int i = 0; i < 3; i++)
-                        {
-                            if (previouscards[i].Id == cards[i].Id)
-                            {
-                                samecards++;
-                            }
-                        }
-
-                        if (samecards == 3)
-                        {
-                            // All the same cards, can be valid but unlikely
-                            samecardsdetected = true;
-                        }
-                    }
-
-                    // Save card choices
-                    previouscards.Clear();
-                    for (int i = 0; i < 3; i++)
-                    {
-                        previouscards.Add(cards[i]);
-                    }
-
-                    // Wait for confirmations when same cards detected
-                    if (samecardsdetected)
-                    {
-                        if (!samecarddelay)
-                        {
-                            Log.Info("Same cards detected: delaying");
-                            samecardtime = DateTime.Now;
-                            samecarddelay = true;
-                        }
-                        else if (DateTime.Now.Subtract(samecardtime).TotalMilliseconds >= samecardmaxtime)
-                        {
-                            samecarddelay = false;
-                            valid = true;
-                        }
-
-                    }
-                    else
-                    {
-                        samecarddelay = false;
-                        valid = true;
+                        samecards++;
                     }
                 }
+
+                if (samecards == 3)
+                {
+                    // All the same cards, can be valid but unlikely
+                    samecardsdetected = true;
+                }
+            }
+
+            // Save card choices
+            previouscards.Clear();
+            for (int i = 0; i < 3; i++)
+            {
+                previouscards.Add(cards[i]);
+            }
+
+            bool valid = false;
+            // Wait for confirmations when same cards detected
+            if (samecardsdetected)
+            {
+                if (!samecarddelay)
+                {
+                    Log.Info("Same cards detected: delaying");
+                    samecardtime = DateTime.Now;
+                    samecarddelay = true;
+                }
+                else if (DateTime.Now.Subtract(samecardtime).TotalMilliseconds >= samecardmaxtime)
+                {
+                    samecarddelay = false;
+                    valid = true;
+                }
+
+            }
+            else
+            {
+                samecarddelay = false;
+                valid = true;
             }
 
             if (valid)
