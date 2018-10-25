@@ -92,11 +92,6 @@ namespace ArenaHelper
             }
         }
 
-        public string StringDonate
-        {
-            get { return "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40rembound%2ecom&lc=NL&item_name=Rembound%2ecom&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted"; }
-        }
-
         public string StringWebsite
         {
             get { return "http://rembound.com/?from=ArenaHelper"; }
@@ -155,11 +150,6 @@ namespace ArenaHelper
         }
 
         // About
-        private void AboutDonate_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start(StringDonate);
-        }
-
         private void AboutVisitWebsite_Click(object sender, RoutedEventArgs e)
         {
             Process.Start(StringWebsite);

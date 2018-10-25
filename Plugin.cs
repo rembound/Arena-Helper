@@ -214,7 +214,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.9.1"); }
+            get { return new Version("0.9.2"); }
         }
 
         public MenuItem MenuItem
@@ -1427,7 +1427,8 @@ namespace ArenaHelper
             {
                 cards[i] = GetCard(choices[i].Id);
 
-                if (cards[i].Type != "Hero") {
+                if (cards[i].Type != "Hero" && cards[i].Type != "Hero Power")
+                {
                     validCards++;
                     Log.Info("Choice: " + choices[i].Id);
                 }
