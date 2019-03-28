@@ -81,6 +81,7 @@
       <DependentUpon>ValueOverlay.xaml</DependentUpon>
     </Compile>
     <Compile Include="Detection.cs" />
+    <Compile Include="HeroWinRate.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Plugins.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

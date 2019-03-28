@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.IO;
@@ -14,11 +13,8 @@ using Hearthstone_Deck_Tracker.Hearthstone;
 using System.Diagnostics;
 using System.Threading;
 using Newtonsoft.Json;
-using System.Runtime.InteropServices;
-using MahApps.Metro.Controls.Dialogs;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Converters;
-using Hearthstone_Deck_Tracker.Utility;
 using Hearthstone_Deck_Tracker.Utility.Logging;
 using HearthMirror;
 
@@ -1148,7 +1144,7 @@ namespace ArenaHelper
             }
             else if (newstate == PluginState.SearchBigHero)
             {
-                ShowOverlay(false);
+                ShowOverlay(true);
                 arenawindow.DetectedHeroesWarning.Text = "";
                 arenawindow.DetectingPanel.Visibility = System.Windows.Visibility.Hidden;
                 arenawindow.ConfigureHeroPanel.Visibility = System.Windows.Visibility.Hidden;
@@ -1916,9 +1912,13 @@ namespace ArenaHelper
                 return;
 
             // All heroes detected, show them
+            var heroWinRate = new HeroWinRate();
             SetHeroControl(arenawindow.Hero0, arenadata.detectedheroes[0]);
+            SetValueText(0, heroWinRate.GetWinRateAsString(arenadata.detectedheroes[0]));
             SetHeroControl(arenawindow.Hero1, arenadata.detectedheroes[1]);
+            SetValueText(1, heroWinRate.GetWinRateAsString(arenadata.detectedheroes[1]));
             SetHeroControl(arenawindow.Hero2, arenadata.detectedheroes[2]);
+            SetValueText(2, heroWinRate.GetWinRateAsString(arenadata.detectedheroes[2]));
 
             // Update window
             arenawindow.Update();
