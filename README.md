@@ -1,15 +1,15 @@
 # Arena Helper
 
-Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/HearthSim/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [The Lightforge: Hearthstone Arena Tier List](http://thelightforge.com/TierList). The created deck can be saved to Hearthstone Deck Tracker. Check out the [How To Install](https://github.com/rembound/Arena-Helper#how-to-install) guide below to download and install the plugin.
+Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/HearthSim/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [The Lightforge: Hearthstone Arena Tier List](https://thelightforge.com/TierList). The created deck can be saved to Hearthstone Deck Tracker. Check out the [How To Install](https://github.com/rembound/Arena-Helper#how-to-install) guide below to download and install the plugin.
 
 ![Arena Helper](images/arena-helper-4.png?raw=true)
 Arena Helper uses [HearthMirror](https://github.com/HearthSim/HearthMirror) to extract the hero and card data from Hearthstone. Older versions of the plugin used perceptual hashing to detect the Hearthstone arena heroes and cards. The technique is based on the article [Looks Like It](http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html). Implementation details of a similar project can be found here: [Hearthstone Image Recognition](https://github.com/wittenbe/Hearthstone-Image-Recognition).
 
-More technical information about how the plugin used image recognition and how it calculated the perceptual hashes can be found in my article [Arena Helper](http://rembound.com/projects/arena-helper).
+More technical information about how the plugin used image recognition and how it calculated the perceptual hashes can be found in my article [Arena Helper](https://rembound.com/projects/arena-helper).
 
 ## Plugins For Arena Helper
 
-Arena Helper has support for plugins within the plugin. Plugins allow you to use the card detection system while drafting a Hearthstone arena deck for your own purposes. It also allows you to override the tier list values and can present an advice to the player. Check out my article [How To Write Plugins For Arena Helper](http://rembound.com/articles/how-to-write-plugins-for-arena-helper) to read a tutorial on how to create such a plugin. If you want to see how it works immediately, you can find a TestPlugin project in the latest source code. If you have made a plugin and want to be featured on this page, contact me.
+Arena Helper has support for plugins within the plugin. Plugins allow you to use the card detection system while drafting a Hearthstone arena deck for your own purposes. It also allows you to override the tier list values and can present an advice to the player. Check out my article [How To Write Plugins For Arena Helper](https://rembound.com/articles/how-to-write-plugins-for-arena-helper) to read a tutorial on how to create such a plugin. If you want to see how it works immediately, you can find a TestPlugin project in the latest source code. If you have made a plugin and want to be featured on this page, contact me.
 
 Available plugins:
 * [Hearth Arena Plugin (Unofficial)](https://github.com/corlettb/HDTAHPluginHAPlugin) by [@corlettb](https://github.com/corlettb)  
