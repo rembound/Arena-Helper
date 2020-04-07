@@ -160,16 +160,16 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <localcontrols:Hero Grid.Row="0" Grid.Column="0" Margin="0,16,0,0" x:Name="Hero0" />
-                <localcontrols:Hero Grid.Row="0" Grid.Column="1" Margin="0,16,0,0" x:Name="Hero1" />
-                <localcontrols:Hero Grid.Row="0" Grid.Column="2" Margin="0,16,0,0" x:Name="Hero2" />
+                <localcontrols:Hero Grid.Row="0" Grid.Column="0" Margin="0,16,0,0" x:Name="Hero0" VerticalAlignment="Top" />
+                <localcontrols:Hero Grid.Row="0" Grid.Column="1" Margin="0,16,0,0" x:Name="Hero1" VerticalAlignment="Top" />
+                <localcontrols:Hero Grid.Row="0" Grid.Column="2" Margin="0,16,0,0" x:Name="Hero2" VerticalAlignment="Top" />
             </Grid>
             <TextBlock x:Name="DetectedHeroesWarning" TextWrapping="Wrap" TextAlignment="Center" Foreground="{DynamicResource TextColor}" Margin="0,20,0,0">text</TextBlock>
         </StackPanel>
 
         <!-- ConfigureHeroPanel -->
-        <StackPanel x:Name="ConfigureHeroPanel" Grid.Row="1" Width="300" Visibility="Hidden">
-            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Select Hero" Margin="0,4,0,0" />
+        <StackPanel x:Name="ConfigureHeroPanel" Grid.Row="1" Width="360" Visibility="Hidden">
+            <local:OutlinedTextBlock HorizontalAlignment="Center" FontFamily="/ArenaHelper;component/resources/#Belwe Bd BT" FontSize="20" Text="Select Hero" Margin="0,0,0,0" />
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -181,19 +181,21 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <!-- -->
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="0" Grid.Column="0" x:Name="CHero0" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="0" Grid.Column="1" x:Name="CHero1" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="0" Grid.Column="2" x:Name="CHero2" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="0" Grid.Column="3" x:Name="CHero3" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="0" Grid.Column="4" x:Name="CHero4" />
+                <localcontrols:Hero Margin="0,4,0,0" Grid.Row="0" Grid.Column="0" x:Name="CHero0" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,4,0,0" Grid.Row="0" Grid.Column="1" x:Name="CHero1" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,4,0,0" Grid.Row="0" Grid.Column="2" x:Name="CHero2" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,4,0,0" Grid.Row="0" Grid.Column="3" x:Name="CHero3" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,4,0,0" Grid.Row="0" Grid.Column="4" x:Name="CHero4" VerticalAlignment="Top" />
                 <!-- -->
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="1" Grid.Column="0" x:Name="CHero5" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="1" Grid.Column="1" x:Name="CHero6" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="1" Grid.Column="2" x:Name="CHero7" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="1" Grid.Column="3" x:Name="CHero8" />
-                <localcontrols:Hero Margin="0,8,0,0" Grid.Row="1" Grid.Column="4" x:Name="CHero9" />
+                <localcontrols:Hero Margin="0,6,0,0" Grid.Row="1" Grid.Column="0" x:Name="CHero5" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,6,0,0" Grid.Row="1" Grid.Column="1" x:Name="CHero6" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,6,0,0" Grid.Row="1" Grid.Column="2" x:Name="CHero7" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,6,0,0" Grid.Row="1" Grid.Column="3" x:Name="CHero8" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,6,0,0" Grid.Row="1" Grid.Column="4" x:Name="CHero9" VerticalAlignment="Top" />
+                <localcontrols:Hero Margin="0,6,0,0" Grid.Row="1" Grid.Column="5" x:Name="CHero10" VerticalAlignment="Top" />
             </Grid>
         </StackPanel>
 

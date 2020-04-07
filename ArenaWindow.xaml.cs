@@ -63,6 +63,7 @@ namespace ArenaHelper
             CHero7.heromouseup += CHero7MouseUp;
             CHero8.heromouseup += CHero8MouseUp;
             CHero9.heromouseup += CHero9MouseUp;
+            CHero10.heromouseup += CHero10MouseUp;
         }
 
         public Card Card0
@@ -94,12 +95,12 @@ namespace ArenaHelper
 
         public string StringWebsite
         {
-            get { return "http://rembound.com/?from=ArenaHelper"; }
+            get { return "https://rembound.com/?from=ArenaHelper"; }
         }
 
         public string StringTierList
         {
-            get { return "http://thelightforge.com/TierList"; }
+            get { return "https://thelightforge.com/TierList"; }
         }
 
         public string StringGitHub
@@ -339,6 +340,14 @@ namespace ArenaHelper
             if (oncheroclick != null)
             {
                 oncheroclick(9);
+            }
+        }
+
+        private void CHero10MouseUp(object sender, RoutedEventArgs e)
+        {
+            if (oncheroclick != null)
+            {
+                oncheroclick(10);
             }
         }
 

@@ -31,11 +31,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HearthMirror">
-      <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\HearthMirror.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\HearthMirror.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Hearthstone Deck Tracker">
-      <HintPath>..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MahApps.Metro">
@@ -125,6 +125,18 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="resources\heroes\druid.png" />
+    <Resource Include="resources\heroes\hunter.png" />
+    <Resource Include="resources\heroes\mage.png" />
+    <Resource Include="resources\heroes\paladin.png" />
+    <Resource Include="resources\heroes\priest.png" />
+    <Resource Include="resources\heroes\rogue.png" />
+    <Resource Include="resources\heroes\shaman.png" />
+    <Resource Include="resources\heroes\warlock.png" />
+    <Resource Include="resources\heroes\warrior.png" />
+    <Resource Include="resources\heroes\demon-hunter.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

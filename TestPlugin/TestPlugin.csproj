@@ -31,11 +31,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ArenaHelper">
-      <HintPath>..\..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Plugins\ArenaHelper\ArenaHelper.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Plugins\ArenaHelper\ArenaHelper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Hearthstone Deck Tracker">
-      <HintPath>..\..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Software\Games\Hearthstone Deck Tracker\Hearthstone Deck Tracker.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

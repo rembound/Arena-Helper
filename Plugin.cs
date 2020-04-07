@@ -199,7 +199,7 @@ namespace ArenaHelper
 
         public string Description
         {
-            get { return "Arena Helper is a plugin for Hearthstone Deck Tracker that tries to detect heroes and cards when drafting a Hearthstone arena deck. Detected cards are displayed alongside the value of the card, that is specified in ADWCTA's Arena Tier List. The created deck can be saved to Hearthstone Deck Tracker.\n\nFor more information and updates, check out:\nhttps://github.com/rembound/Arena-Helper\nhttp://rembound.com"; }
+            get { return "Arena Helper is a plugin for Hearthstone Deck Tracker that tries to detect heroes and cards when drafting a Hearthstone arena deck. Detected cards are displayed alongside the value of the card, that is specified in ADWCTA's Arena Tier List. The created deck can be saved to Hearthstone Deck Tracker.\n\nFor more information and updates, check out:\nhttps://github.com/rembound/Arena-Helper\nhttps://rembound.com"; }
         }
 
         public string ButtonText
@@ -214,7 +214,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.9.2"); }
+            get { return new Version("0.9.3"); }
         }
 
         public MenuItem MenuItem
@@ -233,15 +233,16 @@ namespace ArenaHelper
 
                 // Set hero list
                 herolist.Clear();
-                herolist.Add(new HeroData(0, "Warrior", "warrior_small.png"));
-                herolist.Add(new HeroData(1, "Shaman", "shaman_small.png"));
-                herolist.Add(new HeroData(2, "Rogue", "rogue_small.png"));
-                herolist.Add(new HeroData(3, "Paladin", "paladin_small.png"));
-                herolist.Add(new HeroData(4, "Hunter", "hunter_small.png"));
-                herolist.Add(new HeroData(5, "Druid", "druid_small.png"));
-                herolist.Add(new HeroData(6, "Warlock", "warlock_small.png"));
-                herolist.Add(new HeroData(7, "Mage", "mage_small.png"));
-                herolist.Add(new HeroData(8, "Priest", "priest_small.png"));
+                herolist.Add(new HeroData(0, "Warrior", "warrior.png"));
+                herolist.Add(new HeroData(1, "Shaman", "shaman.png"));
+                herolist.Add(new HeroData(2, "Rogue", "rogue.png"));
+                herolist.Add(new HeroData(3, "Paladin", "paladin.png"));
+                herolist.Add(new HeroData(4, "Hunter", "hunter.png"));
+                herolist.Add(new HeroData(5, "Druid", "druid.png"));
+                herolist.Add(new HeroData(6, "Warlock", "warlock.png"));
+                herolist.Add(new HeroData(7, "Mage", "mage.png"));
+                herolist.Add(new HeroData(8, "Priest", "priest.png"));
+                herolist.Add(new HeroData(9, "Demon Hunter", "demon-hunter.png"));
 
                 AddMenuItem();
 
@@ -376,8 +377,9 @@ namespace ArenaHelper
             SetHeroControl(arenawindow.CHero6, herolist[6].name);
             SetHeroControl(arenawindow.CHero7, herolist[7].name);
             SetHeroControl(arenawindow.CHero8, herolist[8].name);
+            SetHeroControl(arenawindow.CHero9, herolist[9].name);
 
-            arenawindow.CHero9.HeroName.Text = "Cancel";
+            arenawindow.CHero10.HeroName.Text = "Cancel";
             arenawindow.Update();
         }
 
@@ -1902,7 +1904,7 @@ namespace ArenaHelper
             HeroData hero = GetHero(arenadata.pickedhero);
             if (hero != null)
             {
-                arenawindow.PickedHeroImage.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero.image, UriKind.Relative));
+                arenawindow.PickedHeroImage.Source = new BitmapImage(new Uri("pack://application:,,,/ArenaHelper;component/resources/heroes/" + hero.image));
             }
             else
             {
@@ -1946,7 +1948,8 @@ namespace ArenaHelper
             if (hero == null)
                 return;
 
-            herocontrol.HeroImage.Source = new BitmapImage(new Uri(@"/HearthstoneDeckTracker;component/Resources/" + hero.image, UriKind.Relative));
+            herocontrol.HeroImage.Source = new BitmapImage(new Uri("pack://application:,,,/ArenaHelper;component/resources/heroes/" + hero.image));
+            
             herocontrol.HeroName.Text = hero.name;
         }
 
