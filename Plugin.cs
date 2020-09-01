@@ -71,12 +71,14 @@ namespace ArenaHelper
         public class HeroData
         {
             public int index;
+            public string id;
             public string name;
             public string image;
 
-            public HeroData(int index, string name, string image)
+            public HeroData(int index, string id, string name, string image)
             {
                 this.index = index;
+                this.id = id;
                 this.name = name;
                 this.image = image;
             }
@@ -138,7 +140,7 @@ namespace ArenaHelper
         private DateTime loglasttime = DateTime.MinValue;
         private string loglastline = "";
         private DateTime loglastchoice = DateTime.MinValue;
-        private string loglastheroname = "";
+        private string loglastheroid = "";
         private string loglastcardid = "";
         //"DraftManager.OnChosen(): hero=HERO_03 premium=STANDARD"
         public static readonly Regex HeroChosenRegex = new Regex(@"DraftManager\.OnChosen\(\): hero=(?<id>(.+)) .*");
@@ -214,7 +216,7 @@ namespace ArenaHelper
 
         public Version Version
         {
-            get { return new Version("0.9.4"); }
+            get { return new Version("0.9.5"); }
         }
 
         public MenuItem MenuItem
@@ -233,16 +235,16 @@ namespace ArenaHelper
 
                 // Set hero list
                 herolist.Clear();
-                herolist.Add(new HeroData(0, "Warrior", "warrior.png"));
-                herolist.Add(new HeroData(1, "Shaman", "shaman.png"));
-                herolist.Add(new HeroData(2, "Rogue", "rogue.png"));
-                herolist.Add(new HeroData(3, "Paladin", "paladin.png"));
-                herolist.Add(new HeroData(4, "Hunter", "hunter.png"));
-                herolist.Add(new HeroData(5, "Druid", "druid.png"));
-                herolist.Add(new HeroData(6, "Warlock", "warlock.png"));
-                herolist.Add(new HeroData(7, "Mage", "mage.png"));
-                herolist.Add(new HeroData(8, "Priest", "priest.png"));
-                herolist.Add(new HeroData(9, "Demon Hunter", "demon-hunter.png"));
+                herolist.Add(new HeroData(0, "Warrior", "Warrior", "warrior.png"));
+                herolist.Add(new HeroData(1, "Shaman", "Shaman", "shaman.png"));
+                herolist.Add(new HeroData(2, "Rogue", "Rogue", "rogue.png"));
+                herolist.Add(new HeroData(3, "Paladin", "Paladin", "paladin.png"));
+                herolist.Add(new HeroData(4, "Hunter", "Hunter", "hunter.png"));
+                herolist.Add(new HeroData(5, "Druid", "Druid", "druid.png"));
+                herolist.Add(new HeroData(6, "Warlock", "Warlock", "warlock.png"));
+                herolist.Add(new HeroData(7, "Mage", "Mage", "mage.png"));
+                herolist.Add(new HeroData(8, "Priest", "Priest", "priest.png"));
+                herolist.Add(new HeroData(9, "DemonHunter", "Demon Hunter", "demon-hunter.png"));
 
                 AddMenuItem();
 
@@ -368,16 +370,16 @@ namespace ArenaHelper
         {
             configurehero = false;
 
-            SetHeroControl(arenawindow.CHero0, herolist[0].name);
-            SetHeroControl(arenawindow.CHero1, herolist[1].name);
-            SetHeroControl(arenawindow.CHero2, herolist[2].name);
-            SetHeroControl(arenawindow.CHero3, herolist[3].name);
-            SetHeroControl(arenawindow.CHero4, herolist[4].name);
-            SetHeroControl(arenawindow.CHero5, herolist[5].name);
-            SetHeroControl(arenawindow.CHero6, herolist[6].name);
-            SetHeroControl(arenawindow.CHero7, herolist[7].name);
-            SetHeroControl(arenawindow.CHero8, herolist[8].name);
-            SetHeroControl(arenawindow.CHero9, herolist[9].name);
+            SetHeroControl(arenawindow.CHero0, herolist[0].id);
+            SetHeroControl(arenawindow.CHero1, herolist[1].id);
+            SetHeroControl(arenawindow.CHero2, herolist[2].id);
+            SetHeroControl(arenawindow.CHero3, herolist[3].id);
+            SetHeroControl(arenawindow.CHero4, herolist[4].id);
+            SetHeroControl(arenawindow.CHero5, herolist[5].id);
+            SetHeroControl(arenawindow.CHero6, herolist[6].id);
+            SetHeroControl(arenawindow.CHero7, herolist[7].id);
+            SetHeroControl(arenawindow.CHero8, herolist[8].id);
+            SetHeroControl(arenawindow.CHero9, herolist[9].id);
 
             arenawindow.CHero10.HeroName.Text = "Cancel";
             arenawindow.Update();
@@ -796,7 +798,7 @@ namespace ArenaHelper
             loglasttime = DateTime.MinValue;
             loglastline = "";
             loglastchoice = DateTime.MinValue;
-            loglastheroname = "";
+            loglastheroid = "";
             loglastcardid = "";
 
             previouscards.Clear();
@@ -930,28 +932,28 @@ namespace ArenaHelper
                 if (heromatch.Success)
                 {
                     // Hero chosen
-                    string heroname = Database.GetHeroNameFromId(heromatch.Groups["id"].Value, false);
-                    if (heroname != null)
+                    string heroid = Database.GetHeroNameFromId(heromatch.Groups["id"].Value, false);
+                    if (heroid != null)
                     {
-                        HeroData hero = GetHero(heroname);
+                        HeroData hero = GetHero(heroid);
                         if (hero != null)
                         {
                             // Hero choice detection, final
-                            Log.Info("AH Hero chosen: " + heroname);
+                            Log.Info("AH Hero chosen: " + heroid);
                             PickHero(hero.index);
                         }
                     }
                 }
                 else if (match.Success)
                 {
-                    string heroname = Database.GetHeroNameFromId(match.Groups["id"].Value, false);
-                    if (heroname != null)
+                    string heroid = Database.GetHeroNameFromId(match.Groups["id"].Value, false);
+                    if (heroid != null)
                     {
-                        if (GetHero(heroname) != null)
+                        if (GetHero(heroid) != null)
                         {
                             // Hero choice detection, not final
-                            Log.Info("AH Hero choice: " + heroname);
-                            loglastheroname = heroname;
+                            Log.Info("AH Hero choice: " + heroid);
+                            loglastheroid = heroid;
                         }
                     }
                     else
@@ -1298,25 +1300,25 @@ namespace ArenaHelper
             {
                 if (choices.Count == 3)
                 {
-                    List<string> heronames = new List<string>();
+                    List<string> heroids = new List<string>();
                     for (int i = 0; i < 3; i++)
                     {
                         Log.Info("Hero Choice: " + choices[i].Id);
-                        string heroname = Database.GetHeroNameFromId(choices[i].Id, false);
-                        if (heroname != null)
+                        string heroid = Database.GetHeroNameFromId(choices[i].Id, false);
+                        if (heroid != null)
                         {
-                            heronames.Add(heroname);
+                            heroids.Add(heroid);
                         }
                     }
-                    if (heronames.Count == 3)
+                    if (heroids.Count == 3)
                     {
                         arenadata.detectedheroes.Clear();
-                        arenadata.detectedheroes.Add(heronames[0]);
-                        arenadata.detectedheroes.Add(heronames[1]);
-                        arenadata.detectedheroes.Add(heronames[2]);
+                        arenadata.detectedheroes.Add(heroids[0]);
+                        arenadata.detectedheroes.Add(heroids[1]);
+                        arenadata.detectedheroes.Add(heroids[2]);
                         SaveArenaData();
 
-                        plugins.HeroesDetected(arenadata, heronames[0], heronames[1], heronames[2]);
+                        plugins.HeroesDetected(arenadata, heroids[0], heroids[1], heroids[2]);
 
                         // Show the heroes
                         UpdateDetectedHeroes();
@@ -1332,7 +1334,7 @@ namespace ArenaHelper
             // Big hero detected
 
             // Update gui
-            string bigheroname = loglastheroname;
+            string bigheroname = loglastheroid;
             int bigheroindex = -1;
             for (int i = 0; i < arenadata.detectedheroes.Count; i++)
             {
@@ -1399,7 +1401,7 @@ namespace ArenaHelper
             if (state == PluginState.Done)
                 return;
 
-            arenadata.pickedhero = herolist[heroindex].name;
+            arenadata.pickedhero = herolist[heroindex].id;
             SaveArenaData();
 
             UpdateHero();
@@ -1808,13 +1810,13 @@ namespace ArenaHelper
             return Database.GetCardFromId(id);
         }
 
-        public static HeroData GetHero(string name)
+        public static HeroData GetHero(string id)
         {
-            if (name != "")
+            if (id != "")
             {
                 for (int i = 0; i < herolist.Count; i++)
                 {
-                    if (herolist[i].name == name)
+                    if (herolist[i].id == id)
                     {
                         return herolist[i];
                     }
@@ -1941,15 +1943,14 @@ namespace ArenaHelper
             arenawindow.Update();
         }
 
-        private void SetHeroControl(Controls.Hero herocontrol, string heroname)
+        private void SetHeroControl(Controls.Hero herocontrol, string heroid)
         {
-            HeroData hero = GetHero(heroname);
+            HeroData hero = GetHero(heroid);
 
             if (hero == null)
                 return;
 
             herocontrol.HeroImage.Source = new BitmapImage(new Uri("pack://application:,,,/ArenaHelper;component/resources/heroes/" + hero.image));
-            
             herocontrol.HeroName.Text = hero.name;
         }
 
