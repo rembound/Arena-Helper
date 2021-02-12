@@ -1,11 +1,17 @@
 # Arena Helper
 
-Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/HearthSim/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in [The Lightforge: Hearthstone Arena Tier List](https://thelightforge.com/TierList). The created deck can be saved to Hearthstone Deck Tracker. Check out the [How To Install](https://github.com/rembound/Arena-Helper#how-to-install) guide below to download and install the plugin.
+Arena Helper is a plugin for [Hearthstone Deck Tracker](https://github.com/HearthSim/Hearthstone-Deck-Tracker) that helps drafting Hearthstone arena decks by showing an overlay with card values from a tier list. The plugin tries to detect the arena heroes and card choices. Detected cards are displayed alongside the value of the card, that is specified in *The Lightforge: Hearthstone Arena Tier List*. The created deck can be saved to Hearthstone Deck Tracker. Check out the [How To Install](https://github.com/rembound/Arena-Helper#how-to-install) guide below to download and install the plugin.
 
 ![Arena Helper](images/arena-helper-4.png?raw=true)
 Arena Helper uses [HearthMirror](https://github.com/HearthSim/HearthMirror) to extract the hero and card data from Hearthstone. Older versions of the plugin used perceptual hashing to detect the Hearthstone arena heroes and cards. The technique is based on the article [Looks Like It](http://www.hackerfactor.com/blog/?/archives/432-Looks-Like-It.html). Implementation details of a similar project can be found here: [Hearthstone Image Recognition](https://github.com/wittenbe/Hearthstone-Image-Recognition).
 
 More technical information about how the plugin used image recognition and how it calculated the perceptual hashes can be found in my article [Arena Helper](https://rembound.com/projects/arena-helper).
+
+## Project Status
+
+The Lightforge Arena Tier List which is used in Arena Helper was shut down by the creators, as a result there will be no more tier list updates.
+
+Thanks for your support! :thumbsup:
 
 ## Plugins For Arena Helper
 
@@ -49,7 +55,7 @@ Wait for the plugin to finish detecting the cards.
 
 ![Arena Helper](images/arena-helper-3.png?raw=true)
 
-Arena Helper has detected the cards and displays the value from [The Lightforge: Hearthstone Arena Tier List](http://thelightforge.com/TierList) in the window and the overlay.
+Arena Helper has detected the cards and displays the value from *The Lightforge: Hearthstone Arena Tier List* in the window and the overlay.
 
 ![Arena Helper](images/arena-helper-4.png?raw=true)
 
