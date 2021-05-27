@@ -149,7 +149,6 @@ namespace ArenaHelper
         }
 
         // Clean up auto updater
-        // TODO: When coming from 0.8 and skipping a version, how to add new files (they are removed if not synced)
         public static void CleanAutoUpdate()
         {
 

@@ -9,7 +9,7 @@ More technical information about how the plugin used image recognition and how i
 
 ## Project Status
 
-The Lightforge Arena Tier List which is used in Arena Helper was shut down by the creators, as a result there will be no more tier list updates.
+The Lightforge Arena Tier List which is used in Arena Helper was shut down by the creators, as a result there will be no more updates.
 
 Thanks for your support! :thumbsup:
 

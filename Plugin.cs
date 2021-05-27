@@ -201,7 +201,7 @@ namespace ArenaHelper
 
         public string Description
         {
-            get { return "Arena Helper is a plugin for Hearthstone Deck Tracker that tries to detect heroes and cards when drafting a Hearthstone arena deck. Detected cards are displayed alongside the value of the card, that is specified in ADWCTA's Arena Tier List. The created deck can be saved to Hearthstone Deck Tracker.\n\nFor more information and updates, check out:\nhttps://github.com/rembound/Arena-Helper\nhttps://rembound.com"; }
+            get { return "Arena Helper is a plugin for Hearthstone Deck Tracker that tries to detect heroes and cards when drafting a Hearthstone arena deck. Detected cards are displayed alongside the value of the card, that is specified in the Arena Tier List. The created deck can be saved to Hearthstone Deck Tracker.\n\nFor more information and updates, check out:\nhttps://github.com/rembound/Arena-Helper"; }
         }
 
         public string ButtonText
@@ -211,12 +211,12 @@ namespace ArenaHelper
 
         public string Author
         {
-            get { return "Rembound.com"; }
+            get { return "Rembound"; }
         }
 
         public Version Version
         {
-            get { return new Version("0.9.5"); }
+            get { return new Version("0.9.6"); }
         }
 
         public MenuItem MenuItem
@@ -859,7 +859,7 @@ namespace ArenaHelper
             try
             {
                 // Check for plugin updates
-                CheckUpdate();
+                // CheckUpdate();
             }
             catch (Exception e)
             {
